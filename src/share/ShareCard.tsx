@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { config } from '../app/config';
+import { brandSlug, config } from '../app/config';
 import s from '../app/pages/pages.module.css';
 import { Button } from '../components/Button';
 import { Field } from '../components/Field';
@@ -10,14 +10,7 @@ import type { SessionSummary } from '../storage/session';
 import { cardBlob, drawCard, type CardSize } from './card';
 import { cardContent, unitAvailable, type CardContent, type CardUnit } from './content';
 
-// ASCII only: some browsers drop non-ASCII download names and fall back to "download".
-const fileName = () =>
-  `${config.name
-    .replace(/ı/g, 'i')
-    .replace(/İ/g, 'I')
-    .normalize('NFD')
-    .replace(/[^A-Za-z0-9]+/g, '')
-    .toLowerCase()}-kart.png`;
+const fileName = () => `${brandSlug}-kart.png`;
 
 /** Size picker, live canvas preview, download/share buttons for any card content. */
 export function CardExport({ content }: { content: CardContent }) {

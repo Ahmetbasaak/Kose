@@ -219,3 +219,33 @@ a.modeCard:hover {
   font-size: 32px;
   font-weight: 700;
 }
+
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+.table thead th {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.table tbody th {
+  font-weight: 600;
+}
+
+/* Secondary buttons on the dark live card. */
+.onDark {
+  color: var(--corner-text);
+  border-color: var(--corner-muted);
+}
+.onDark:hover {
+  background: color-mix(in srgb, var(--corner-text) 12%, transparent);
+  color: var(--corner-text);
+}

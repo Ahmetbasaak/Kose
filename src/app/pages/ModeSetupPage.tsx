@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router';
 import { t } from '../../i18n';
 import { modeBySlug } from '../../modes/registry';
+import { ProGate } from '../../components/ProGate';
 import { NotFoundPage } from './NotFoundPage';
 import s from './pages.module.css';
 
@@ -10,7 +11,7 @@ export function ModeSetupPage() {
   const title = t(`modes.${mode.id}.title`);
   return (
     <div className={s.stack}>
-      <div className={s.spread}>
+      <div className={s.spread} data-noprint>
         <Link to="/" className={s.backLink}>
           {t('setup.back')}
         </Link>
@@ -18,7 +19,13 @@ export function ModeSetupPage() {
       </div>
       <h1 className={s.h1}>{title}</h1>
       {mode.Setup ? (
-        <mode.Setup />
+        mode.pro ? (
+          <ProGate feature={mode.pro}>
+            <mode.Setup />
+          </ProGate>
+        ) : (
+          <mode.Setup />
+        )
       ) : (
         <div className={s.card}>
           <h2>{t('setup.soonTitle')}</h2>

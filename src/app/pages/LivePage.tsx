@@ -34,7 +34,7 @@ export function LivePage() {
   const d = sessionDisplay(active, now);
   return (
     <div className={s.stack}>
-      <section className={s.liveCard} aria-label={active.label}>
+      <section className={s.liveCard} aria-label={active.label} data-level={d.level}>
         <div className={s.spread}>
           <span className={s.liveCaption}>{active.label}</span>
           <span className={s.liveCaption}>{d.caption}</span>

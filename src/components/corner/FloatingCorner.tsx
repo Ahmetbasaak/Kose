@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useEntitlements } from '../../app/entitlements';
 import { t } from '../../i18n';
 import { usePrefsStore, type Corner } from '../../storage/prefs';
 import { CornerView } from './CornerView';
@@ -35,6 +36,8 @@ function useViewportSize() {
 export function FloatingCorner() {
   const corner = usePrefsStore((s) => s.corner);
   const setCorner = usePrefsStore((s) => s.setCorner);
+  const opacity = usePrefsStore((s) => s.cornerOpacity);
+  const { can } = useEntitlements();
   const ref = useRef<HTMLDivElement>(null);
   const grab = useRef<Pos | null>(null);
   const [drag, setDrag] = useState<Pos | null>(null);
@@ -74,8 +77,9 @@ export function FloatingCorner() {
     <div
       ref={ref}
       className={styles.root}
+      data-noprint
       data-dragging={drag !== null}
-      style={{ left: pos.x, top: pos.y }}
+      style={{ left: pos.x, top: pos.y, opacity: can('cornerSettings') ? opacity / 100 : undefined }}
       title={t('timer.dragHint')}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}

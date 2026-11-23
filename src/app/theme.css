@@ -100,3 +100,39 @@ a:hover {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Presentation traffic light: recolours the corner window and the live card. White text stays ≥ 4.5:1. */
+[data-level='green'] {
+  --corner-bg: #166534;
+  --corner-muted: #e3f1e7;
+}
+[data-level='yellow'] {
+  --corner-bg: #854d0e;
+  --corner-muted: #fbeedd;
+}
+[data-level='red'] {
+  --corner-bg: #b91c1c;
+  --corner-muted: #fde8e8;
+}
+[data-level] {
+  --corner-accent: #ffffff;
+  transition: background-color 0.4s var(--ease);
+}
+
+/* "PDF olarak yazdır": the browser's print-to-PDF gets just the report, no chrome. */
+@media print {
+  [data-noprint],
+  [data-noprint] * {
+    display: none !important;
+  }
+  :root {
+    --bg: #fff;
+    --surface: #fff;
+    --text: #000;
+    --muted: #333;
+    --border: #999;
+  }
+  body {
+    background: #fff;
+  }
+}

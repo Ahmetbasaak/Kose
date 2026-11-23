@@ -44,3 +44,15 @@
 - Tekrarlayan geri sayımın linki bir sonraki tarihi sabit an olarak paylaşır.
 - Canlı sayfada "Paylaşılabilir kart" o anki durumun anlık görüntüsünden kart üretir.
 - OBS için URL oluşturucu arayüz yapılmadı; parametreler README'de.
+- Pro yetki katmanı: `useProStore` (localStorage) + `useEntitlements().can(feature)`; tüm Pro özellikleri tek plan, `ProFeature` listesi ileride kademeler için.
+- Geliştirici Pro anahtarı: `VITE_DEV_PRO_KEY` derlemede tanımlıysa `?gelistirici=<anahtar>` açar; tanımsızsa hiçbir şey yapmaz. İstemci tarafı olduğundan gizli değildir; yalnızca geliştirme.
+- Mod kaydında `pro` alanı artık gereken `ProFeature` (null = ücretsiz); kurulum ekranı `ProGate` ile kapılanır.
+- Excel: `write-excel-file` (dinamik import, ~20 KB gzip, yalnızca dışa aktarırken yüklenir). PDF: kütüphane yok; `window.print()` + `@media print` (`data-noprint` ile başlık, form, düğmeler gizlenir) → tarayıcının "PDF olarak kaydet"i.
+- Serbest çalışan: müşteri/proje/kayıtlar localStorage'da (`shortcut:` notlu); proje sayacı köşe oturumunun kendisi. Başka projeyi başlatmak çalışanı sormadan kaydeder ve değiştirir (`switchSession`); köşe penceresi kapanmaz. Kayıt, başladığı güne yazılır.
+- Geçmiş: IndexedDB'deki tüm bitmiş oturumlar; ay + mod filtresi, aylık toplam süre/kazanç/maliyet, Excel ve yazdırma.
+- Sunum sayacı: bölümler sırayla; bölümün son çeyreğinde (en az son dakika) sarı, tüm bölümler bitince kırmızı ve "+süre" ileri sayar. Her bölüm geçişinde nazik uyarı. Trafik ışığı, Pro temasını bastırır.
+- Temalar yalnızca köşe penceresine uygulanır (varsayılan, retro LCD, neon, kâğıt, minimal); uygulamanın geri kalanı açık/koyu sistem temasını izler.
+- Köşe ayarları: PiP boyutu (S/M/L; sonraki açılışta), saydamlık yalnızca sayfa içi widget'ta (PiP'te tarayıcı izin vermiyor), rakam boyutu %80–140.
+- Klavye kısayolları: P (duraklat/devam), B (bitir), K (köşe penceresini aç); metin alanında ve Ctrl/Alt/Cmd ile çalışmaz; PiP penceresinde de dinlenir.
+- Açılışta otomatik başlatma: son başlatılan oturum girdisi saklanır; açılışta oturum yoksa yeniden başlatılır, PiP tıklama gerektirdiğinden sayfa köşesinde.
+- Çoklu sayaç: köşe oturumundan bağımsız, sayfa içi ek sayaçlar (ileri ya da geri); her biri mutlak zaman damgalı, geri sayım bitince bir kez ses.

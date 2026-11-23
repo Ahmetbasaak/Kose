@@ -18,7 +18,7 @@ export function SessionRunner() {
   const dismissAlert = useSessionStore((s) => s.dismissAlert);
   const addStudyDay = usePrefsStore((s) => s.addStudyDay);
   const pipWin = usePipStore((s) => s.win);
-  const watching = active !== null && ['countdown', 'cycle', 'target'].includes(active.kind);
+  const watching = active !== null && ['countdown', 'cycle', 'target', 'sections'].includes(active.kind);
   const now = useNow(250, pipWin ?? window, watching);
   const ev = active && watching ? sessionEvents(active, now) : null;
 

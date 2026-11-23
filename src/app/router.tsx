@@ -6,6 +6,8 @@ import { LivePage } from './pages/LivePage';
 import { SummaryPage } from './pages/SummaryPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { OverlayPage } from './pages/OverlayPage';
+import { HistoryPage } from './pages/HistoryPage';
+import { SettingsPage } from './pages/SettingsPage';
 import { SharedCountdownPage } from './pages/SharedCountdownPage';
 
 export const router = createBrowserRouter([
@@ -17,6 +19,8 @@ export const router = createBrowserRouter([
       { path: '/sayac', element: <LivePage /> },
       { path: '/ozet', element: <SummaryPage /> },
       { path: '/sayim', element: <SharedCountdownPage /> },
+      { path: '/gecmis', element: <HistoryPage /> },
+      { path: '/ayarlar', element: <SettingsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },

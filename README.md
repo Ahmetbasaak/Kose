@@ -23,6 +23,17 @@ npm run preview    # paketi yerelde sun
 
 Plan: `PLAN.md`. Kararlar: `DECISIONS.md`.
 
+## Pro (geliştirme)
+
+Pro özellikleri tek bir yetki katmanından (`src/app/entitlements.ts`, `useEntitlements()`) açılır. Ödeme sağlayıcısı henüz yok.
+Geliştirirken Pro'yu açmak için derleme sırasında bir anahtar ver ve uygulamayı `?gelistirici=<anahtar>` ile aç:
+
+```bash
+VITE_DEV_PRO_KEY=yerel-anahtar npm run dev
+```
+
+Anahtar istemci paketine gömülür; yalnızca geliştirme içindir. **Üretim derlemesinde `VITE_DEV_PRO_KEY` tanımlama.**
+
 ## Paylaşım ve yayıncı
 
 - **Paylaşılan geri sayım:** `/sayim?ad=<başlık>&t=<unix saniye>`. Sunucu yok; linkte yalnızca başlık ve tarih var.

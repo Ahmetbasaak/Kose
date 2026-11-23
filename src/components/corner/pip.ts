@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { config } from '../../app/config';
+import { useProStore } from '../../app/entitlements';
+import { CORNER_SIZES, usePrefsStore } from '../../storage/prefs';
 
 interface DocumentPictureInPicture {
   requestWindow(options?: { width?: number; height?: number }): Promise<Window>;
@@ -35,7 +37,8 @@ function copyStyles(target: Document) {
 export async function openPip(): Promise<Window> {
   const open = usePipStore.getState().win;
   if (open) return open;
-  const win = await api()!.requestWindow({ width: 280, height: 140 });
+  const size = CORNER_SIZES[useProStore.getState().pro ? usePrefsStore.getState().cornerSize : 'm'];
+  const win = await api()!.requestWindow(size);
   copyStyles(win.document);
   win.document.documentElement.lang = document.documentElement.lang;
   win.document.title = config.name;

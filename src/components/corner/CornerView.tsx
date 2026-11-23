@@ -1,9 +1,11 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useFinishSession } from '../../app/actions';
 import { config } from '../../app/config';
 import type { SessionDisplay } from '../../app/sessionView';
 import { finishLabel, sessionDisplay } from '../../app/sessionView';
 import { t } from '../../i18n';
+import { useEntitlements } from '../../app/entitlements';
+import { usePrefsStore } from '../../storage/prefs';
 import { useSessionStore, type ActiveSession } from '../../storage/session';
 import { MoneyValue } from '../MoneyValue';
 import { useNow } from '../useNow';
@@ -21,8 +23,19 @@ interface FaceProps {
 
 /** Pure visual of the corner window; also used as the static preview on setup screens. */
 export function CornerFace({ label, display, variant, children }: FaceProps) {
+  const { can } = useEntitlements();
+  const theme = usePrefsStore((st) => st.cornerTheme);
+  const scale = usePrefsStore((st) => st.cornerScale);
   return (
-    <div className={styles.root} data-variant={variant} data-status={display.status}>
+    <div
+      className={styles.root}
+      data-variant={variant}
+      data-status={display.status}
+      data-level={display.level}
+      // The presentation traffic light outranks a decorative theme.
+      data-theme={can('themes') && !display.level ? theme : undefined}
+      style={can('cornerSettings') ? ({ '--corner-scale': scale / 100 } as CSSProperties) : undefined}
+    >
       <div className={styles.top}>
         <span className={styles.label}>
           {config.name} · {label}

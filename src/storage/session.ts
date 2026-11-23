@@ -8,9 +8,10 @@ import type { ModeId } from '../modes/registry';
 
 /**
  * stopwatch: counts up (meeting cost is a stopwatch with `meeting` set)
- * countdown: fixed length; work: shift clock; cycle: repeating `segments`; target: a calendar moment.
+ * countdown: fixed length; work: shift clock; cycle: repeating `segments`; target: a calendar moment;
+ * sections: presentation `segments` in order, then overtime.
  */
-export type TimerKind = 'stopwatch' | 'countdown' | 'work' | 'cycle' | 'target';
+export type TimerKind = 'stopwatch' | 'countdown' | 'work' | 'cycle' | 'target' | 'sections';
 
 export interface MeetingConfig {
   people: number;
@@ -28,8 +29,11 @@ export interface ActiveSession {
   /** Shift settings for kind 'work'; earnings come from the clock, not from the timer. */
   work?: WorkConfig | null;
   meeting?: MeetingConfig | null;
-  /** Segment lengths (ms) for kind 'cycle'. */
+  /** Segment lengths (ms) for kinds 'cycle' and 'sections'. */
   segments?: number[] | null;
+  sectionNames?: string[] | null;
+  /** Freelance project being timed. */
+  projectId?: string | null;
   target?: TargetRule | null;
   createdAt: number;
   /** Alerts already fired (one per boundary), so a reload never repeats one. */
@@ -51,12 +55,13 @@ export interface SessionSummary {
   focusMs?: number | null;
   /** The natural whole for a percentage: countdown length or net work day. */
   totalMs?: number | null;
+  projectId?: string | null;
   startedAt: number;
   endedAt: number;
 }
 
 export type StartInput = Pick<ActiveSession, 'modeId' | 'kind' | 'label' | 'durationMs'> &
-  Partial<Pick<ActiveSession, 'work' | 'meeting' | 'segments' | 'target'>>;
+  Partial<Pick<ActiveSession, 'work' | 'meeting' | 'segments' | 'sectionNames' | 'target' | 'projectId'>>;
 
 interface SessionState {
   active: ActiveSession | null;
@@ -83,6 +88,7 @@ export function summarize(a: ActiveSession, now: number): SessionSummary {
     meeting: a.meeting ?? null,
     focusMs: a.modeId === 'student' && a.segments ? timeInSegment(elapsed, a.segments, 0) : null,
     totalMs: a.work ? netDailyHours(a.work) * 3_600_000 : a.durationMs,
+    projectId: a.projectId ?? null,
     startedAt: a.createdAt,
     endedAt: now,
   };

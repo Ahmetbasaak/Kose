@@ -1,6 +1,10 @@
 import { Suspense, useState } from 'react';
 import { Button, ButtonLink } from '../../components/Button';
 import { LazyShareCard } from '../../share/lazy';
+import { downloadXlsx, hours } from '../../export/xlsx';
+import { brandSlug } from '../config';
+import { useEntitlements } from '../entitlements';
+import { formatTrDate } from '../sessionView';
 import { formatClock, formatMoney } from '../../engine/format';
 import { t } from '../../i18n';
 import { useSessionStore } from '../../storage/session';
@@ -12,6 +16,8 @@ const time = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digi
 export function SummaryPage() {
   const summary = useSessionStore((st) => st.lastSummary);
   const [sharing, setSharing] = useState(false);
+  const { can } = useEntitlements();
+  const canExport = can('export');
   if (!summary)
     return (
       <div className={s.stack}>
@@ -67,7 +73,7 @@ export function SummaryPage() {
           </div>
         )}
       </div>
-      <section className={`${s.card} ${s.stack}`} style={{ gap: 14 }} aria-labelledby="outputs-title">
+      <section className={`${s.card} ${s.stack}`} style={{ gap: 14 }} aria-labelledby="outputs-title" data-noprint>
         <h2 id="outputs-title" className={s.label} style={{ fontSize: 16 }}>
           {t('summary.outputs')}
         </h2>
@@ -75,18 +81,43 @@ export function SummaryPage() {
           <Button variant="primary" aria-expanded={sharing} onClick={() => setSharing(!sharing)}>
             {t('summary.shareCard')}
           </Button>
-          <Button disabled>
-            {t('summary.excel')} <span className={s.badge}>{t('home.pro')}</span>
+          <Button
+            disabled={!canExport}
+            onClick={() =>
+              void downloadXlsx(`${brandSlug}-ozet.xlsx`, [
+                {
+                  name: t('summary.title'),
+                  rows: [
+                    [
+                      t('history.label'),
+                      t('history.date'),
+                      `${t('summary.duration')} (saat)`,
+                      `${t('history.amount')} (₺)`,
+                    ],
+                    [
+                      summary.label,
+                      formatTrDate(summary.endedAt),
+                      hours(summary.elapsedMs),
+                      summary.earned ?? summary.cost ?? '',
+                    ],
+                  ],
+                },
+              ])
+            }
+          >
+            {t('summary.excel')} {!canExport && <span className={s.badge}>{t('home.pro')}</span>}
           </Button>
-          <Button disabled>
-            {t('summary.pdf')} <span className={s.badge}>{t('home.pro')}</span>
+          <Button disabled={!canExport} onClick={() => window.print()}>
+            {t('summary.pdf')} {!canExport && <span className={s.badge}>{t('home.pro')}</span>}
           </Button>
         </div>
         <p className={`${s.muted} ${s.small}`}>{t('summary.proNote')}</p>
       </section>
       {sharing && (
         <Suspense fallback={null}>
-          <LazyShareCard summary={summary} />
+          <div data-noprint>
+            <LazyShareCard summary={summary} />
+          </div>
         </Suspense>
       )}
       <div>

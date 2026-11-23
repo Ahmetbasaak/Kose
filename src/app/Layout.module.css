@@ -85,3 +85,22 @@
   font-weight: 600;
   cursor: pointer;
 }
+.nav {
+  display: flex;
+  gap: 4px;
+}
+.nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--text);
+}
+.nav a:hover,
+.nav a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--text);
+}

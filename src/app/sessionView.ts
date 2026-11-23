@@ -1,5 +1,6 @@
 import { targetState } from '../engine/calendar';
 import { cycleState } from '../engine/cycles';
+import { sectionState, type SectionLevel } from '../engine/sections';
 import { durationParts, formatClock, formatMoney } from '../engine/format';
 import { elapsedMs, finishAt, isRunning, remainingMs } from '../engine/timer';
 import { meetingCost, workState, type WorkConfig } from '../engine/work';
@@ -17,6 +18,8 @@ export interface SessionDisplay {
   /** Set when the value is money, so the kuruş digits can animate. */
   money?: number;
   canPause: boolean;
+  /** Presentation traffic light. */
+  level?: SectionLevel;
 }
 
 const DAY = 86_400_000;
@@ -114,6 +117,26 @@ export function sessionDisplay(s: ActiveSession, now: number): SessionDisplay {
         };
   }
 
+  if (s.kind === 'sections' && s.segments) {
+    const st = sectionState(elapsedMs(s.timer, now), s.segments);
+    const names = s.sectionNames ?? [];
+    const over = st.index >= s.segments.length;
+    return {
+      value: over
+        ? t('presentation.overtimeValue', { clock: formatClock(st.overtimeMs) })
+        : formatClock(st.remainingMs, 'ceil'),
+      status: running ? 'running' : 'paused',
+      caption: !running ? t('timer.paused') : over ? t('presentation.overtime') : (names[st.index] ?? ''),
+      sub: over
+        ? undefined
+        : st.index + 1 < names.length
+          ? t('presentation.next', { name: names[st.index + 1]! })
+          : t('presentation.last'),
+      level: st.level,
+      canPause: pausable,
+    };
+  }
+
   if (s.kind === 'cycle' && s.segments) {
     const c = cycleState(elapsedMs(s.timer, now), s.segments);
     return {
@@ -185,6 +208,15 @@ export function sessionEvents(s: ActiveSession, now: number): SessionEvents | nu
           : t('student.restMessage')
         : t('break.message');
     return { count: c.boundaries, lastAt: now - c.segmentElapsedMs, message, gentle: true };
+  }
+  if (s.kind === 'sections' && s.segments) {
+    const st = sectionState(elapsedMs(s.timer, now), s.segments);
+    const over = st.index >= s.segments.length;
+    const intoSection = over ? st.overtimeMs : s.segments[st.index]! - st.remainingMs;
+    const message = over
+      ? t('presentation.endMessage')
+      : t('presentation.sectionMessage', { name: s.sectionNames?.[st.index] ?? '' });
+    return { count: st.boundaries, lastAt: now - intoSection, message, gentle: true };
   }
   return null;
 }

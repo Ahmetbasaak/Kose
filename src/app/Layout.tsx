@@ -1,7 +1,8 @@
-import { Link, Outlet } from 'react-router';
+import { Link, NavLink, Outlet } from 'react-router';
 import { CornerHost } from '../components/corner/CornerHost';
 import { t } from '../i18n';
 import { config } from './config';
+import { ProBehaviors } from './ProBehaviors';
 import { SessionRunner } from './SessionRunner';
 import styles from './Layout.module.css';
 
@@ -11,18 +12,25 @@ export function Layout() {
       <a href="#main" className={styles.skip}>
         {t('app.skipToContent')}
       </a>
-      <header className={styles.header}>
+      <header className={styles.header} data-noprint>
         <Link to="/" className={styles.brand} aria-label={`${config.name} – ${t('app.home')}`}>
           <span className={styles.logo} aria-hidden="true" />
           {config.name}
         </Link>
+        <nav aria-label={t('app.nav')} className={styles.nav}>
+          <NavLink to="/gecmis">{t('app.navHistory')}</NavLink>
+          <NavLink to="/ayarlar">{t('app.navSettings')}</NavLink>
+        </nav>
       </header>
       <SessionRunner />
       <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
-      <footer className={styles.footer}>{t('app.privacyNote')}</footer>
+      <footer className={styles.footer} data-noprint>
+        {t('app.privacyNote')}
+      </footer>
       <CornerHost />
+      <ProBehaviors />
     </div>
   );
 }

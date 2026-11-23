@@ -1,8 +1,10 @@
 import { useNavigate } from 'react-router';
 import { closePip, isPipSupported, openPip } from '../components/corner/pip';
 import { t } from '../i18n';
+import { useFreelanceStore } from '../storage/freelance';
+import { usePrefsStore } from '../storage/prefs';
 import { addRecord } from '../storage/history';
-import { useSessionStore, type StartInput } from '../storage/session';
+import { summarize, useSessionStore, type SessionSummary, type StartInput } from '../storage/session';
 import { requestNotificationPermission } from './alerts';
 
 const isNarrow = () => window.matchMedia('(max-width: 639px)').matches;
@@ -33,22 +35,43 @@ export function useStartSession() {
   return async (input: StartInput, opts: { askNotify?: boolean } = {}) => {
     if (useSessionStore.getState().active && !window.confirm(t('setup.replaceConfirm'))) return;
     start(input);
+    usePrefsStore.getState().set({ lastStart: input });
     await launch();
     // After the PiP request: both need the click's user activation and PiP must go first.
     if (opts.askNotify) requestNotificationPermission();
   };
 }
 
+/** Persist a finished session: history DB, plus a time entry for a freelance project. */
+export function recordSummary(s: SessionSummary): void {
+  // History is a bonus: private mode or a full disk must not block finishing.
+  addRecord(s).catch(() => undefined);
+  if (s.modeId === 'freelance' && s.projectId)
+    useFreelanceStore
+      .getState()
+      .addEntry({ projectId: s.projectId, startedAt: s.startedAt, endedAt: s.endedAt, elapsedMs: s.elapsedMs });
+}
+
+/** Swap the running session for another without asking or closing the corner, saving the old one's time. */
+export function switchSession(input: StartInput): void {
+  const current = useSessionStore.getState().active;
+  if (current) recordSummary(summarize(current, Date.now()));
+  useSessionStore.getState().start(input);
+  usePrefsStore.getState().set({ lastStart: input });
+}
+
+const afterFinish = (s: SessionSummary | null) =>
+  // A calendar countdown has nothing to summarise; a freelance stop returns to the project list.
+  s?.kind === 'target' ? '/mod/geri-sayim' : s?.modeId === 'freelance' ? '/mod/serbest' : '/ozet';
+
 export function useFinishSession() {
   const navigate = useNavigate();
   const finish = useSessionStore((s) => s.finish);
   return () => {
     const summary = finish();
-    // History is a bonus: private mode or a full disk must not block finishing.
-    if (summary) addRecord(summary).catch(() => undefined);
+    if (summary) recordSummary(summary);
     closePip();
     window.focus();
-    // A calendar countdown has nothing to summarise; go back to the list.
-    void navigate(summary?.kind === 'target' ? '/mod/geri-sayim' : '/ozet');
+    void navigate(afterFinish(summary));
   };
 }
