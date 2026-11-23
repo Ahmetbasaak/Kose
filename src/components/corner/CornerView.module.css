@@ -1,0 +1,129 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--corner-bg);
+  color: var(--corner-text);
+  padding: 14px 16px;
+  border-radius: var(--radius);
+}
+.root[data-variant='window'] {
+  height: 100vh;
+  border-radius: 0;
+  padding: 10px 14px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--corner-muted);
+}
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--corner-muted);
+}
+.root[data-status='running'] .dot {
+  background: var(--corner-live);
+}
+.root[data-status='done'] .dot {
+  background: #fbbf24;
+}
+
+.value {
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+/* In the PiP window the number grows with the window. */
+.root[data-variant='window'] .value {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  font-size: clamp(28px, min(22vw, 42vh), 200px);
+}
+.root[data-status='done'] .value {
+  animation: pulse 1.2s var(--ease) 3;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 4px 12px;
+  flex-wrap: wrap;
+}
+.action {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--corner-text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.action:hover {
+  text-decoration: underline;
+}
+/* Desktop-only PiP window is mouse-driven and 140px tall; 44px targets would push the number out. */
+.root[data-variant='window'] .action {
+  min-height: 28px;
+  font-size: 13px;
+}
+.finish {
+  color: #7fe0d2;
+}
+.action:focus-visible {
+  box-shadow: 0 0 0 2px var(--corner-text);
+}
+
+.iconBtn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--corner-text);
+  cursor: pointer;
+}
+.iconBtn + .iconBtn {
+  margin-left: 0;
+}
+.iconBtn:hover {
+  background: rgb(255 255 255 / 0.16);
+}
+.iconBtn:focus-visible {
+  box-shadow: 0 0 0 2px var(--corner-text);
+}
+
+:global(.pip-body) {
+  margin: 0;
+  background: var(--corner-bg);
+  overflow: hidden;
+}

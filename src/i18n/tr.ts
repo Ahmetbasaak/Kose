@@ -1,0 +1,100 @@
+// Placeholders: {brand} is filled automatically from brand.config.json; others come from t(key, vars).
+export const tr = {
+  app: {
+    home: 'Ana sayfa',
+    skipToContent: 'İçeriğe geç',
+    privacyNote: 'Verilerin yalnızca bu cihazda saklanır. Hesap gerekmez.',
+    notFoundTitle: 'Burada sayacak bir şey yok',
+    notFoundBody: 'Aradığın sayfa bulunamadı.',
+    backHome: 'Ana sayfaya dön',
+  },
+  home: {
+    title: 'Ne sayacağız?',
+    lead: 'Bir mod seç. Sayaç, ekranının köşesinde küçük bir pencere olarak kalır.',
+    pro: 'PRO',
+    soon: 'Yakında',
+  },
+  modes: {
+    simple: { title: 'Basit sayaç', desc: 'Süre gir, bitince haber versin. Ya da sadece say.', hint: 'Girdi: süre' },
+    work: {
+      title: 'Mesai ve kazanç',
+      desc: 'Mesai bitimine kalan süre ve bugün kazandığın tutar, canlı.',
+      hint: 'Girdi: maaş, mesai saatleri',
+    },
+    countdowns: {
+      title: 'Geri sayımlar',
+      desc: 'Hafta sonuna, maaş gününe, tatile ne kaldı?',
+      hint: 'Hazır şablonlar',
+    },
+    meeting: {
+      title: 'Toplantı maliyeti',
+      desc: 'Toplantı boyunca akan maliyeti göster.',
+      hint: 'Girdi: kişi, saat ücreti',
+    },
+    break: { title: 'Mola hatırlatıcı', desc: 'Her 20 dakikada hafif bir hatırlatma.', hint: 'Girdi: aralık' },
+    student: { title: 'Öğrenci modu', desc: 'Pomodoro, çalışma serisi, sınav geri sayımı.', hint: 'Girdi: süreler' },
+    freelance: {
+      title: 'Serbest çalışan sayacı',
+      desc: 'Müşteri ve proje başına süre tut, rapora dök.',
+      hint: 'Çıktı: Excel, PDF',
+    },
+    presentation: { title: 'Sunum sayacı', desc: 'Bölüm süreleri, renkli uyarı.', hint: 'Girdi: bölümler' },
+  },
+  setup: {
+    back: '← Modlara dön',
+    modeLabel: 'Mod: {mode}',
+    preview: 'Önizleme',
+    startInCorner: 'Köşede başlat',
+    start: 'Başlat',
+    replaceConfirm: 'Çalışan bir sayaç var. Yenisini başlatırsan o biter. Devam edilsin mi?',
+    soonTitle: 'Bu mod yolda',
+    soonBody: 'Henüz hazır değil. Şimdilik basit sayaçla idare edelim.',
+    pipUnsupported: 'Bu tarayıcıda pencere diğer uygulamaların üstünde kalmaz; sayaç sayfanın köşesinde durur.',
+  },
+  simple: {
+    kindLegend: 'Ne tür sayaç?',
+    stopwatch: 'İleri say (kronometre)',
+    countdown: 'Geri say',
+    label: 'Ad (isteğe bağlı)',
+    labelPlaceholder: 'Örn. Çay demlensin',
+    defaultLabel: 'Sayaç',
+    minutes: 'Dakika',
+    seconds: 'Saniye',
+    durationError: 'Bir süre gir (en az 1 saniye).',
+  },
+  timer: {
+    pause: 'Duraklat',
+    resume: 'Devam et',
+    finish: 'Bitir ve özeti gör',
+    paused: 'Duraklatıldı',
+    running: 'Çalışıyor',
+    done: 'Süre doldu',
+    remaining: 'Kalan',
+    elapsed: 'Geçen',
+    openCorner: 'Köşede aç',
+    moveCorner: 'Köşeyi değiştir',
+    dragHint: 'Sürükleyip bir köşeye bırak',
+    mobileNote: 'Telefonda köşe penceresi yok. Sayfa açık kaldıkça sayaç burada akar.',
+    noActive: 'Şu an çalışan bir sayaç yok.',
+    newTimer: 'Yeni sayaç',
+  },
+  alert: {
+    doneTitle: 'Süre doldu',
+    doneBody: '{label} tamamlandı.',
+    dismiss: 'Tamam',
+  },
+  summary: {
+    title: 'Özet',
+    duration: 'Süre',
+    range: '{start} – {end}',
+    empty: 'Henüz bir özet yok. Bir sayaç başlat, bitince burada görürsün.',
+    newTimer: 'Yeni sayaç',
+  },
+  units: {
+    hm: '{h} s {m} dk',
+    ms: '{m} dk {s} sn',
+  },
+} as const;
+
+type Widen<T> = { [K in keyof T]: T[K] extends string ? string : Widen<T[K]> };
+export type Dictionary = Widen<typeof tr>;
