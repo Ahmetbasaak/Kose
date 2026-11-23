@@ -37,16 +37,23 @@ export interface WeekRow {
   ms: number;
 }
 
-/** Entries of one week grouped by (day, project), day order. An entry belongs to the day it started. */
-export function weekRows(entries: readonly TimeEntry[], weekStart: number): WeekRow[] {
-  const end = weekStart + 7 * 86_400_000;
+/**
+ * Entries in [start, end) (default: one week) grouped by (day, project), day order.
+ * An entry belongs to the day it started. `msOf` lets billing round each entry first.
+ */
+export function weekRows(
+  entries: readonly TimeEntry[],
+  weekStart: number,
+  end = weekStart + 7 * 86_400_000,
+  msOf: (e: TimeEntry) => number = (e) => e.elapsedMs,
+): WeekRow[] {
   const map = new Map<string, WeekRow>();
   for (const e of entries) {
     if (e.startedAt < weekStart || e.startedAt >= end) continue;
     const day = trDay(e.startedAt);
     const key = `${day}:${e.projectId}`;
     const row = map.get(key) ?? { day, projectId: e.projectId, ms: 0 };
-    row.ms += e.elapsedMs;
+    row.ms += msOf(e);
     map.set(key, row);
   }
   return [...map.values()].sort((a, b) => a.day - b.day || a.projectId.localeCompare(b.projectId));
@@ -58,3 +65,7 @@ export function totalsBy(rows: readonly WeekRow[], keyOf: (projectId: string) =>
   for (const r of rows) totals.set(keyOf(r.projectId), (totals.get(keyOf(r.projectId)) ?? 0) + r.ms);
   return totals;
 }
+
+/** Billing rounding: each entry rounded up to the next `minutes` (0 = exact). */
+export const roundUp = (ms: number, minutes: number) =>
+  minutes > 0 ? Math.ceil(ms / (minutes * 60_000)) * minutes * 60_000 : ms;

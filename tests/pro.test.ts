@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { amountFor, manualEntry, totalsBy, weekRows, type TimeEntry } from '../src/engine/freelance';
+import { amountFor, manualEntry, roundUp, totalsBy, weekRows, type TimeEntry } from '../src/engine/freelance';
 import { sectionState } from '../src/engine/sections';
 
 const MIN = 60_000;
@@ -72,5 +72,13 @@ describe('manual time entry', () => {
   it('bills hours × rate, nothing without a rate', () => {
     expect(amountFor(90 * MIN, 600)).toBe(900);
     expect(amountFor(90 * MIN, null)).toBeNull();
+  });
+});
+
+describe('billing rounding', () => {
+  it('rounds each entry up to the step', () => {
+    expect(roundUp(61 * MIN, 15)).toBe(75 * MIN);
+    expect(roundUp(60 * MIN, 15)).toBe(60 * MIN);
+    expect(roundUp(61 * MIN, 0)).toBe(61 * MIN);
   });
 });

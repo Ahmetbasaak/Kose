@@ -12,6 +12,8 @@ export interface Project {
   clientId: string;
   /** Optional ₺/hour for the report's amount column. */
   hourlyRate?: number | null;
+  /** false = internal work: counted as time, never billed. Missing = billable. */
+  billable?: boolean;
 }
 
 interface FreelanceState {
@@ -22,6 +24,10 @@ interface FreelanceState {
   /** Reuses a client with the same name (case-insensitive) or creates one. */
   addProject: (name: string, clientName: string, hourlyRate: number | null) => void;
   setRate: (projectId: string, hourlyRate: number | null) => void;
+  setBillable: (projectId: string, billable: boolean) => void;
+  /** Report rounding: each entry up to this many minutes (0 = exact). */
+  rounding: number;
+  setRounding: (minutes: number) => void;
   /** Deletes the project and its entries. */
   removeProject: (projectId: string) => void;
   addEntry: (e: Omit<TimeEntry, 'id'>) => void;
@@ -45,6 +51,10 @@ export const useFreelanceStore = create<FreelanceState>()(
         }),
       setRate: (projectId, hourlyRate) =>
         set((s) => ({ projects: s.projects.map((p) => (p.id === projectId ? { ...p, hourlyRate } : p)) })),
+      setBillable: (projectId, billable) =>
+        set((s) => ({ projects: s.projects.map((p) => (p.id === projectId ? { ...p, billable } : p)) })),
+      rounding: 0,
+      setRounding: (rounding) => set({ rounding }),
       removeProject: (projectId) =>
         set((s) => ({
           projects: s.projects.filter((p) => p.id !== projectId),

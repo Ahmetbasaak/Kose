@@ -6,7 +6,17 @@ import { daysClock, formatTrDate } from '../../app/sessionView';
 import { Button } from '../../components/Button';
 import { Field } from '../../components/Field';
 import { useNow } from '../../components/useNow';
-import { parseIsoDate, targetState, trMidnight, type TargetRule } from '../../engine/calendar';
+import {
+  businessDaysUntil,
+  parseIsoDate,
+  targetState,
+  toIcs,
+  trMidnight,
+  type TargetRule,
+} from '../../engine/calendar';
+import { brandSlug } from '../../app/config';
+
+const DAY = 86_400_000;
 import { parseTime } from '../../engine/work';
 import { upcomingHolidays } from '../../data/holidays';
 import { shareCountdownUrl } from '../../share/link';
@@ -32,7 +42,12 @@ function CountdownItem({ item, now }: { item: SavedCountdown; now: number }) {
             : t('countdowns.arrived')
           : daysClock(ts.remainingMs)}
       </span>
-      <span className={`${s.muted} ${s.small}`}>{formatTrDate(ts.at)}</span>
+      <span className={`${s.muted} ${s.small}`}>
+        {formatTrDate(ts.at)}
+        {!arrived &&
+          ts.remainingMs >= DAY &&
+          ` · ${t('countdowns.businessDays', { n: businessDaysUntil(now, ts.at, upcomingHolidays(now)) })}`}
+      </span>
       {item.unverified && <span className={`${s.muted} ${s.small}`}>{t('countdowns.unverified')}</span>}
       {shareMsg && (
         <span role="status" className={`${s.muted} ${s.small}`} style={{ overflowWrap: 'anywhere' }}>
@@ -67,6 +82,21 @@ function CountdownItem({ item, now }: { item: SavedCountdown; now: number }) {
           }}
         >
           {t('shared.shareLink')}
+        </Button>
+        <Button
+          onClick={() => {
+            const blob = new Blob([toIcs(item.title, item.rule, Date.now(), `${item.id}@kose`)], {
+              type: 'text/calendar',
+            });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${brandSlug}-${item.id.slice(0, 8)}.ics`;
+            document.body.append(a);
+            a.click();
+            a.remove();
+          }}
+        >
+          {t('countdowns.addToCalendar')}
         </Button>
         <Button aria-label={t('countdowns.removeLabel', { title: item.title })} onClick={() => remove(item.id)}>
           {t('countdowns.remove')}

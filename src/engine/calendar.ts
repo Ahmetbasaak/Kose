@@ -92,3 +92,56 @@ export function streak(days: readonly number[], today: number): number {
   }
   return n;
 }
+
+/**
+ * Working days (Mon–Fri, not a public holiday) after today up to and including the target day.
+ * "Maaş gününe 6 iş günü". `holidays` are [start, days] pairs in epoch ms (Turkey midnight).
+ */
+export function businessDaysUntil(
+  now: number,
+  target: number,
+  holidays: readonly { at: number; days: number }[],
+): number {
+  const off = new Set<number>();
+  for (const h of holidays) for (let i = 0; i < h.days; i++) off.add(trDay(h.at) + i);
+  let n = 0;
+  for (let d = trDay(now) + 1; d <= trDay(target); d++) {
+    const wd = trWeekday(d);
+    if (wd !== 0 && wd !== 6 && !off.has(d)) n++;
+  }
+  return n;
+}
+
+const icsText = (s: string) => s.replace(/[\\;,]/g, (c) => `\\${c}`).replace(/\r?\n/g, '\\n');
+const icsDate = (ms: number) => {
+  const { y, m, d } = trYmd(ms);
+  return `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}`;
+};
+const icsUtc = (ms: number) =>
+  new Date(ms)
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}/, '');
+
+/**
+ * Calendar file for a countdown: all-day for day targets, timed for a custom moment,
+ * and a repeating event for weekend / payday / yearly rules.
+ */
+export function toIcs(title: string, rule: TargetRule, now: number, uid: string): string {
+  const at = targetState(rule, now).at;
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Kose//TR', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT'];
+  lines.push(`UID:${uid}`, `DTSTAMP:${icsUtc(now)}`, `SUMMARY:${icsText(title)}`);
+  const midnight = (at + TR_OFFSET_MS) % DAY === 0;
+  if (rule.type === 'at' && !midnight) lines.push(`DTSTART:${icsUtc(at)}`, `DTEND:${icsUtc(at + 3_600_000)}`);
+  else
+    lines.push(
+      `DTSTART;VALUE=DATE:${icsDate(at)}`,
+      `DTEND;VALUE=DATE:${icsDate(at + (rule.type === 'weekend' ? 2 : 1) * DAY)}`,
+    );
+  if (rule.type === 'weekend') lines.push('RRULE:FREQ=WEEKLY;BYDAY=SA');
+  // shortcut: RFC 5545 skips months without that day (e.g. 31st); the app itself uses the month's last day.
+  if (rule.type === 'payday') lines.push(`RRULE:FREQ=MONTHLY;BYMONTHDAY=${rule.day}`);
+  if (rule.type === 'yearly') lines.push('RRULE:FREQ=YEARLY');
+  lines.push('END:VEVENT', 'END:VCALENDAR');
+  return lines.join('\r\n') + '\r\n';
+}

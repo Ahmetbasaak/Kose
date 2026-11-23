@@ -6,9 +6,9 @@ import { durationWords } from '../../app/sessionView';
 import { Button } from '../../components/Button';
 import { Field } from '../../components/Field';
 import { useNow } from '../../components/useNow';
-import { trWeekStart } from '../../engine/calendar';
+import { trMidnight, trWeekStart, trYmd } from '../../engine/calendar';
 import { formatClock, formatMoney } from '../../engine/format';
-import { amountFor, manualEntry, totalsBy, weekRows } from '../../engine/freelance';
+import { amountFor, manualEntry, roundUp, totalsBy, weekRows } from '../../engine/freelance';
 import { elapsedMs, isRunning } from '../../engine/timer';
 import { parseTrNumber, TR_OFFSET_MS } from '../../engine/work';
 import { downloadXlsx, hours } from '../../export/xlsx';
@@ -19,6 +19,7 @@ import { useSessionStore } from '../../storage/session';
 const DAY = 86_400_000;
 const LONG_RUN_MS = 8 * 3_600_000;
 const tz = { timeZone: 'Europe/Istanbul' } as const;
+const monthFmt = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric', ...tz });
 const dayFmt = new Intl.DateTimeFormat('tr-TR', { weekday: 'short', day: 'numeric', month: 'short', ...tz });
 const timeFmt = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit', ...tz });
 const isoFmt = new Intl.DateTimeFormat('sv-SE', tz); // yyyy-mm-dd
@@ -36,7 +37,10 @@ export function FreelanceSetup() {
   const startSession = useStartSession();
   const finishSession = useFinishSession();
   const now = useNow(1000);
-  const [weekStart, setWeekStart] = useState(() => trWeekStart(Date.now()));
+  // The report covers a week or a month around this anchor.
+  const [anchor, setAnchor] = useState(() => trWeekStart(Date.now()));
+  const [period, setPeriod] = useState<'week' | 'month'>('week');
+  const [clientFilter, setClientFilter] = useState('');
   const [name, setName] = useState('');
   const [clientName, setClientName] = useState('');
   const [rate, setRate] = useState('');
@@ -52,9 +56,22 @@ export function FreelanceSetup() {
 
   const projectById = (id: string) => projects.find((p) => p.id === id);
   const clientOf = (p: Project | undefined) => clients.find((c) => c.id === p?.clientId)?.name ?? '';
-  const rateOf = (pid: string) => projectById(pid)?.hourlyRate ?? null;
-  const rows = weekRows(entries, weekStart);
-  const anyRate = projects.some((p) => p.hourlyRate);
+  // Non-billable projects still count as time, never as money.
+  const rateOf = (pid: string) =>
+    projectById(pid)?.billable === false ? null : (projectById(pid)?.hourlyRate ?? null);
+  const { y: ay, m: am } = trYmd(anchor);
+  const rangeStart = period === 'week' ? trWeekStart(anchor) : trMidnight(ay, am, 1);
+  const rangeEnd = period === 'week' ? rangeStart + 7 * DAY : trMidnight(ay, am + 1, 1);
+  const shift = (dir: 1 | -1) => setAnchor(period === 'week' ? anchor + dir * 7 * DAY : trMidnight(ay, am + dir, 1));
+  const inFilter = (pid: string) => !clientFilter || projectById(pid)?.clientId === clientFilter;
+  const billMs = (ms: number) => roundUp(ms, store.rounding);
+  const rows = weekRows(
+    entries.filter((e) => inFilter(e.projectId)),
+    rangeStart,
+    rangeEnd,
+    (e) => billMs(e.elapsedMs),
+  );
+  const anyRate = projects.some((p) => p.hourlyRate && p.billable !== false);
   const total = rows.reduce((a, r) => a + r.ms, 0);
   const totalAmount = rows.reduce((a, r) => a + (amountFor(r.ms, rateOf(r.projectId)) ?? 0), 0);
   const clientTime = totalsBy(rows, (pid) => clientOf(projectById(pid)));
@@ -64,7 +81,7 @@ export function FreelanceSetup() {
     clientMoney.set(c, (clientMoney.get(c) ?? 0) + (amountFor(r.ms, rateOf(r.projectId)) ?? 0));
   }
   const weekEntries = entries
-    .filter((e) => e.startedAt >= weekStart && e.startedAt < weekStart + 7 * DAY)
+    .filter((e) => e.startedAt >= rangeStart && e.startedAt < rangeEnd && inFilter(e.projectId))
     .sort((a, b) => a.startedAt - b.startedAt);
   const thisWeekByProject = totalsBy(weekRows(entries, trWeekStart(now)), (pid) => pid);
   const running = active?.modeId === 'freelance' ? active : null;
@@ -104,7 +121,7 @@ export function FreelanceSetup() {
   };
 
   const exportExcel = () =>
-    downloadXlsx(`${brandSlug}-zaman-${isoFmt.format(weekStart)}.xlsx`, [
+    downloadXlsx(`${brandSlug}-zaman-${isoFmt.format(rangeStart)}.xlsx`, [
       {
         name: t('freelance.reportTitle'),
         rows: [
@@ -141,7 +158,7 @@ export function FreelanceSetup() {
             timeFmt.format(en.startedAt),
             timeFmt.format(en.endedAt),
             projectById(en.projectId)?.name ?? '',
-            hours(en.elapsedMs),
+            hours(billMs(en.elapsedMs)),
             en.note ?? '',
           ]),
         ],
@@ -186,6 +203,14 @@ export function FreelanceSetup() {
                       {isOn ? formatClock(live) : durationWords(thisWeekByProject.get(p.id) ?? 0)}
                     </span>
                   </div>
+                  <label className={`${s.radio} ${s.small}`} style={{ minHeight: 32 }}>
+                    <input
+                      type="checkbox"
+                      checked={p.billable !== false}
+                      onChange={(e) => store.setBillable(p.id, e.target.checked)}
+                    />
+                    {t('freelance.billable')}
+                  </label>
                   {paused && <span className={`${s.muted} ${s.small}`}>{t('freelance.paused')}</span>}
                   {isOn && live > LONG_RUN_MS && (
                     <p role="status" className={s.error}>
@@ -363,17 +388,79 @@ export function FreelanceSetup() {
       <section className={s.formCol} style={{ flexGrow: 1.4 }} aria-labelledby="fl-week">
         <div className={s.spread}>
           <h2 id="fl-week" className={s.modeTitle}>
-            {t('freelance.week', { start: dayLabel(weekStart / DAY + 0.5), end: dayLabel(weekStart / DAY + 6.5) })}
+            {period === 'week'
+              ? t('freelance.week', { start: dayLabel(rangeStart / DAY + 0.5), end: dayLabel(rangeStart / DAY + 6.5) })
+              : monthFmt.format(rangeStart + 12 * 3_600_000)}
           </h2>
           <span className={s.row} data-noprint>
-            <Button aria-label={t('freelance.prevWeek')} onClick={() => setWeekStart(weekStart - 7 * DAY)}>
+            <Button aria-label={t('freelance.prevWeek')} onClick={() => shift(-1)}>
               ‹
             </Button>
-            <Button aria-label={t('freelance.nextWeek')} onClick={() => setWeekStart(weekStart + 7 * DAY)}>
+            <Button aria-label={t('freelance.nextWeek')} onClick={() => shift(1)}>
               ›
             </Button>
           </span>
         </div>
+        <div className={s.row} data-noprint>
+          <fieldset className={s.fieldset} style={{ flexDirection: 'row', gap: 12 }}>
+            <legend className="visually-hidden">{t('freelance.period')}</legend>
+            {(['week', 'month'] as const).map((k) => (
+              <label key={k} className={s.radio}>
+                <input
+                  type="radio"
+                  name="fl-period"
+                  checked={period === k}
+                  onChange={() => {
+                    setPeriod(k);
+                    setAnchor(rangeStart);
+                  }}
+                />
+                {t(`freelance.periods.${k}`)}
+              </label>
+            ))}
+          </fieldset>
+          <div className={s.field}>
+            <label htmlFor="fl-client-filter" className={s.label}>
+              {t('freelance.clientFilter')}
+            </label>
+            <select
+              id="fl-client-filter"
+              className={s.input}
+              value={clientFilter}
+              onChange={(e) => setClientFilter(e.target.value)}
+            >
+              <option value="">{t('freelance.allClients')}</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={s.field}>
+            <label htmlFor="fl-rounding" className={s.label}>
+              {t('freelance.rounding')}
+            </label>
+            <select
+              id="fl-rounding"
+              className={s.input}
+              value={store.rounding}
+              aria-describedby="fl-rounding-note"
+              onChange={(e) => store.setRounding(Number(e.target.value))}
+            >
+              {([0, 5, 15, 30] as const).map((m) => (
+                <option key={m} value={m}>
+                  {t(`freelance.roundings.r${m}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {store.rounding > 0 && (
+          <p id="fl-rounding-note" className={`${s.muted} ${s.small}`}>
+            {t('freelance.roundNote')}
+          </p>
+        )}
         {rows.length === 0 ? (
           <p className={s.muted}>{t('freelance.empty')}</p>
         ) : (
