@@ -17,6 +17,10 @@ export const router = createBrowserRouter([
       },
       { path: '/gecmis', lazy: () => import('./pages/HistoryPage').then((m) => ({ Component: m.HistoryPage })) },
       { path: '/ayarlar', lazy: () => import('./pages/SettingsPage').then((m) => ({ Component: m.SettingsPage })) },
+      {
+        path: '/basarilar',
+        lazy: () => import('./pages/AchievementsPage').then((m) => ({ Component: m.AchievementsPage })),
+      },
       { path: '/fiyat', lazy: () => import('./pages/PricingPage').then((m) => ({ Component: m.PricingPage })) },
       { path: '/gizlilik', lazy: () => import('./pages/PrivacyPage').then((m) => ({ Component: m.PrivacyPage })) },
       { path: '*', lazy: () => import('./pages/NotFoundPage').then((m) => ({ Component: m.NotFoundPage })) },

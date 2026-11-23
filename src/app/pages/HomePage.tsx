@@ -10,6 +10,7 @@ import { useSessionStore } from '../../storage/session';
 import { useFinishSession, useStartSession } from '../actions';
 import { MONTHLY_HOURS } from '../../engine/work';
 import { sessionDisplay } from '../sessionView';
+import { AchievementsTeaser } from '../AchievementsTeaser';
 import { WeeklyCard } from '../WeeklyCard';
 import s from './pages.module.css';
 
@@ -141,6 +142,7 @@ export function HomePage() {
       <ActiveCard />
       <QuickStart />
       <WeeklyCard />
+      <AchievementsTeaser />
       {GROUPS.map((g) => (
         <section key={g} aria-labelledby={`grp-${g}`} className={s.stack} style={{ gap: 12 }}>
           <h2 id={`grp-${g}`} className={s.modeTitle}>

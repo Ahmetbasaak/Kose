@@ -46,6 +46,7 @@ export function Layout() {
       <footer className={styles.footer} data-noprint>
         <span>{t('app.privacyNote')}</span>
         <span className={styles.footerLinks}>
+          <Link to="/basarilar">{t('app.navAchievements')}</Link>
           <Link to="/gizlilik">{t('app.navPrivacy')}</Link>
           <Link to="/fiyat">{t('app.navPricing')}</Link>
         </span>

@@ -1,5 +1,6 @@
 import { Suspense, useRef, useState } from 'react';
 import { Button, ButtonLink } from '../../components/Button';
+import { AmbientControl } from '../../components/AmbientControl';
 import { InstallHint } from '../../components/InstallHint';
 import { LazyShareCard } from '../../share/lazy';
 import { isPipSupported, openPip, usePipStore } from '../../components/corner/pip';
@@ -99,6 +100,7 @@ export function LivePage() {
         <p className={`${s.lead} num`}>{equivalentsLine(d.money)}</p>
       )}
       {d.extra && <p className={`${s.muted} num`}>{d.extra}</p>}
+      {active.kind !== 'work' && !active.meeting && <AmbientControl />}
       {active.kind === 'work' && <p className={`${s.muted} ${s.small}`}>{t('work.disclaimer')}</p>}
       {!isPipSupported() && <p className={`${s.muted} ${s.small}`}>{t('timer.mobileNote')}</p>}
       {active.kind !== 'stopwatch' && active.kind !== 'work' && <InstallHint />}

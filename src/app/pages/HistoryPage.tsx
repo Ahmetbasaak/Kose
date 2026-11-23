@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from '../../components/Button';
 import { ProGate } from '../../components/ProGate';
-import { trMidnight, trYmd } from '../../engine/calendar';
+import { daysInMonth, trMidnight, trYmd } from '../../engine/calendar';
+import { BarChart, HBarList, type Bar } from '../../components/BarChart';
 import { formatClock, formatMoney } from '../../engine/format';
 import { downloadXlsx, hours } from '../../export/xlsx';
 import { t } from '../../i18n';
@@ -13,6 +14,8 @@ import { durationWords, formatTrDate } from '../sessionView';
 import s from './pages.module.css';
 
 const amountOf = (r: SessionSummary) => r.earned ?? r.cost ?? null;
+const hoursFmt = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 });
+const fmtHours = (h: number) => hoursFmt.format(h);
 
 function History() {
   const [month, setMonth] = useState(() => {
@@ -40,6 +43,33 @@ function History() {
   const earned = shown.reduce((a, r) => a + (r.earned ?? 0), 0);
   const cost = shown.reduce((a, r) => a + (r.cost ?? 0), 0);
   const modeTitle = (id: ModeId) => t(`modes.${id}.title`);
+
+  // Charts: hours per day of the month and per mode (calendar countdowns don't count as time).
+  const [yy, mm] = month.split('-').map(Number);
+  const timed = shown.filter((r) => r.kind !== 'target');
+  const perDay = new Map<number, number>();
+  for (const r of timed) perDay.set(trYmd(r.endedAt).d, (perDay.get(trYmd(r.endedAt).d) ?? 0) + r.elapsedMs);
+  const dayCount = yy && mm ? daysInMonth(yy, mm) : 30;
+  const dailyBars: Bar[] = Array.from({ length: dayCount }, (_, i) => {
+    const v = (perDay.get(i + 1) ?? 0) / 3_600_000;
+    return {
+      key: String(i + 1),
+      label: [1, 5, 10, 15, 20, 25, dayCount].includes(i + 1) ? String(i + 1) : '',
+      value: v,
+      tip: t('charts.dayTip', { day: `${i + 1}.${mm}`, v: t('charts.hours', { v: fmtHours(v) }) }),
+    };
+  });
+  const maxDay = Math.max(0, ...dailyBars.map((b) => b.value));
+  const perMode = new Map<ModeId, number>();
+  for (const r of timed) perMode.set(r.modeId, (perMode.get(r.modeId) ?? 0) + r.elapsedMs);
+  const modeBars = [...perMode]
+    .sort((a, b) => b[1] - a[1])
+    .map(([id, ms]) => ({
+      key: id,
+      label: modeTitle(id),
+      value: ms,
+      text: t('charts.hours', { v: fmtHours(ms / 3_600_000) }),
+    }));
 
   const exportExcel = () =>
     downloadXlsx(`${brandSlug}-gecmis-${month}.xlsx`, [
@@ -124,6 +154,13 @@ function History() {
           )}
         </div>
       </section>
+
+      {shown.length > 0 && (
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 24 }} data-noprint>
+          <BarChart bars={dailyBars} title={t('charts.daily')} maxLabel={t('charts.hours', { v: fmtHours(maxDay) })} />
+          <HBarList title={t('charts.byMode')} items={modeBars} />
+        </div>
+      )}
 
       {records && shown.length === 0 ? (
         <p className={s.muted}>{t('history.empty')}</p>

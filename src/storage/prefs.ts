@@ -23,6 +23,9 @@ interface PrefsState {
   /** Last work-mode settings, so the form is prefilled next time. Stays on this device. */
   lastWork: WorkConfig | null;
   setLastWork: (w: WorkConfig) => void;
+  /** Turkey day numbers with any finished session (streak across all modes). */
+  activeDays: number[];
+  addActiveDay: (day: number) => void;
   /** Turkey day numbers with at least one finished Pomodoro focus block. */
   studyDays: number[];
   addStudyDay: (day: number) => void;
@@ -82,6 +85,9 @@ export const usePrefsStore = create<PrefsState>()(
       lastWork: null,
       setLastWork: (lastWork) => set({ lastWork }),
       studyDays: [],
+      activeDays: [],
+      addActiveDay: (day) =>
+        set((s) => (s.activeDays.includes(day) ? s : { activeDays: [...s.activeDays, day].slice(-366) })),
       pomodoroDay: { day: 0, count: 0 },
       addPomodoros: (day, n) =>
         set((s) => ({ pomodoroDay: { day, count: (s.pomodoroDay.day === day ? s.pomodoroDay.count : 0) + n } })),

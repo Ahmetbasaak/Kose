@@ -15,7 +15,7 @@ const WEEK = 7 * 86_400_000;
 export function WeeklyCard() {
   const seen = usePrefsStore((st) => st.weeklySeenWeek);
   const setSeen = usePrefsStore((st) => st.setWeeklySeenWeek);
-  const studyDays = usePrefsStore((st) => st.studyDays);
+  const activeDays = usePrefsStore((st) => st.activeDays);
   const [data, setData] = useState<{ week: number; content: ReturnType<typeof weeklyContent> } | null>(null);
   const [sharing, setSharing] = useState(false);
 
@@ -28,10 +28,10 @@ export function WeeklyCard() {
         const stats = weeklyStats(records);
         // Nothing happened last week: nothing to show, don't ask again this week.
         if (stats.sessions === 0) setSeen(week);
-        else setData({ week, content: weeklyContent(stats, streak(studyDays, trDay(now))) });
+        else setData({ week, content: weeklyContent(stats, streak(activeDays, trDay(now))) });
       })
       .catch(() => undefined);
-  }, [seen, setSeen, studyDays]);
+  }, [seen, setSeen, activeDays]);
 
   if (!data || seen === data.week) return null;
   return (

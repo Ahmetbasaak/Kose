@@ -11,6 +11,7 @@ import { formatClock } from '../../engine/format';
 import { trDay } from '../../engine/work';
 import { t } from '../../i18n';
 import { usePrefsStore } from '../../storage/prefs';
+import { AmbientControl } from '../../components/AmbientControl';
 import { StartFooter } from '../StartFooter';
 
 const valid = (n: number) => Number.isInteger(n) && n >= 1 && n <= 180;
@@ -124,6 +125,7 @@ export function StudentSetup() {
               {t('student.error')}
             </p>
           )}
+          <AmbientControl />
           <StartFooter />
         </form>
         <div className={s.previewCol}>

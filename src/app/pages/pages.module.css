@@ -307,3 +307,43 @@ a.modeCard:hover {
 .liveCard:fullscreen .liveValue {
   font-size: min(26vw, 48vh);
 }
+
+/* Achievements */
+.badgeGrid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+  gap: 12px;
+}
+.badgeItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.badgeItem[data-earned='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.badgeMark {
+  font-size: 22px;
+  color: var(--accent);
+}
+.yearGrid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 24px;
+  margin: 0;
+}
+.yearGrid dt {
+  color: var(--muted);
+}
+.yearGrid dd {
+  margin: 0;
+  font-weight: 600;
+}

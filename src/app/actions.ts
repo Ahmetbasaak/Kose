@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router';
 import { closePip, isPipSupported, openPip } from '../components/corner/pip';
+import { trDay } from '../engine/work';
 import { t } from '../i18n';
 import { useFreelanceStore } from '../storage/freelance';
 import { usePrefsStore } from '../storage/prefs';
@@ -51,6 +52,7 @@ export function recordSummary(s: SessionSummary): void {
     if (usePrefsStore.getState().workRecordedDay === s.shiftDay) return;
     usePrefsStore.getState().set({ workRecordedDay: s.shiftDay });
   }
+  usePrefsStore.getState().addActiveDay(trDay(s.endedAt));
   // History is a bonus: private mode or a full disk must not block finishing.
   addRecord(s).catch(() => undefined);
   if (s.modeId === 'freelance' && s.projectId)
