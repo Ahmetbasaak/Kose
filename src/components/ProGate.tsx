@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Link } from 'react-router';
 import s from '../app/pages/pages.module.css';
 import { useEntitlements, type ProFeature } from '../app/entitlements';
 import { t } from '../i18n';
@@ -14,6 +15,9 @@ export function ProGate({ feature, children }: { feature: ProFeature; children: 
       </span>
       <h2 className={s.modeTitle}>{t('pro.gateTitle')}</h2>
       <p className={s.muted}>{t('pro.gateBody')}</p>
+      <Link to="/fiyat" className={s.backLink}>
+        {t('pro.gateLink')}
+      </Link>
     </div>
   );
 }

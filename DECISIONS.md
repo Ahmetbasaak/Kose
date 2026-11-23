@@ -64,3 +64,9 @@
 - E2E için ayrı test derlemesi `VITE_DEV_PRO_KEY=e2e-only-key` ile yapılır (Pro ekranlarına ulaşmak için); bu derleme yayına alınmamalı. CI ana `npm run build`'i anahtarsız yapar.
 - `@axe-core/playwright` kendi `playwright-core` sürümünü getiriyordu; `overrides` ile @playwright/test (1.63.0) sürümüne sabitlendi.
 - E2E'de PiP kapatılıp sayfa içi pencere test ediliyor; gerçek PiP penceresi elle kontrol gerektiriyor.
+- Ödeme sınırı: `LicenseAdapter { name, checkoutUrl, activate(key) }`; varsayılan `noProvider` her denemede `not-configured` döner. `activateLicense` anahtar biçimini (8–128, harf/rakam/tire) sağlayıcıya göndermeden doğrular, başarıda `grant('license')`; sağlayıcı hatası `network` sayılır, Pro açılmaz.
+- Lisans formu `/fiyat`'ta (Pro değilken). Satın alma düğmesi yalnızca adaptör `checkoutUrl` verince görünür.
+- Fiyat sayfası tek tablo: satırlar özellik grupları, sütunlar Ücretsiz/Pro; fiyatlar `brand.config.json`'dan.
+- Gizlilik sayfası taslak işaretli; sağlayıcı adları gibi bilinmeyen bilgiler `[YAYINDAN ÖNCE: …]` yer tutucusu, hukuki iddia yok.
+- Dağıtım: Cloudflare Pages (`public/_headers`, `public/_redirects`) ve Vercel (`vercel.json`) aynı CSP ve başlıklarla. CSP `style-src 'unsafe-inline'` içerir (React stil öznitelikleri ve PiP'e kopyalanan stiller); betik yalnızca `'self'`. `frame-ancestors 'none'` (OBS Browser Source çerçeve değil, etkilenmez).
+- CSP e2e testi dağıtılan politikayı yerel sunucuya enjekte edip PiP, kart ve overlay akışında ihlal olmadığını; iki dosyanın aynı CSP'yi taşıdığını doğrular.

@@ -3,7 +3,9 @@
 Ekranın köşesinde duran küçük sayaç penceresi. Statik PWA: hesap yok, sunucu yok, veri yalnızca cihazda.
 Çalışma adı geçicidir; marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
 
-## Komutlar
+## Kurulum
+
+Node 22 gerekir.
 
 ```bash
 npm install
@@ -24,13 +26,23 @@ npm run e2e        # Playwright: akışlar, çevrimdışı, axe erişilebilirlik
 - `src/storage/` — Zustand store'ları; aktif oturum localStorage'da kalıcı.
 - `src/components/corner/` — Köşe penceresi: Document Picture-in-Picture (Chromium) varsa ayrı üstte kalan pencere, yoksa sayfa içi sürüklenebilir, köşeye yapışan widget.
 - `src/modes/` — modlar ve kayıt defteri (`registry.ts`).
-- `src/i18n/` — tüm arayüz metinleri (`tr.ts`).
+- `src/app/` — router, kabuk, sayfalar, oturum görünümü (`sessionView.ts`), başlat/bitir eylemleri, Pro yetkisi (`entitlements.ts`) ve ödeme sınırı (`license.ts`).
+- `src/i18n/` — tüm arayüz metinleri (`tr.ts`). Yeni dil = aynı şekilde yeni sözlük.
+- `src/share/` — paylaşım kartı (canvas), haftalık özet, URL ile paylaşılan geri sayım ve OBS parametreleri.
+- `src/export/` — Excel (`write-excel-file`, yalnızca dışa aktarırken yüklenir). PDF, tarayıcının yazdırma → PDF'i ile.
+- `src/data/holidays.tr.json` — resmî tatiller (doğrulanmamış kayıtlar `"verified": false`).
+- Depolama: ayarlar, aktif oturum, geri sayımlar, serbest çalışan kayıtları localStorage'da; bitmiş oturum geçmişi IndexedDB'de. Hiçbiri cihazdan çıkmaz.
 
 Plan: `PLAN.md`. Kararlar: `DECISIONS.md`.
 
-## Pro (geliştirme)
+## Pro ve ödeme
 
-Pro özellikleri tek bir yetki katmanından (`src/app/entitlements.ts`, `useEntitlements()`) açılır. Ödeme sağlayıcısı henüz yok.
+Pro özellikleri tek bir yetki katmanından (`src/app/entitlements.ts`, `useEntitlements()`) açılır. Fiyatlar `brand.config.json` → `pricing` (şimdilik `[FİYAT]` yer tutucusu); karşılaştırma tablosu `/fiyat`.
+
+Ödeme sağlayıcısı henüz bağlı değil. Bağlamak için `src/app/license.ts` içinde bir `LicenseAdapter` yaz (`name`, `checkoutUrl`, `activate(key)`) ve `licenseAdapter`'a ata; arayüz (`/fiyat` lisans formu) hazır. Sunucu olmadığı için sağlayıcının tarayıcıdan çağrılabilen bir lisans doğrulama uç noktası olmalı (ör. Lemon Squeezy License API, Gumroad license verify). O alan adını CSP `connect-src`'ye ekle (`public/_headers`, `vercel.json`).
+
+### Geliştirmede Pro
+
 Geliştirirken Pro'yu açmak için derleme sırasında bir anahtar ver ve uygulamayı `?gelistirici=<anahtar>` ile aç:
 
 ```bash
@@ -55,9 +67,21 @@ Anahtar istemci paketine gömülür; yalnızca geliştirme içindir. **Üretim d
 
 Örnek: `/overlay?sure=10&ad=Mola&renk=ffffff&boyut=140`
 
+## Dağıtım
+
+Statik site: `npm run build` çıktısı `dist/`.
+
+- **Cloudflare Pages:** derleme komutu `npm run build`, çıktı dizini `dist`. `public/_redirects` (SPA yönlendirmesi) ve `public/_headers` (CSP, güvenlik ve önbellek başlıkları) pakete kopyalanır.
+- **Vercel:** `vercel.json` aynı yönlendirme ve başlıkları içerir; çerçeve "Vite", çıktı `dist`.
+
+İki dosyadaki CSP aynı olmalı; `npm run e2e` bunu ve uygulamanın bu CSP altında (PiP dahil) çalıştığını kontrol eder.
+
 ## Yayından önce yapılacaklar
 
-- [ ] Resmî tatil/bayram verisini (`src/data/holidays.tr.json`, Faz 3) resmî kaynaktan doğrula; `"verified": false` kalan kayıt olmasın.
-- [ ] Marka adı ve alan adı müsaitlik kontrolü; `brand.config.json` güncelle.
-- [ ] Ödeme sağlayıcısını seç (Faz 7 adapter'ı).
-- [ ] Gizlilik metnini hukukçuya incelet.
+- [ ] Resmî tatil/bayram verisini (`src/data/holidays.tr.json`) Resmî Gazete ve Diyanet takviminden doğrula; doğrulananları `"verified": true` yap. 2027 Kurban Bayramı'nın ilk günü kaynaklarda 16/17 Mayıs diye farklı geçiyor.
+- [ ] Marka adı ve alan adı müsaitlik kontrolü (alan adı, marka tescili, uygulama mağazası adları); `brand.config.json` → `name`, `domain`.
+- [ ] Ödeme sağlayıcısını seç, `src/app/license.ts` adaptörünü yaz, fiyatları `brand.config.json` → `pricing`'e işle, sağlayıcının API alan adını CSP `connect-src`'ye ekle.
+- [ ] Gizlilik metnini (`/gizlilik`, `src/i18n/tr.ts` → `privacy`) hukukçuya incelet (KVKK); `[YAYINDAN ÖNCE: …]` yer tutucularını doldur (barındırma ve ödeme sağlayıcısı).
+- [ ] Üretim derlemesinde `VITE_DEV_PRO_KEY` tanımlı olmadığını kontrol et.
+- [ ] Gerçek Chrome/Edge'de köşe penceresini (PiP) ve bildirim iznini elle dene; telefonda PWA kurulumunu dene.
+- [ ] `public/pwa-*.png` ikonlarını marka kesinleşince yeniden üret.

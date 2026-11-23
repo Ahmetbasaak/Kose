@@ -34,7 +34,11 @@ export function Layout() {
         <Outlet />
       </main>
       <footer className={styles.footer} data-noprint>
-        {t('app.privacyNote')}
+        <span>{t('app.privacyNote')}</span>
+        <span className={styles.footerLinks}>
+          <Link to="/gizlilik">{t('app.navPrivacy')}</Link>
+          <Link to="/fiyat">{t('app.navPricing')}</Link>
+        </span>
       </footer>
       <CornerHost />
       <ProBehaviors />

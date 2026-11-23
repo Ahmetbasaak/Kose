@@ -132,3 +132,18 @@
     display: inline-flex !important;
   }
 }
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  justify-content: space-between;
+}
+.footerLinks {
+  display: flex;
+  gap: 16px;
+}
+.footerLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

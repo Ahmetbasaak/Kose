@@ -18,6 +18,8 @@ const PAGES = [
   '/gecmis',
   '/ayarlar',
   '/sayim?ad=S%C4%B1nav&t=1812574800',
+  '/fiyat',
+  '/gizlilik',
   '/bilinmeyen-sayfa',
 ];
 
@@ -86,4 +88,14 @@ test.describe('axe with live UI', () => {
     const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(violations).toEqual([]);
   });
+});
+
+test('pricing without Pro: license form, failed activation, accessible', async ({ page }) => {
+  await page.goto('/fiyat');
+  await page.getByRole('textbox', { name: 'Lisans anahtarı' }).fill('ABCD-1234-EFGH');
+  await page.getByRole('button', { name: 'Etkinleştir' }).click();
+  await expect(page.getByRole('alert')).toHaveText('Lisans etkinleştirme henüz açık değil.');
+  const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  expect(violations.map((v) => v.id)).toEqual([]);
+  await page.screenshot({ path: 'test-results/pricing.png', fullPage: true });
 });

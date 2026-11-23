@@ -83,6 +83,10 @@ Köşe penceresi: `documentPictureInPicture` varsa React portal ile PiP penceres
 - Fiyat sayfası (config'den yer tutucu fiyatlar), lisans arayüzü + adapter sınırı (`license.ts`)
 - Gizlilik sayfası taslağı, Cloudflare Pages / Vercel yapılandırması, README ("yayından önce yapılacaklar")
 
+## Durum
+
+Faz 0–7 tamamlandı. Ayrıntılar commit geçmişinde ve `DECISIONS.md`'de; yayın öncesi kalanlar README'deki listede.
+
 ## Açık sorular (kullanıcıya)
 
 - Marka adı / alan adı (şimdilik "Köşe", `brand.config.json`)
