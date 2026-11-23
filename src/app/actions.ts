@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { closePip, isPipSupported, openPip } from '../components/corner/pip';
 import { t } from '../i18n';
+import { addRecord } from '../storage/history';
 import { useSessionStore, type StartInput } from '../storage/session';
 import { requestNotificationPermission } from './alerts';
 
@@ -43,6 +44,8 @@ export function useFinishSession() {
   const finish = useSessionStore((s) => s.finish);
   return () => {
     const summary = finish();
+    // History is a bonus: private mode or a full disk must not block finishing.
+    if (summary) addRecord(summary).catch(() => undefined);
     closePip();
     window.focus();
     // A calendar countdown has nothing to summarise; go back to the list.

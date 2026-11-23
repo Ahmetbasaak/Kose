@@ -23,6 +23,22 @@ npm run preview    # paketi yerelde sun
 
 Plan: `PLAN.md`. Kararlar: `DECISIONS.md`.
 
+## Paylaşım ve yayıncı
+
+- **Paylaşılan geri sayım:** `/sayim?ad=<başlık>&t=<unix saniye>`. Sunucu yok; linkte yalnızca başlık ve tarih var.
+- **OBS "Browser Source":** `/overlay` — arka plan şeffaf, başlık/alt bilgi yok.
+
+| Parametre   | Anlamı                                                  | Örnek          |
+| ----------- | ------------------------------------------------------- | -------------- |
+| `t`         | Bu ana kadar geri say (unix saniye)                     | `t=1812574800` |
+| `sure`      | Sayfa açıldığından itibaren dakika geri say (`t` yoksa) | `sure=10`      |
+| _(hiçbiri)_ | Sayfa açıldığından itibaren ileri say                   |                |
+| `ad`        | Üstte küçük başlık (en çok 60 karakter)                 | `ad=Mola`      |
+| `renk`      | Yazı rengi, `#` olmadan hex                             | `renk=ffcc00`  |
+| `boyut`     | Rakam boyutu, piksel (16–400, varsayılan 96)            | `boyut=140`    |
+
+Örnek: `/overlay?sure=10&ad=Mola&renk=ffffff&boyut=140`
+
 ## Yayından önce yapılacaklar
 
 - [ ] Resmî tatil/bayram verisini (`src/data/holidays.tr.json`, Faz 3) resmî kaynaktan doğrula; `"verified": false` kalan kayıt olmasın.

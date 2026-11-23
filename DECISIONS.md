@@ -34,3 +34,13 @@
 - Tatil verisi: 2027 ve 1 Ocak 2028 resmî günleri. Dinî bayram tarihleri Diyanet takvimine atıf yapan haberlerden (Ramazan 9–11 Mart, Kurban 16–19 Mayıs 2027); tüm kayıtlar `verified: false`, arayüzde "doğrulanmadı" notuyla gösterilir.
 - Çalışma serisi: bir Pomodoro odak bloğu bittiği gün seriye eklenir; dünkü seri bugün bitene kadar korunur; son 366 gün tutulur.
 - Kurulum formlarında ortak `useStartSession` (değiştirme onayı + köşede başlatma + bildirim izni) ve `Field` bileşeni.
+- Bitirilen oturumlar şimdiden IndexedDB'ye (`idb`, ~1 KB) yazılıyor: haftalık özet buna dayanıyor; Faz 5 geçmiş ekranı aynı veriyi kullanacak. Yazma hatası bitirmeyi engellemez.
+- Paylaşım kartı canvas 2D ile çiziliyor (kütüphane yok) ve `React.lazy` ile ayrı parçada (~1,8 KB gzip).
+- Kart birimleri: Gizli (varsayılan, tutar yok) / Yüzde (bütünü olan kayıtlar: mesai günü, geri sayım süresi) / Kahve parası (tutar olan kayıtlar; kahve fiyatı girilmeden tutar gösterilmez, varsayılan fiyat yok).
+- Uygulanamayan birim seçilemez; içerik fonksiyonu yine de güvenli tarafa (Gizli) düşer — testli.
+- İndirilen dosya adı ASCII (`kose-kart.png`); bazı tarayıcılar Türkçe karakterli adı yok sayıyor.
+- Haftalık özet: haftanın (Pazartesi 00:00, TR) ilk açılışında geçen haftanın toplam süresi, en uzun odak ve mevcut seri; geçen hafta kayıt yoksa gösterilmez. Takvim geri sayımları süreye katılmaz.
+- Paylaşılan link `/sayim`, OBS `/overlay`; tüm URL parametreleri katı doğrulanıyor (başlık ≤60 karakter, kontrol karakteri yok; renk yalnızca hex; boyut 16–400).
+- Tekrarlayan geri sayımın linki bir sonraki tarihi sabit an olarak paylaşır.
+- Canlı sayfada "Paylaşılabilir kart" o anki durumun anlık görüntüsünden kart üretir.
+- OBS için URL oluşturucu arayüz yapılmadı; parametreler README'de.

@@ -1,4 +1,6 @@
+import { Suspense, useState } from 'react';
 import { Button, ButtonLink } from '../../components/Button';
+import { LazyShareCard } from '../../share/lazy';
 import { formatClock, formatMoney } from '../../engine/format';
 import { t } from '../../i18n';
 import { useSessionStore } from '../../storage/session';
@@ -9,6 +11,7 @@ const time = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digi
 
 export function SummaryPage() {
   const summary = useSessionStore((st) => st.lastSummary);
+  const [sharing, setSharing] = useState(false);
   if (!summary)
     return (
       <div className={s.stack}>
@@ -69,8 +72,8 @@ export function SummaryPage() {
           {t('summary.outputs')}
         </h2>
         <div className={s.row}>
-          <Button variant="primary" disabled>
-            {t('summary.shareCard')} · {t('summary.soon')}
+          <Button variant="primary" aria-expanded={sharing} onClick={() => setSharing(!sharing)}>
+            {t('summary.shareCard')}
           </Button>
           <Button disabled>
             {t('summary.excel')} <span className={s.badge}>{t('home.pro')}</span>
@@ -81,6 +84,11 @@ export function SummaryPage() {
         </div>
         <p className={`${s.muted} ${s.small}`}>{t('summary.proNote')}</p>
       </section>
+      {sharing && (
+        <Suspense fallback={null}>
+          <LazyShareCard summary={summary} />
+        </Suspense>
+      )}
       <div>
         <ButtonLink to="/" variant="primary">
           {t('summary.newTimer')}

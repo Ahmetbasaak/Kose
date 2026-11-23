@@ -17,6 +17,9 @@ export function trYmd(now: number): Ymd {
   return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
 }
 
+/** Monday 00:00 (Turkey time) of the week containing `now`. */
+export const trWeekStart = (now: number) => (trDay(now) - ((trWeekday(trDay(now)) + 6) % 7)) * DAY - TR_OFFSET_MS;
+
 export const daysInMonth = (y: number, m: number) => new Date(Date.UTC(y, m, 0)).getUTCDate();
 
 /** "2027-03-09" → Ymd; null if malformed or not a real date. */

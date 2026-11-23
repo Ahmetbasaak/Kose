@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { TargetRule } from '../engine/calendar';
 import { timeInSegment } from '../engine/cycles';
 import { elapsedMs, pauseTimer, resumeTimer, startTimer, type Timer } from '../engine/timer';
-import { meetingCost, workState, type WorkConfig } from '../engine/work';
+import { meetingCost, netDailyHours, workState, type WorkConfig } from '../engine/work';
 import type { ModeId } from '../modes/registry';
 
 /**
@@ -49,6 +49,8 @@ export interface SessionSummary {
   meeting?: MeetingConfig | null;
   /** Pomodoro focus time. */
   focusMs?: number | null;
+  /** The natural whole for a percentage: countdown length or net work day. */
+  totalMs?: number | null;
   startedAt: number;
   endedAt: number;
 }
@@ -80,6 +82,7 @@ export function summarize(a: ActiveSession, now: number): SessionSummary {
     cost: a.meeting ? meetingCost(elapsed, a.meeting.people, a.meeting.hourlyRate) : null,
     meeting: a.meeting ?? null,
     focusMs: a.modeId === 'student' && a.segments ? timeInSegment(elapsed, a.segments, 0) : null,
+    totalMs: a.work ? netDailyHours(a.work) * 3_600_000 : a.durationMs,
     startedAt: a.createdAt,
     endedAt: now,
   };

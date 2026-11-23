@@ -9,6 +9,7 @@ import { useNow } from '../../components/useNow';
 import { parseIsoDate, targetState, trMidnight, type TargetRule } from '../../engine/calendar';
 import { parseTime } from '../../engine/work';
 import { upcomingHolidays } from '../../data/holidays';
+import { shareCountdownUrl } from '../../share/link';
 import { t } from '../../i18n';
 import { useCountdownsStore, type CountdownTemplate, type SavedCountdown } from '../../storage/countdowns';
 
@@ -18,6 +19,7 @@ type FormError = 'title' | 'payday' | 'holiday' | 'date' | 'past';
 function CountdownItem({ item, now }: { item: SavedCountdown; now: number }) {
   const remove = useCountdownsStore((st) => st.remove);
   const startSession = useStartSession();
+  const [shareMsg, setShareMsg] = useState<string | null>(null);
   const ts = targetState(item.rule, now);
   const arrived = ts.arrived || ts.remainingMs === 0;
   return (
@@ -32,6 +34,11 @@ function CountdownItem({ item, now }: { item: SavedCountdown; now: number }) {
       </span>
       <span className={`${s.muted} ${s.small}`}>{formatTrDate(ts.at)}</span>
       {item.unverified && <span className={`${s.muted} ${s.small}`}>{t('countdowns.unverified')}</span>}
+      {shareMsg && (
+        <span role="status" className={`${s.muted} ${s.small}`} style={{ overflowWrap: 'anywhere' }}>
+          {shareMsg} {t('shared.linkNote')}
+        </span>
+      )}
       <div className={s.row} style={{ marginTop: 'auto' }}>
         <Button
           variant="primary"
@@ -43,6 +50,23 @@ function CountdownItem({ item, now }: { item: SavedCountdown; now: number }) {
           }
         >
           {t('countdowns.showInCorner')}
+        </Button>
+        <Button
+          onClick={async () => {
+            // Recurring rules share their next occurrence as a fixed moment.
+            const url = shareCountdownUrl(location.origin, item.title, ts.at);
+            if (navigator.share) {
+              await navigator.share({ title: item.title, url }).catch(() => undefined);
+              return;
+            }
+            const copied = await navigator.clipboard?.writeText(url).then(
+              () => true,
+              () => false,
+            );
+            setShareMsg(copied ? t('shared.copied') : t('shared.copyFailed', { url }));
+          }}
+        >
+          {t('shared.shareLink')}
         </Button>
         <Button aria-label={t('countdowns.removeLabel', { title: item.title })} onClick={() => remove(item.id)}>
           {t('countdowns.remove')}

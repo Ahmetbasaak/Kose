@@ -1,9 +1,11 @@
+import { Suspense, useState } from 'react';
 import { Button, ButtonLink } from '../../components/Button';
+import { LazyShareCard } from '../../share/lazy';
 import { isPipSupported, openPip, usePipStore } from '../../components/corner/pip';
 import { MoneyValue } from '../../components/MoneyValue';
 import { useNow } from '../../components/useNow';
 import { t } from '../../i18n';
-import { useSessionStore } from '../../storage/session';
+import { summarize, useSessionStore, type SessionSummary } from '../../storage/session';
 import { useFinishSession } from '../actions';
 import { finishLabel, sessionDisplay } from '../sessionView';
 import s from './pages.module.css';
@@ -14,6 +16,7 @@ export function LivePage() {
   const togglePause = useSessionStore((st) => st.togglePause);
   const pipOpen = usePipStore((st) => st.win !== null);
   const finishSession = useFinishSession();
+  const [snapshot, setSnapshot] = useState<SessionSummary | null>(null);
   const now = useNow(250, window, active !== null);
 
   if (!active)
@@ -48,8 +51,19 @@ export function LivePage() {
         <Button variant="primary" onClick={finishSession}>
           {finishLabel(active.kind)}
         </Button>
+        <Button
+          aria-expanded={snapshot !== null}
+          onClick={() => setSnapshot(snapshot ? null : summarize(active, Date.now()))}
+        >
+          {t('share.title')}
+        </Button>
         {isPipSupported() && !pipOpen && <Button onClick={() => void openPip()}>{t('timer.openCorner')}</Button>}
       </div>
+      {snapshot && (
+        <Suspense fallback={null}>
+          <LazyShareCard summary={snapshot} />
+        </Suspense>
+      )}
       {active.kind === 'work' && <p className={`${s.muted} ${s.small}`}>{t('work.disclaimer')}</p>}
       {!isPipSupported() && <p className={`${s.muted} ${s.small}`}>{t('timer.mobileNote')}</p>}
     </div>

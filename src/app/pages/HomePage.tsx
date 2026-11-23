@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { t } from '../../i18n';
 import { modes } from '../../modes/registry';
+import { WeeklyCard } from '../WeeklyCard';
 import s from './pages.module.css';
 
 export function HomePage() {
@@ -10,6 +11,7 @@ export function HomePage() {
         <h1 className={s.h1}>{t('home.title')}</h1>
         <p className={s.lead}>{t('home.lead')}</p>
       </div>
+      <WeeklyCard />
       <ul className={s.grid} role="list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
         {modes.map((m) => {
           const body = (
