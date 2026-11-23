@@ -37,27 +37,26 @@ export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: 
 
   ctx.fillStyle = BG[c.tone ?? 'work'];
   ctx.fillRect(0, 0, w, h);
-  // Brand mark (public/icon.svg) top-right: corner frame and clock hands.
+  // Brand mark (public/icon.svg) top-right: framed dial, two bold corners, clock hands.
   const m = 120 / 64;
   ctx.save();
   ctx.translate(w - pad - 120, pad - 20);
   ctx.scale(m, m);
-  ctx.lineWidth = 4.5;
   ctx.lineCap = 'round';
+  ctx.strokeStyle = 'rgb(255 255 255 / 0.35)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.roundRect(11, 11, 42, 42, 11);
+  ctx.stroke();
   ctx.strokeStyle = SOFT;
-  for (const d of [
-    'M12 22V15a3 3 0 0 1 3-3h7',
-    'M42 12h7a3 3 0 0 1 3 3v7',
-    'M52 42v7a3 3 0 0 1-3 3h-7',
-    'M22 52h-7a3 3 0 0 1-3-3v-7',
-    'M32 32V21',
-  ])
+  ctx.lineWidth = 5;
+  for (const d of ['M11 25v-3a11 11 0 0 1 11-11h3', 'M53 39v3a11 11 0 0 1-11 11h-3', 'M32 32V19'])
     ctx.stroke(new Path2D(d));
   ctx.strokeStyle = DOT;
-  ctx.stroke(new Path2D('M32 32l9 6'));
-  ctx.fillStyle = SOFT;
+  ctx.stroke(new Path2D('M32 32l8 8'));
+  ctx.fillStyle = DOT;
   ctx.beginPath();
-  ctx.arc(32, 32, 3.5, 0, Math.PI * 2);
+  ctx.arc(32, 32, 3.8, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 
