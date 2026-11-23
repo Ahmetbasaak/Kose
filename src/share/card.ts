@@ -3,7 +3,13 @@ import type { CardContent } from './content';
 export type CardSize = 'square' | 'story';
 export const CARD_SIZES: Record<CardSize, [number, number]> = { square: [1080, 1080], story: [1080, 1920] };
 
-const BG = '#0F766E';
+// White text stays ≥ 4.5:1 on every tone.
+const BG: Record<NonNullable<CardContent['tone']>, string> = {
+  work: '#0F766E',
+  meeting: '#9A3412',
+  focus: '#3730A3',
+  life: '#9F1239',
+};
 const FG = '#FFFFFF';
 const SOFT = '#D5EEEA';
 const DOT = '#FBBF24';
@@ -29,7 +35,7 @@ export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: 
   const pad = 96;
   const inner = w - pad * 2;
 
-  ctx.fillStyle = BG;
+  ctx.fillStyle = BG[c.tone ?? 'work'];
   ctx.fillRect(0, 0, w, h);
   // Brand mark (public/icon.svg) top-right: the corner stroke and the live dot.
   const m = 120 / 64;

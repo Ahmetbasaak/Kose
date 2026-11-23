@@ -80,3 +80,19 @@ describe('trWeekStart', () => {
     expect(trWeekStart(Date.UTC(2026, 10, 29, 20, 59))).toBe(monday); // Sun 23:59 TR
   });
 });
+
+describe('mode-specific cards', () => {
+  it('meeting and focus cards get their own tone; Pomodoro shows focus time', () => {
+    const meeting: SessionSummary = { ...simple, modeId: 'meeting', cost: 500 };
+    expect(cardContent(meeting, 'hidden', null).tone).toBe('meeting');
+    const pomodoro: SessionSummary = {
+      ...simple,
+      modeId: 'student',
+      kind: 'cycle',
+      elapsedMs: 2 * H,
+      focusMs: 1.5 * H,
+    };
+    const c = cardContent(pomodoro, 'hidden', null);
+    expect([c.tone, c.big]).toEqual(['focus', '1 s 30 dk']);
+  });
+});

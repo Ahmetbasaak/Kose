@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  earnedSince,
+  equivalents,
   hourlyRate,
+  workMilestones,
   netDailyHours,
   parseTime,
   parseTrNumber,
@@ -154,5 +157,36 @@ describe('parsers', () => {
     expect(parseTrNumber('1.250.000 ₺')).toBe(1_250_000);
     expect(parseTrNumber('45.5')).toBeNaN();
     expect(parseTrNumber('')).toBeNaN();
+  });
+});
+
+describe('earnedSince (weekly / monthly estimate)', () => {
+  const rate = 45_000 / 176;
+  it('Monday 14:30 since Monday = 4.5 h', () => {
+    expect(earnedSince(base, trDay(MON(0)), MON(14, 30))).toBeCloseTo(4.5 * rate, 6);
+  });
+  it('Wednesday 10:00 since Monday = 2 full days + 1 h, weekends add nothing', () => {
+    expect(earnedSince(base, trDay(MON(0)), tr(2026, 11, 25, 10))).toBeCloseTo(17 * rate, 4);
+    expect(earnedSince(base, trDay(MON(0)) - 2, MON(9))).toBeCloseTo(0, 6); // Sat + Sun + Monday at 9:00
+  });
+});
+
+describe('workMilestones', () => {
+  it('reports wins in order and needs a coffee price for the coffee one', () => {
+    const w = workState(base, MON(14)); // 4 h worked (lunch 12–13)
+    expect(workMilestones(base, w, null)).toEqual(['quarter', 'half']);
+    expect(workMilestones(base, w, 90)).toEqual(['coffee', 'quarter', 'half']);
+    expect(workMilestones(base, workState(base, MON(12, 15)), null)).toContain('lunch');
+    expect(workMilestones(base, workState(base, MON(18)), null)).toContain('done');
+    expect(workMilestones(base, workState(base, tr(2026, 11, 28, 12)), 90)).toEqual([]);
+  });
+});
+
+describe('equivalents', () => {
+  it('only counts items with a price and at least one whole item', () => {
+    expect(equivalents(1150, { coffee: 90, simit: 20, tea: null, subscription: 2000 })).toEqual([
+      { key: 'coffee', n: 12 },
+      { key: 'simit', n: 57 },
+    ]);
   });
 });

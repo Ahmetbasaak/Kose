@@ -5,18 +5,39 @@ import type { SessionSummary } from '../storage/session';
 /** How a card may hint at money. 'hidden' (the default) never shows an amount. */
 export type CardUnit = 'hidden' | 'percent' | 'coffee';
 
+/** Card colour family, so a meeting card doesn't look like a focus card. */
+export type CardTone = 'work' | 'meeting' | 'focus' | 'life';
+
 export interface CardContent {
   kicker: string;
   big: string;
   lines: string[];
+  tone?: CardTone;
 }
+
+const TONE: Partial<Record<SessionSummary['modeId'], CardTone>> = {
+  work: 'work',
+  freelance: 'work',
+  meeting: 'meeting',
+  simple: 'focus',
+  student: 'focus',
+  break: 'focus',
+  multi: 'focus',
+  presentation: 'focus',
+  countdowns: 'life',
+};
 
 const moneyOf = (s: SessionSummary) => s.earned ?? s.cost ?? null;
 
 export const unitAvailable = (s: SessionSummary, unit: CardUnit): boolean =>
   unit === 'hidden' || (unit === 'percent' ? !!s.totalMs : moneyOf(s) !== null);
 
-const lineKey = (s: SessionSummary) => (s.modeId === 'work' ? 'work' : s.modeId === 'meeting' ? 'meeting' : 'other');
+const lineKey = (s: SessionSummary) =>
+  s.modeId === 'work' || s.modeId === 'meeting' || s.modeId === 'presentation'
+    ? s.modeId
+    : s.modeId === 'student' || s.modeId === 'simple'
+      ? 'focus'
+      : 'other';
 
 /**
  * Text for a shareable card. Falls back to 'hidden' when the unit does not apply
@@ -24,16 +45,19 @@ const lineKey = (s: SessionSummary) => (s.modeId === 'work' ? 'work' : s.modeId 
  */
 export function cardContent(s: SessionSummary, unit: CardUnit, coffeePrice: number | null): CardContent {
   const kicker = s.label;
+  const tone = TONE[s.modeId] ?? 'work';
   const money = moneyOf(s);
   if (unit === 'percent' && s.totalMs) {
     const pct = Math.min(100, Math.round((s.elapsedMs / s.totalMs) * 100));
-    return { kicker, big: t('share.percent', { n: pct }), lines: [t(`share.lines.percent.${lineKey(s)}`)] };
+    return { kicker, tone, big: t('share.percent', { n: pct }), lines: [t(`share.lines.percent.${lineKey(s)}`)] };
   }
   if (unit === 'coffee' && money !== null && coffeePrice && coffeePrice > 0) {
     const cups = Math.floor(money / coffeePrice);
-    return { kicker, big: t('share.coffee', { n: cups }), lines: [t(`share.lines.coffee.${lineKey(s)}`)] };
+    return { kicker, tone, big: t('share.coffee', { n: cups }), lines: [t(`share.lines.coffee.${lineKey(s)}`)] };
   }
-  return { kicker, big: durationWords(s.elapsedMs), lines: [t(`share.lines.hidden.${lineKey(s)}`)] };
+  // A Pomodoro card brags about focus time, not the breaks in between.
+  const shown = s.focusMs ?? s.elapsedMs;
+  return { kicker, tone, big: durationWords(shown), lines: [t(`share.lines.hidden.${lineKey(s)}`)] };
 }
 
 export interface WeeklyStats {

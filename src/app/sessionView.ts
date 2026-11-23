@@ -3,7 +3,8 @@ import { cycleState } from '../engine/cycles';
 import { sectionState, type SectionLevel } from '../engine/sections';
 import { durationParts, formatClock, formatMoney } from '../engine/format';
 import { elapsedMs, finishAt, isRunning, remainingMs } from '../engine/timer';
-import { meetingCost, workState, type WorkConfig } from '../engine/work';
+import { equivalents, meetingCost, workState, type WorkConfig } from '../engine/work';
+import { usePrefsStore } from '../storage/prefs';
 import { t } from '../i18n';
 import { canPause, type ActiveSession, type TimerKind } from '../storage/session';
 
@@ -20,6 +21,25 @@ export interface SessionDisplay {
   canPause: boolean;
   /** Presentation traffic light. */
   level?: SectionLevel;
+  /** Background work earnings while another timer runs. */
+  extra?: string;
+}
+
+/** "≈ 12 kahve · 30 simit" from the user's own prices; null when none apply. */
+export function equivalentsLine(amount: number): string | null {
+  const { coffeePrice, prices } = usePrefsStore.getState();
+  const list = equivalents(amount, { coffee: coffeePrice, ...prices });
+  return list.length
+    ? t('equiv.line', { list: list.map((e) => t(`equiv.units.${e.key}`, { n: e.n })).join(' · ') })
+    : null;
+}
+
+/** Today's work earnings when "count in the background" is on and another timer is in front. */
+function backgroundWork(now: number): string | undefined {
+  const { workBackground, lastWork } = usePrefsStore.getState();
+  if (!workBackground || !lastWork) return undefined;
+  const w = workState(lastWork, now);
+  return w.earned > 0 ? t('work.bgLine', { v: formatMoney(w.earned) }) : undefined;
 }
 
 const DAY = 86_400_000;
@@ -93,6 +113,11 @@ function cycleCaption(s: ActiveSession, segment: number): string {
 }
 
 export function sessionDisplay(s: ActiveSession, now: number): SessionDisplay {
+  const d = baseDisplay(s, now);
+  return s.kind === 'work' ? d : { ...d, extra: backgroundWork(now) };
+}
+
+function baseDisplay(s: ActiveSession, now: number): SessionDisplay {
   const running = isRunning(s.timer);
   const pausable = canPause(s.kind);
   if (s.kind === 'work' && s.work) return workDisplay(s.work, now);

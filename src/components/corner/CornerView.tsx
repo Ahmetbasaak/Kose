@@ -53,6 +53,7 @@ export function CornerFace({ label, display, variant, children }: FaceProps) {
         {display.money === undefined ? display.value : <MoneyValue amount={display.money} />}
       </div>
       {display.sub && <div className={styles.sub}>{display.sub}</div>}
+      {display.extra && <div className={styles.sub}>{display.extra}</div>}
       {children}
     </div>
   );

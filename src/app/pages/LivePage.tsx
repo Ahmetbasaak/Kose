@@ -8,8 +8,28 @@ import { useNow } from '../../components/useNow';
 import { t } from '../../i18n';
 import { summarize, useSessionStore, type SessionSummary } from '../../storage/session';
 import { useFinishSession } from '../actions';
-import { finishLabel, sessionDisplay } from '../sessionView';
+import { equivalentsLine, finishLabel, sessionDisplay } from '../sessionView';
+import { trWeekStart, trMidnight, trYmd } from '../../engine/calendar';
+import { formatMoney } from '../../engine/format';
+import { earnedSince, trDay, workState, type WorkConfig } from '../../engine/work';
 import s from './pages.module.css';
+
+/** Work mode: this week's and month's estimate plus today's fun comparison. */
+function WorkPeriods({ config, now }: { config: WorkConfig; now: number }) {
+  const { y, m } = trYmd(now);
+  const today = workState(config, now).earned;
+  const eq = equivalentsLine(today);
+  return (
+    <div className={s.stack} style={{ gap: 4 }}>
+      {eq && <p className={`${s.lead} num`}>{eq}</p>}
+      <p className="num">
+        {t('work.week', { v: formatMoney(earnedSince(config, trDay(trWeekStart(now)), now)) })} ·{' '}
+        {t('work.month', { v: formatMoney(earnedSince(config, trDay(trMidnight(y, m, 1)), now)) })}
+      </p>
+      <p className={`${s.muted} ${s.small}`}>{t('work.periodNote')}</p>
+    </div>
+  );
+}
 
 /** Full-page view of the running session; the main view on phones. */
 export function LivePage() {
@@ -74,6 +94,11 @@ export function LivePage() {
           <LazyShareCard summary={snapshot} />
         </Suspense>
       )}
+      {active.kind === 'work' && active.work && <WorkPeriods config={active.work} now={now} />}
+      {active.meeting && d.money !== undefined && equivalentsLine(d.money) && (
+        <p className={`${s.lead} num`}>{equivalentsLine(d.money)}</p>
+      )}
+      {d.extra && <p className={`${s.muted} num`}>{d.extra}</p>}
       {active.kind === 'work' && <p className={`${s.muted} ${s.small}`}>{t('work.disclaimer')}</p>}
       {!isPipSupported() && <p className={`${s.muted} ${s.small}`}>{t('timer.mobileNote')}</p>}
       {active.kind !== 'stopwatch' && active.kind !== 'work' && <InstallHint />}

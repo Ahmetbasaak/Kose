@@ -33,6 +33,7 @@ const fmtSalary = (n: number) => (Number.isFinite(n) ? new Intl.NumberFormat('tr
 export function WorkSetup() {
   const saved = usePrefsStore((st) => st.lastWork) ?? DEFAULTS;
   const setLastWork = usePrefsStore((st) => st.setLastWork);
+  const workBackground = usePrefsStore((st) => st.workBackground);
   const [f, setF] = useState({
     salary: fmtSalary(saved.monthlySalary),
     start: formatTime(saved.startMin),
@@ -133,6 +134,17 @@ export function WorkSetup() {
           </p>
         )}
         <p className={`${s.muted} ${s.small}`}>{t('work.formNote')}</p>
+        <div>
+          <label className={s.radio}>
+            <input
+              type="checkbox"
+              checked={workBackground}
+              onChange={(e) => usePrefsStore.getState().set({ workBackground: e.target.checked })}
+            />
+            {t('work.background')}
+          </label>
+          <p className={`${s.muted} ${s.small}`}>{t('work.backgroundNote')}</p>
+        </div>
         <div>
           <Button type="submit" variant="primary">
             {t('setup.startInCorner')}

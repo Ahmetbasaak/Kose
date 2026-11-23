@@ -46,6 +46,11 @@ export function useStartSession() {
 
 /** Persist a finished session: history DB, plus a time entry for a freelance project. */
 export function recordSummary(s: SessionSummary): void {
+  if (s.kind === 'work' && s.shiftDay != null) {
+    // The day may already be saved automatically at shift end.
+    if (usePrefsStore.getState().workRecordedDay === s.shiftDay) return;
+    usePrefsStore.getState().set({ workRecordedDay: s.shiftDay });
+  }
   // History is a bonus: private mode or a full disk must not block finishing.
   addRecord(s).catch(() => undefined);
   if (s.modeId === 'freelance' && s.projectId)

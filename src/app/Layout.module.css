@@ -139,3 +139,13 @@
   font-size: 14px;
   font-weight: 600;
 }
+/* Milestone cheer: a short pop, nothing more (reduced motion turns it off). */
+.cheer {
+  animation: pop 0.5s var(--ease);
+}
+@keyframes pop {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+}

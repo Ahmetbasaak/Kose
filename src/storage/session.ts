@@ -58,6 +58,8 @@ export interface SessionSummary {
   /** The natural whole for a percentage: countdown length or net work day. */
   totalMs?: number | null;
   projectId?: string | null;
+  /** Work mode: the shift's Turkey day, so a day is saved to history only once. */
+  shiftDay?: number | null;
   startedAt: number;
   endedAt: number;
 }
@@ -91,6 +93,7 @@ export function summarize(a: ActiveSession, now: number): SessionSummary {
     focusMs: a.modeId === 'student' && a.segments ? focusTime(elapsed, a.segments) : null,
     totalMs: a.work ? netDailyHours(a.work) * 3_600_000 : a.durationMs,
     projectId: a.projectId ?? null,
+    shiftDay: ws?.shiftDay ?? null,
     startedAt: a.createdAt,
     endedAt: now,
   };

@@ -1,7 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import { Button } from '../../components/Button';
 import { CornerFace } from '../../components/corner/CornerView';
+import { Field } from '../../components/Field';
 import { InstallHint } from '../../components/InstallHint';
+import { parseTrNumber } from '../../engine/work';
 import { ProGate } from '../../components/ProGate';
 import { t } from '../../i18n';
 import { clearLocalStorage, collectLocalStorage, parseBackup } from '../../storage/backup';
@@ -47,6 +49,35 @@ function Check({
       </label>
       {note && <p className={`${s.muted} ${s.small}`}>{note}</p>}
     </div>
+  );
+}
+
+/** ₺ price input; keeps the user's text while typing, stores a number (or null when empty/invalid). */
+function PriceField({
+  id,
+  label,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: number | null;
+  onChange: (v: number | null) => void;
+}) {
+  const [text, setText] = useState(value ? String(value).replace('.', ',') : '');
+  return (
+    <Field
+      id={id}
+      label={`${label} (₺)`}
+      inputMode="decimal"
+      placeholder={t('equiv.placeholder')}
+      value={text}
+      onChange={(e) => {
+        setText(e.target.value);
+        const n = parseTrNumber(e.target.value);
+        onChange(n > 0 ? n : null);
+      }}
+    />
   );
 }
 
@@ -346,6 +377,29 @@ export function SettingsPage() {
             />
           </div>
         </ProGate>
+      </Section>
+
+      <Section id="set-equiv" title={t('equiv.title')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>
+          <p className={`${s.muted} ${s.small}`}>{t('equiv.note')}</p>
+          <div className={s.row}>
+            <PriceField
+              id="price-coffee"
+              label={t('equiv.names.coffee')}
+              value={prefs.coffeePrice}
+              onChange={(v) => prefs.setCoffeePrice(v)}
+            />
+            {(['simit', 'tea', 'subscription'] as const).map((k) => (
+              <PriceField
+                key={k}
+                id={`price-${k}`}
+                label={t(`equiv.names.${k}`)}
+                value={prefs.prices[k] ?? null}
+                onChange={(v) => prefs.set({ prices: { ...prefs.prices, [k]: v } })}
+              />
+            ))}
+          </div>
+        </div>
       </Section>
 
       <Section id="set-data" title={t('settings.data')}>

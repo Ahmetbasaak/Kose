@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { WorkConfig } from '../engine/work';
+import type { Milestone, PriceKey, WorkConfig } from '../engine/work';
 import type { StartInput } from './session';
 
 export type Corner = 'tl' | 'tr' | 'br' | 'bl';
@@ -45,6 +45,14 @@ interface PrefsState {
   cornerScale: number;
   shortcuts: boolean;
   autostart: boolean;
+  /** User's own prices for "≈ 12 kahve" style comparisons (coffee lives in coffeePrice). */
+  prices: Partial<Record<Exclude<PriceKey, 'coffee'>, number | null>>;
+  /** Keep counting today's work earnings while other timers run, and save each day's summary. */
+  workBackground: boolean;
+  /** Shift day (Turkey day number) whose summary is already in history. */
+  workRecordedDay: number | null;
+  /** Milestones already celebrated for a shift day. */
+  milestones: { day: number; done: Milestone[] };
   /** Last meeting setup, for the home screen's one-tap start. */
   lastMeeting: { people: number; monthlySalary: number } | null;
   /** Last session started from a setup screen, for autostart. */
@@ -89,6 +97,10 @@ export const usePrefsStore = create<PrefsState>()(
       autostart: false,
       lastStart: null,
       lastMeeting: null,
+      prices: {},
+      workBackground: false,
+      workRecordedDay: null,
+      milestones: { day: 0, done: [] },
       appTheme: 'system',
       reduceMotion: false,
       titleTimer: true,

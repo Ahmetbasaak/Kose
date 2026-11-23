@@ -4,7 +4,7 @@ import { LazyShareCard } from '../../share/lazy';
 import { downloadXlsx, hours } from '../../export/xlsx';
 import { brandSlug } from '../config';
 import { useEntitlements } from '../entitlements';
-import { formatTrDate } from '../sessionView';
+import { equivalentsLine, formatTrDate } from '../sessionView';
 import { formatClock, formatMoney } from '../../engine/format';
 import { MONTHLY_HOURS } from '../../engine/work';
 import { t } from '../../i18n';
@@ -68,6 +68,14 @@ export function SummaryPage() {
           <div className={`${s.card} ${s.stat}`}>
             <span className={`${s.muted} ${s.small}`}>{t('student.focusTotal')}</span>
             <span className={`${s.statValue} num`}>{durationWords(summary.focusMs)}</span>
+          </div>
+        )}
+        {(summary.earned ?? summary.cost) != null && equivalentsLine((summary.earned ?? summary.cost)!) && (
+          <div className={`${s.card} ${s.stat}`}>
+            <span className={`${s.muted} ${s.small}`}>{t('equiv.title')}</span>
+            <span className={`${s.statValue} num`} style={{ fontSize: 22 }}>
+              {equivalentsLine((summary.earned ?? summary.cost)!)}
+            </span>
           </div>
         )}
         {isWork && (

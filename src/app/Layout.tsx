@@ -7,6 +7,7 @@ import { TEST_MODE } from './entitlements';
 import { ProBehaviors } from './ProBehaviors';
 import { SessionChrome } from './SessionChrome';
 import { SessionRunner } from './SessionRunner';
+import { WorkRunner } from './WorkRunner';
 import styles from './Layout.module.css';
 
 export function Layout() {
@@ -38,6 +39,7 @@ export function Layout() {
         </p>
       )}
       <SessionRunner />
+      <WorkRunner />
       <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />
       </main>
