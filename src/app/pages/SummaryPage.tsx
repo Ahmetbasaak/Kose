@@ -33,10 +33,13 @@ export function SummaryPage() {
         <div className={`${s.card} ${s.stat}`}>
           <span className={`${s.muted} ${s.small}`}>{isWork ? t('summary.worked') : t('summary.duration')}</span>
           <span className={`${s.statValue} num`}>{durationWords(summary.elapsedMs)}</span>
-          <span className={`${s.muted} ${s.small} num`}>
-            {formatClock(summary.elapsedMs)} ·{' '}
-            {t('summary.range', { start: time.format(summary.startedAt), end: time.format(summary.endedAt) })}
-          </span>
+          {/* Work time comes from the shift, so the open/close range would contradict it. */}
+          {!isWork && (
+            <span className={`${s.muted} ${s.small} num`}>
+              {formatClock(summary.elapsedMs)} ·{' '}
+              {t('summary.range', { start: time.format(summary.startedAt), end: time.format(summary.endedAt) })}
+            </span>
+          )}
         </div>
         {isWork && (
           <div className={`${s.card} ${s.stat}`}>

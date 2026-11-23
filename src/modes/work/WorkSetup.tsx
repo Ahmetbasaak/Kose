@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useLaunchCorner } from '../../app/actions';
 import s from '../../app/pages/pages.module.css';
-import { durationWords, type SessionDisplay } from '../../app/sessionView';
+import { workDisplay } from '../../app/sessionView';
 import { Button } from '../../components/Button';
 import { CornerFace } from '../../components/corner/CornerView';
 import { isPipSupported } from '../../components/corner/pip';
@@ -31,25 +31,6 @@ const DEFAULTS: WorkConfig = {
 
 const fmtSalary = (n: number) => (Number.isFinite(n) ? new Intl.NumberFormat('tr-TR').format(n) : '');
 
-function previewDisplay(c: WorkConfig, now: number): SessionDisplay {
-  const w = workState(c, now);
-  const caption = w.phase === 'working' ? t('work.estimate') : t(`work.phase.${w.phase}`);
-  const sub =
-    w.phase === 'working' || w.phase === 'break'
-      ? t('work.untilEnd', { d: durationWords(w.remainingMs, 'ceil') })
-      : w.phase === 'before'
-        ? t('work.untilStart', { d: durationWords(w.remainingMs, 'ceil') })
-        : undefined;
-  return {
-    value: formatMoney(w.earned),
-    money: w.earned,
-    status: w.phase === 'working' ? 'running' : 'paused',
-    caption,
-    sub,
-    canPause: false,
-  };
-}
-
 export function WorkSetup() {
   const saved = usePrefsStore((st) => st.lastWork) ?? DEFAULTS;
   const setLastWork = usePrefsStore((st) => st.setLastWork);
@@ -74,23 +55,30 @@ export function WorkSetup() {
     lunchMin: f.lunchMin.trim() === '' ? NaN : Number(f.lunchMin),
     lunchStartMin: parseTime(f.lunchStart),
   };
-  const timeBad = [config.startMin, config.endMin, config.lunchStartMin, config.lunchMin].some(
-    (n) => !Number.isFinite(n),
-  );
-  const error: WorkConfigError | 'time' | null = timeBad ? 'time' : validateWork(config);
-  const errorField: Record<WorkConfigError | 'time', string> = {
+  const errorField: Record<WorkConfigError, string> = {
     salary: 'work-salary',
     workDays: 'work-days',
     shift: 'work-end',
     lunch: 'work-lunch-min',
-    time: 'work-start',
   };
+  // Unparseable fields first, each pointing at itself; then the config rules.
+  const blank = (
+    [
+      ['work-start', config.startMin, 'time'],
+      ['work-end', config.endMin, 'time'],
+      ['work-lunch-start', config.lunchStartMin, 'time'],
+      ['work-lunch-min', config.lunchMin, 'lunchMin'],
+    ] as const
+  ).find(([, v]) => !Number.isFinite(v));
+  const configError = blank ? null : validateWork(config);
+  const error: WorkConfigError | 'time' | 'lunchMin' | null = blank ? blank[2] : configError;
+  const errorId = blank ? blank[0] : configError && errorField[configError];
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (error) {
       setShowErrors(true);
-      document.getElementById(errorField[error])?.focus();
+      document.getElementById(errorId!)?.focus();
       return;
     }
     if (useSessionStore.getState().active && !window.confirm(t('setup.replaceConfirm'))) return;
@@ -100,7 +88,7 @@ export function WorkSetup() {
   };
 
   const field = (id: string, key: keyof typeof f, label: string, props: Record<string, unknown> = {}) => {
-    const invalid = showErrors && error !== null && errorField[error] === id;
+    const invalid = showErrors && errorId === id;
     return (
       <div className={s.field}>
         <label htmlFor={id} className={s.label}>
@@ -173,7 +161,7 @@ export function WorkSetup() {
           />
         ) : (
           <>
-            <CornerFace variant="preview" label={t('modes.work.title')} display={previewDisplay(config, now)} />
+            <CornerFace variant="preview" label={t('modes.work.title')} display={workDisplay(config, now)} />
             <p className={`${s.muted} ${s.small} num`}>
               {t('work.hourly', { rate: formatMoney(workState(config, now).hourlyRate) })}
             </p>

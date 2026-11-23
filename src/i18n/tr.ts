@@ -108,6 +108,7 @@ export const tr = {
       shift: 'Başlangıç ve bitiş saati aynı olamaz.',
       lunch: 'Öğle arası mesai saatlerinin içinde kalmalı.',
       time: 'Saatleri SS:DD biçiminde gir.',
+      lunchMin: 'Öğle arası süresini dakika olarak gir (yoksa 0).',
     },
   },
   alert: {
