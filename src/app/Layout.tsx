@@ -1,7 +1,9 @@
 import { Link, NavLink, Outlet } from 'react-router';
 import { CornerHost } from '../components/corner/CornerHost';
+import { Logo } from '../components/Logo';
 import { t } from '../i18n';
 import { config } from './config';
+import { TEST_MODE } from './entitlements';
 import { ProBehaviors } from './ProBehaviors';
 import { SessionRunner } from './SessionRunner';
 import styles from './Layout.module.css';
@@ -14,7 +16,7 @@ export function Layout() {
       </a>
       <header className={styles.header} data-noprint>
         <Link to="/" className={styles.brand} aria-label={`${config.name} – ${t('app.home')}`}>
-          <span className={styles.logo} aria-hidden="true" />
+          <Logo size={32} />
           {config.name}
         </Link>
         <nav aria-label={t('app.nav')} className={styles.nav}>
@@ -29,6 +31,11 @@ export function Layout() {
           <NavLink to="/ayarlar">{t('app.navSettings')}</NavLink>
         </nav>
       </header>
+      {TEST_MODE && (
+        <p role="note" className={styles.testNote} data-noprint>
+          {t('app.testMode')}
+        </p>
+      )}
       <SessionRunner />
       <main id="main" tabIndex={-1} className={styles.main}>
         <Outlet />

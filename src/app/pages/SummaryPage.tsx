@@ -6,6 +6,7 @@ import { brandSlug } from '../config';
 import { useEntitlements } from '../entitlements';
 import { formatTrDate } from '../sessionView';
 import { formatClock, formatMoney } from '../../engine/format';
+import { MONTHLY_HOURS } from '../../engine/work';
 import { t } from '../../i18n';
 import { useSessionStore } from '../../storage/session';
 import { durationWords } from '../sessionView';
@@ -55,7 +56,11 @@ export function SummaryPage() {
             <span className={`${s.muted} ${s.small}`}>{t('meeting.cost')}</span>
             <span className={`${s.statValue} num`}>{formatMoney(summary.cost)}</span>
             <span className={`${s.muted} ${s.small} num`}>
-              {t('meeting.summarySub', { n: summary.meeting.people, rate: formatMoney(summary.meeting.hourlyRate) })}
+              {t('meeting.summarySub', {
+                n: summary.meeting.people,
+                // Sessions saved before the salary field existed only have the hourly rate.
+                salary: formatMoney(summary.meeting.monthlySalary ?? summary.meeting.hourlyRate * MONTHLY_HOURS),
+              })}
             </span>
           </div>
         )}

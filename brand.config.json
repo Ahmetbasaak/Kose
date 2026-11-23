@@ -8,5 +8,6 @@
     "currency": "TRY",
     "proMonthly": "[FİYAT]",
     "proLifetime": "[FİYAT]"
-  }
+  },
+  "testMode": true
 }

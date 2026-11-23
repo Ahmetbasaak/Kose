@@ -6,6 +6,7 @@ export const CARD_SIZES: Record<CardSize, [number, number]> = { square: [1080, 1
 const BG = '#0F766E';
 const FG = '#FFFFFF';
 const SOFT = '#D5EEEA';
+const DOT = '#FBBF24';
 const FONT = "'Inter Variable', Inter, system-ui, sans-serif";
 
 /** Shrink until the text fits the width. */
@@ -30,11 +31,21 @@ export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: 
 
   ctx.fillStyle = BG;
   ctx.fillRect(0, 0, w, h);
-  // The "köşe": a small window sitting in the corner.
-  ctx.fillStyle = SOFT;
+  // Brand mark (public/icon.svg) top-right: the corner stroke and the live dot.
+  const m = 120 / 64;
+  const ox = w - pad - 120;
+  ctx.save();
+  ctx.translate(ox, pad - 20);
+  ctx.scale(m, m);
+  ctx.strokeStyle = SOFT;
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.stroke(new Path2D('M19 45V27a8 8 0 0 1 8-8h18'));
+  ctx.fillStyle = DOT;
   ctx.beginPath();
-  ctx.roundRect(w - pad - 132, pad, 132, 92, 18);
+  ctx.arc(44, 44, 7.5, 0, Math.PI * 2);
   ctx.fill();
+  ctx.restore();
 
   ctx.fillStyle = SOFT;
   ctx.textBaseline = 'alphabetic';

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { config } from './config';
 
 /** Everything Pro gates. One list so pricing copy and gates stay in sync. */
 export type ProFeature =
@@ -35,9 +36,19 @@ export const useProStore = create<ProState>()(
   ),
 );
 
+/**
+ * Pre-launch test mode: every visitor gets Pro so the live site can be tested end to end.
+ * Turn off with `"testMode": false` in brand.config.json before Pro goes on sale.
+ * VITE_TEST_MODE=0/1 overrides it for a single build (e2e uses 0 to test the gates).
+ */
+export const TEST_MODE = import.meta.env.VITE_TEST_MODE ? import.meta.env.VITE_TEST_MODE === '1' : config.testMode;
+
+/** Pro check outside React. */
+export const isPro = () => TEST_MODE || useProStore.getState().pro;
+
 /** The single gate for Pro features. */
 export function useEntitlements() {
-  const pro = useProStore((s) => s.pro);
+  const pro = useProStore((s) => s.pro) || TEST_MODE;
   // Every feature is in the one Pro plan today; `feature` keeps call sites ready for plan tiers.
   return { pro, can: (feature: ProFeature) => (void feature, pro) };
 }

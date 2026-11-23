@@ -3,7 +3,7 @@ import { CornerFace } from '../../components/corner/CornerView';
 import { ProGate } from '../../components/ProGate';
 import { t } from '../../i18n';
 import { usePrefsStore, type CornerSize, type CornerTheme } from '../../storage/prefs';
-import { useProStore } from '../entitlements';
+import { TEST_MODE, useProStore } from '../entitlements';
 import s from './pages.module.css';
 
 const THEMES: CornerTheme[] = ['default', 'lcd', 'neon', 'paper', 'minimal'];
@@ -21,7 +21,13 @@ export function SettingsPage() {
         <h2 id="set-pro" className={s.modeTitle}>
           {t('settings.proStatus')}
         </h2>
-        <p>{pro ? t('settings.proOn', { source: source ?? '' }) : t('settings.proOff')}</p>
+        <p>
+          {TEST_MODE
+            ? t('settings.proTest')
+            : pro
+              ? t('settings.proOn', { source: source ?? '' })
+              : t('settings.proOff')}
+        </p>
         {pro && (
           <div>
             <Button onClick={revoke}>{t('settings.revoke')}</Button>

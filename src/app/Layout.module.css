@@ -36,23 +36,6 @@
 .brand:hover {
   color: var(--text);
 }
-.logo {
-  position: relative;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  background: var(--accent);
-}
-.logo::after {
-  content: '';
-  position: absolute;
-  right: 4px;
-  top: 4px;
-  width: 10px;
-  height: 7px;
-  border-radius: 2px;
-  background: var(--bg);
-}
 .main {
   flex: 1;
   padding: 16px 0 48px;
@@ -146,4 +129,13 @@
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+}
+.testNote {
+  margin: 0 0 12px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--pro-bg);
+  color: var(--pro-text);
+  font-size: 14px;
+  font-weight: 600;
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { parseIsoDate, streak, targetState, trMidnight } from '../src/engine/calendar';
-import { meetingCost, trDay } from '../src/engine/work';
+import { MONTHLY_HOURS, meetingCost, trDay } from '../src/engine/work';
 
 const tr = (y: number, mo: number, d: number, h = 0, mi = 0) => Date.UTC(y, mo - 1, d, h - 3, mi);
 const H = 3_600_000;
@@ -90,5 +90,7 @@ describe('meetingCost', () => {
   it('people × rate × hours', () => {
     expect(meetingCost(30 * 60_000, 6, 400)).toBe(1200);
     expect(meetingCost(0, 6, 400)).toBe(0);
+    // 6 people on 45.000 ₺ a month, 30 minutes: 45000 / 176 h × 6 × 0.5
+    expect(meetingCost(30 * 60_000, 6, 45_000 / MONTHLY_HOURS)).toBeCloseTo(767.05, 2);
   });
 });

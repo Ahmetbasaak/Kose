@@ -4,20 +4,21 @@ import s from '../../app/pages/pages.module.css';
 import { CornerFace } from '../../components/corner/CornerView';
 import { Field } from '../../components/Field';
 import { formatMoney } from '../../engine/format';
-import { meetingCost, parseTrNumber } from '../../engine/work';
+import { MONTHLY_HOURS, meetingCost, parseTrNumber } from '../../engine/work';
 import { t } from '../../i18n';
 import { StartFooter } from '../StartFooter';
 
 export function MeetingSetup() {
   const [people, setPeople] = useState('6');
-  const [rate, setRate] = useState('');
+  const [salary, setSalary] = useState('');
   const [showErrors, setShowErrors] = useState(false);
   const startSession = useStartSession();
 
   const n = Number(people);
-  const hourly = parseTrNumber(rate);
-  const error = !Number.isInteger(n) || n < 1 || n > 1000 ? 'people' : !(hourly > 0) ? 'rate' : null;
-  const fieldId = { people: 'meeting-people', rate: 'meeting-rate' } as const;
+  const monthly = parseTrNumber(salary);
+  const hourly = monthly / MONTHLY_HOURS;
+  const error = !Number.isInteger(n) || n < 1 || n > 1000 ? 'people' : !(monthly > 0) ? 'salary' : null;
+  const fieldId = { people: 'meeting-people', salary: 'meeting-salary' } as const;
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -31,10 +32,10 @@ export function MeetingSetup() {
       kind: 'stopwatch',
       label: t('modes.meeting.title'),
       durationMs: null,
-      meeting: { people: n, hourlyRate: hourly },
+      meeting: { people: n, hourlyRate: hourly, monthlySalary: monthly },
     });
   };
-  const errFor = (k: 'people' | 'rate') => (showErrors && error === k ? 'meeting-error' : null);
+  const errFor = (k: 'people' | 'salary') => (showErrors && error === k ? 'meeting-error' : null);
 
   return (
     <div className={s.split}>
@@ -51,14 +52,14 @@ export function MeetingSetup() {
             onChange={(e) => setPeople(e.target.value)}
           />
           <Field
-            id={fieldId.rate}
-            label={t('meeting.rate')}
+            id={fieldId.salary}
+            label={t('meeting.salary')}
             inputMode="decimal"
             autoComplete="off"
-            placeholder={t('meeting.ratePlaceholder')}
-            value={rate}
-            errorId={errFor('rate')}
-            onChange={(e) => setRate(e.target.value)}
+            placeholder={t('meeting.salaryPlaceholder')}
+            value={salary}
+            errorId={errFor('salary')}
+            onChange={(e) => setSalary(e.target.value)}
           />
         </div>
         {showErrors && error && (
@@ -84,6 +85,8 @@ export function MeetingSetup() {
         />
         {!error && (
           <p className={`${s.muted} ${s.small} num`}>
+            {t('meeting.derived', { rate: formatMoney(hourly), hours: MONTHLY_HOURS })}
+            <br />
             {t('meeting.perMinute', { v: formatMoney(meetingCost(60_000, n, hourly)) })}
           </p>
         )}

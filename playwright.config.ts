@@ -10,7 +10,8 @@ export default defineConfig({
     command: 'npx vite build && npx vite preview --port 4173 --strictPort',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
-    env: { VITE_DEV_PRO_KEY: E2E_PRO_KEY },
+    // Test mode off so the Pro gates themselves are exercised.
+    env: { VITE_DEV_PRO_KEY: E2E_PRO_KEY, VITE_TEST_MODE: '0' },
     timeout: 120_000,
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],

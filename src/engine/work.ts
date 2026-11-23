@@ -106,6 +106,9 @@ export function parseTrNumber(v: string): number {
   return Number(s.replace(/\./g, '').replace(',', '.'));
 }
 
+/** Paid hours in a month for turning a monthly salary into an hourly rate (22 days × 8 h). */
+export const MONTHLY_HOURS = 22 * 8;
+
 /** Live meeting cost: everyone's paid time so far. */
 export const meetingCost = (elapsedMs: number, people: number, hourlyRate: number) =>
   (elapsedMs / 3_600_000) * people * hourlyRate;

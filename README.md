@@ -41,6 +41,10 @@ Pro özellikleri tek bir yetki katmanından (`src/app/entitlements.ts`, `useEnti
 
 Ödeme sağlayıcısı henüz bağlı değil. Bağlamak için `src/app/license.ts` içinde bir `LicenseAdapter` yaz (`name`, `checkoutUrl`, `activate(key)`) ve `licenseAdapter`'a ata; arayüz (`/fiyat` lisans formu) hazır. Sunucu olmadığı için sağlayıcının tarayıcıdan çağrılabilen bir lisans doğrulama uç noktası olmalı (ör. Lemon Squeezy License API, Gumroad license verify). O alan adını CSP `connect-src`'ye ekle (`public/_headers`, `vercel.json`).
 
+### Test modu (şu an açık)
+
+`brand.config.json` → `"testMode": true` iken yayındaki sitede **herkes** tüm Pro özelliklerini görür; sayfanın üstünde "Test sürümü" notu çıkar. Pro satışa çıkmadan önce `false` yap.
+
 ### Geliştirmede Pro
 
 Geliştirirken Pro'yu açmak için derleme sırasında bir anahtar ver ve uygulamayı `?gelistirici=<anahtar>` ile aç:
@@ -83,6 +87,7 @@ Statik site: `npm run build` çıktısı `dist/`.
 - [ ] Alan adını al ve `brand.config.json` → `domain`'e yaz; marka tescili kontrolü.
 - [ ] Ödeme sağlayıcısını seç, `src/app/license.ts` adaptörünü yaz, fiyatları `brand.config.json` → `pricing`'e işle, sağlayıcının API alan adını CSP `connect-src`'ye ekle.
 - [ ] Gizlilik metnini (`/gizlilik`, `src/i18n/tr.ts` → `privacy`) hukukçuya incelet (KVKK); `[YAYINDAN ÖNCE: …]` yer tutucularını doldur (barındırma ve ödeme sağlayıcısı).
+- [ ] `brand.config.json` → `testMode`'u `false` yap (yoksa herkes Pro'yu bedava kullanır).
 - [ ] Üretim derlemesinde `VITE_DEV_PRO_KEY` tanımlı olmadığını kontrol et.
 - [ ] Gerçek Chrome/Edge'de köşe penceresini (PiP) ve bildirim iznini elle dene; telefonda PWA kurulumunu dene.
 - [ ] `public/pwa-*.png` ikonlarını marka kesinleşince yeniden üret.

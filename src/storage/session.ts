@@ -16,6 +16,8 @@ export type TimerKind = 'stopwatch' | 'countdown' | 'work' | 'cycle' | 'target' 
 export interface MeetingConfig {
   people: number;
   hourlyRate: number;
+  /** What the user typed; the hourly rate is derived from it. */
+  monthlySalary?: number;
 }
 
 export interface ActiveSession {
