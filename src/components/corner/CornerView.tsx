@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { useFinishSession } from '../../app/actions';
 import { config } from '../../app/config';
 import type { SessionDisplay } from '../../app/sessionView';
-import { sessionDisplay } from '../../app/sessionView';
+import { finishLabel, sessionDisplay } from '../../app/sessionView';
 import { t } from '../../i18n';
 import { useSessionStore, type ActiveSession } from '../../storage/session';
 import { MoneyValue } from '../MoneyValue';
@@ -60,7 +60,7 @@ function LiveCorner({ session, variant, extra }: { session: ActiveSession; varia
           </button>
         )}
         <button type="button" className={`${styles.action} ${styles.finish}`} onClick={finishSession}>
-          {t('timer.finish')}
+          {finishLabel(session.kind)}
         </button>
         {extra}
       </div>

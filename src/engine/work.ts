@@ -105,3 +105,7 @@ export function parseTrNumber(v: string): number {
   if (!/^\d{1,3}(\.\d{3})*(,\d+)?$|^\d+(,\d+)?$/.test(s)) return NaN;
   return Number(s.replace(/\./g, '').replace(',', '.'));
 }
+
+/** Live meeting cost: everyone's paid time so far. */
+export const meetingCost = (elapsedMs: number, people: number, hourlyRate: number) =>
+  (elapsedMs / 3_600_000) * people * hourlyRate;

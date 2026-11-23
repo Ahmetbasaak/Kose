@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useLaunchCorner } from '../../app/actions';
+import { useStartSession } from '../../app/actions';
 import s from '../../app/pages/pages.module.css';
 import { workDisplay } from '../../app/sessionView';
 import { Button } from '../../components/Button';
@@ -18,7 +18,6 @@ import {
 } from '../../engine/work';
 import { t } from '../../i18n';
 import { usePrefsStore } from '../../storage/prefs';
-import { useSessionStore } from '../../storage/session';
 
 const DEFAULTS: WorkConfig = {
   monthlySalary: NaN,
@@ -43,8 +42,7 @@ export function WorkSetup() {
     lunchMin: String(saved.lunchMin),
   });
   const [showErrors, setShowErrors] = useState(false);
-  const start = useSessionStore((st) => st.start);
-  const launch = useLaunchCorner();
+  const startSession = useStartSession();
   const now = useNow(250);
 
   const config: WorkConfig = {
@@ -81,10 +79,8 @@ export function WorkSetup() {
       document.getElementById(errorId!)?.focus();
       return;
     }
-    if (useSessionStore.getState().active && !window.confirm(t('setup.replaceConfirm'))) return;
     setLastWork(config);
-    start({ modeId: 'work', kind: 'work', label: t('modes.work.title'), durationMs: null, work: config });
-    await launch();
+    await startSession({ modeId: 'work', kind: 'work', label: t('modes.work.title'), durationMs: null, work: config });
   };
 
   const field = (id: string, key: keyof typeof f, label: string, props: Record<string, unknown> = {}) => {

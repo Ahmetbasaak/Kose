@@ -1,8 +1,8 @@
-/** Soft three-note chime via Web Audio; no audio files to ship. */
-export function playChime(): void {
+/** Soft chime via Web Audio (1–3 notes); no audio files to ship. */
+export function playChime(notes = 3): void {
   try {
     const ctx = new AudioContext();
-    [0, 0.22, 0.44].forEach((offset, i) => {
+    [0, 0.22, 0.44].slice(0, notes).forEach((offset, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';

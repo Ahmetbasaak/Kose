@@ -1,13 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { useLaunchCorner } from '../../app/actions';
-import { requestNotificationPermission } from '../../app/alerts';
+import { useStartSession } from '../../app/actions';
 import s from '../../app/pages/pages.module.css';
 import { Button } from '../../components/Button';
 import { CornerFace } from '../../components/corner/CornerView';
 import { isPipSupported } from '../../components/corner/pip';
 import { formatClock } from '../../engine/format';
 import { t } from '../../i18n';
-import { useSessionStore, type TimerKind } from '../../storage/session';
+import type { TimerKind } from '../../storage/session';
 
 const toInt = (v: string) => Math.max(0, Math.floor(Number(v) || 0));
 
@@ -17,8 +16,7 @@ export function SimpleSetup() {
   const [minutes, setMinutes] = useState('25');
   const [seconds, setSeconds] = useState('0');
   const [error, setError] = useState(false);
-  const start = useSessionStore((st) => st.start);
-  const launch = useLaunchCorner();
+  const startSession = useStartSession();
 
   const durationMs = (toInt(minutes) * 60 + toInt(seconds)) * 1000;
   const name = label.trim() || t('simple.defaultLabel');
@@ -26,11 +24,11 @@ export function SimpleSetup() {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (kind === 'countdown' && durationMs < 1000) return setError(true);
-    if (useSessionStore.getState().active && !window.confirm(t('setup.replaceConfirm'))) return;
     setError(false);
-    start({ modeId: 'simple', kind, label: name, durationMs: kind === 'countdown' ? durationMs : null });
-    await launch();
-    if (kind === 'countdown') requestNotificationPermission();
+    await startSession(
+      { modeId: 'simple', kind, label: name, durationMs: kind === 'countdown' ? durationMs : null },
+      { askNotify: kind === 'countdown' },
+    );
   };
 
   return (

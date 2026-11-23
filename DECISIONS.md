@@ -24,3 +24,13 @@
 - Mesai modunda duraklatma yok: kazanç saate bağlı, sayaç değil.
 - Son mesai ayarları (maaş dahil) yalnızca bu cihazda localStorage'da tutulur ki form tekrar doldurulmasın.
 - Özet ekranındaki paylaşım kartı ve Excel/PDF düğmeleri şimdilik pasif; kart önizlemesi Faz 4'te kartla birlikte gelir.
+- Oturum türleri genelleştirildi: `cycle` (mola, Pomodoro: tekrarlayan bölümler), `target` (takvim geri sayımı); toplantı maliyeti `stopwatch` + `meeting` ayarı. Uyarılar oturum başına sayaçla (`alerts`) tutulur; her bölüm sınırı bir kez uyarır.
+- Kalıcı oturum şeması v2'ye geçti; v1'deki `alertedAt` → `alerts` sayısına dönüştürülür.
+- Mola/Pomodoro uyarıları "nazik": tek nota, `role="status"` (ekran okuyucuyu bölmez); süre doldu/geri sayım geldi `role="alert"`.
+- Hedef geri sayımlar (hafta sonu, maaş günü, doğum günü) kural olarak saklanır, tarih değil; hedef her açılışta Türkiye saatine göre yeniden hesaplanır. Ayın 31'i olmayan aylarda maaş günü ayın son günü; 29 Şubat artık olmayan yıllarda 28 Şubat.
+- "Hafta sonuna" hedefi Cumartesi 00:00; hafta sonu boyunca "Hafta sonundasın" gösterilir.
+- Takvim geri sayımı oturum başına bir kez uyarır (tekrarlayan kurallarda sonraki dönem yeni uyarı vermez, köşede yeniden başlatılmalı).
+- Geri sayım listesi localStorage'da (ayar niteliğinde); IndexedDB geçmiş kayıtlar için Faz 5'te.
+- Tatil verisi: 2027 ve 1 Ocak 2028 resmî günleri. Dinî bayram tarihleri Diyanet takvimine atıf yapan haberlerden (Ramazan 9–11 Mart, Kurban 16–19 Mayıs 2027); tüm kayıtlar `verified: false`, arayüzde "doğrulanmadı" notuyla gösterilir.
+- Çalışma serisi: bir Pomodoro odak bloğu bittiği gün seriye eklenir; dünkü seri bugün bitene kadar korunur; son 366 gün tutulur.
+- Kurulum formlarında ortak `useStartSession` (değiştirme onayı + köşede başlatma + bildirim izni) ve `Field` bileşeni.

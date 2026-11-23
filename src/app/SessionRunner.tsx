@@ -1,38 +1,44 @@
 import { useEffect } from 'react';
 import { usePipStore } from '../components/corner/pip';
 import { useNow } from '../components/useNow';
-import { finishAt } from '../engine/timer';
+import { trDay } from '../engine/work';
 import { t } from '../i18n';
+import { usePrefsStore } from '../storage/prefs';
 import { useSessionStore } from '../storage/session';
 import { notify, playChime } from './alerts';
+import { sessionEvents } from './sessionView';
 import styles from './Layout.module.css';
 
-/** Alerts slower than this after the real end were missed (page closed): show in-page only, no sound. */
+/** Alerts slower than this after the real moment were missed (page closed): show in-page only, no sound. */
 const MISSED_AFTER_MS = 5000;
 
 export function SessionRunner() {
   const active = useSessionStore((s) => s.active);
   const markAlerted = useSessionStore((s) => s.markAlerted);
   const dismissAlert = useSessionStore((s) => s.dismissAlert);
+  const addStudyDay = usePrefsStore((s) => s.addStudyDay);
   const pipWin = usePipStore((s) => s.win);
-  const watching = active?.kind === 'countdown' && active.alertedAt === null;
+  const watching = active !== null && ['countdown', 'cycle', 'target'].includes(active.kind);
   const now = useNow(250, pipWin ?? window, watching);
+  const ev = active && watching ? sessionEvents(active, now) : null;
 
   useEffect(() => {
-    if (!watching || active.durationMs === null) return;
-    const end = finishAt(active.timer, active.durationMs);
-    if (end === null || now < end) return;
-    markAlerted(now);
-    if (now - end > MISSED_AFTER_MS) return;
-    playChime();
-    notify(t('alert.doneTitle'), t('alert.doneBody', { label: active.label }));
-  }, [watching, active, now, markAlerted]);
+    if (!active || !ev || ev.count <= active.alerts) return;
+    // Pomodoro boundary k (1-based) ends a focus block when k is odd; record the study day.
+    if (active.modeId === 'student' && (ev.count - active.alerts >= 2 || ev.count % 2 === 1)) addStudyDay(trDay(now));
+    markAlerted(ev.count);
+    if (now - ev.lastAt > MISSED_AFTER_MS) return;
+    playChime(ev.gentle ? 1 : 3);
+    notify(ev.gentle ? ev.message : t('alert.doneTitle'), ev.gentle ? '' : ev.message);
+  }, [active, ev, now, markAlerted, addStudyDay]);
 
-  if (!active?.alertedAt || active.alertDismissed) return null;
+  if (!active || !ev || active.alerts === 0 || active.alertDismissed) return null;
   return (
-    <div role="alert" className={styles.alert}>
+    // Gentle reminders must not interrupt a screen reader; "time is up" may.
+    <div role={ev.gentle ? 'status' : 'alert'} className={styles.alert}>
       <p>
-        <strong>{t('alert.doneTitle')}.</strong> {t('alert.doneBody', { label: active.label })}
+        {!ev.gentle && <strong>{t('alert.doneTitle')}. </strong>}
+        {ev.message}
       </p>
       <button type="button" className={styles.alertBtn} onClick={dismissAlert}>
         {t('alert.dismiss')}

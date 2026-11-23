@@ -1,0 +1,85 @@
+{
+  "note": "Türkiye resmî tatil ve bayram günleri. 'verified: false' olan kayıtlar yayından önce resmî kaynaktan (Resmî Gazete, Diyanet dinî günler takvimi) doğrulanmalıdır. Saatler Türkiye saatiyle 00:00 kabul edilir.",
+  "holidays": [
+    {
+      "id": "yilbasi-2027",
+      "name": "Yılbaşı",
+      "start": "2027-01-01",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    },
+    {
+      "id": "ramazan-2027",
+      "name": "Ramazan Bayramı",
+      "start": "2027-03-09",
+      "days": 3,
+      "verified": false,
+      "source": "Diyanet takvimine atıf yapan haberler; arife 8 Mart yarım gün"
+    },
+    {
+      "id": "23-nisan-2027",
+      "name": "Ulusal Egemenlik ve Çocuk Bayramı",
+      "start": "2027-04-23",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    },
+    {
+      "id": "1-mayis-2027",
+      "name": "Emek ve Dayanışma Günü",
+      "start": "2027-05-01",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    },
+    {
+      "id": "kurban-2027",
+      "name": "Kurban Bayramı",
+      "start": "2027-05-16",
+      "days": 4,
+      "verified": false,
+      "source": "Diyanet takvimine atıf yapan haberler (bir kaynak 17 Mayıs diyor); arife 15 Mayıs yarım gün"
+    },
+    {
+      "id": "19-mayis-2027",
+      "name": "Atatürk'ü Anma, Gençlik ve Spor Bayramı",
+      "start": "2027-05-19",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    },
+    {
+      "id": "15-temmuz-2027",
+      "name": "Demokrasi ve Millî Birlik Günü",
+      "start": "2027-07-15",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    },
+    {
+      "id": "30-agustos-2027",
+      "name": "Zafer Bayramı",
+      "start": "2027-08-30",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    },
+    {
+      "id": "29-ekim-2027",
+      "name": "Cumhuriyet Bayramı",
+      "start": "2027-10-29",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih); 28 Ekim yarım gün"
+    },
+    {
+      "id": "yilbasi-2028",
+      "name": "Yılbaşı",
+      "start": "2028-01-01",
+      "days": 1,
+      "verified": false,
+      "source": "2429 sayılı Kanun (sabit tarih)"
+    }
+  ]
+}

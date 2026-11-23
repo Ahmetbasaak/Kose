@@ -5,7 +5,7 @@ import { useNow } from '../../components/useNow';
 import { t } from '../../i18n';
 import { useSessionStore } from '../../storage/session';
 import { useFinishSession } from '../actions';
-import { sessionDisplay } from '../sessionView';
+import { finishLabel, sessionDisplay } from '../sessionView';
 import s from './pages.module.css';
 
 /** Full-page view of the running session; the main view on phones. */
@@ -46,7 +46,7 @@ export function LivePage() {
           <Button onClick={() => togglePause()}>{d.status === 'paused' ? t('timer.resume') : t('timer.pause')}</Button>
         )}
         <Button variant="primary" onClick={finishSession}>
-          {t('timer.finish')}
+          {finishLabel(active.kind)}
         </Button>
         {isPipSupported() && !pipOpen && <Button onClick={() => void openPip()}>{t('timer.openCorner')}</Button>}
       </div>

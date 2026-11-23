@@ -41,6 +41,21 @@ export function SummaryPage() {
             </span>
           )}
         </div>
+        {summary.cost != null && summary.meeting && (
+          <div className={`${s.card} ${s.stat}`}>
+            <span className={`${s.muted} ${s.small}`}>{t('meeting.cost')}</span>
+            <span className={`${s.statValue} num`}>{formatMoney(summary.cost)}</span>
+            <span className={`${s.muted} ${s.small} num`}>
+              {t('meeting.summarySub', { n: summary.meeting.people, rate: formatMoney(summary.meeting.hourlyRate) })}
+            </span>
+          </div>
+        )}
+        {summary.focusMs != null && (
+          <div className={`${s.card} ${s.stat}`}>
+            <span className={`${s.muted} ${s.small}`}>{t('student.focusTotal')}</span>
+            <span className={`${s.statValue} num`}>{durationWords(summary.focusMs)}</span>
+          </div>
+        )}
         {isWork && (
           <div className={`${s.card} ${s.stat}`}>
             <span className={`${s.muted} ${s.small}`}>{t('summary.earned')}</span>
