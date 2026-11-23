@@ -1,7 +1,7 @@
 # Köşe
 
 Ekranın köşesinde duran küçük sayaç penceresi. Statik PWA: hesap yok, sunucu yok, veri yalnızca cihazda.
-Çalışma adı geçicidir; marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
+Marka adı Türkçe **Köşe**, İngilizce **Corner**. Marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
 
 ## Kurulum
 
@@ -30,7 +30,7 @@ npm run e2e        # Playwright: akışlar, çevrimdışı, axe erişilebilirlik
 - `src/i18n/` — tüm arayüz metinleri (`tr.ts`). Yeni dil = aynı şekilde yeni sözlük.
 - `src/share/` — paylaşım kartı (canvas), haftalık özet, URL ile paylaşılan geri sayım ve OBS parametreleri.
 - `src/export/` — Excel (`write-excel-file`, yalnızca dışa aktarırken yüklenir). PDF, tarayıcının yazdırma → PDF'i ile.
-- `src/data/holidays.tr.json` — resmî tatiller (doğrulanmamış kayıtlar `"verified": false`).
+- `src/data/holidays.ts` — resmî tatiller her yıl için çevrimdışı hesaplanır: kanunla sabit günler kurala göre, Ramazan/Kurban Bayramı tarayıcının hicri takviminden (Ümmü'l-Kura; Diyanet'in 2023–2027 ilanlarıyla birebir aynı). Diyanet farklı bir tarih ilan ederse `src/data/holidays.tr.json` → `overrides`'a eklenir.
 - Depolama: ayarlar, aktif oturum, geri sayımlar, serbest çalışan kayıtları localStorage'da; bitmiş oturum geçmişi IndexedDB'de. Hiçbiri cihazdan çıkmaz.
 
 Plan: `PLAN.md`. Kararlar: `DECISIONS.md`.
@@ -78,8 +78,8 @@ Statik site: `npm run build` çıktısı `dist/`.
 
 ## Yayından önce yapılacaklar
 
-- [ ] Resmî tatil/bayram verisini (`src/data/holidays.tr.json`) Resmî Gazete ve Diyanet takviminden doğrula; doğrulananları `"verified": true` yap. 2027 Kurban Bayramı'nın ilk günü kaynaklarda 16/17 Mayıs diye farklı geçiyor.
-- [ ] Marka adı ve alan adı müsaitlik kontrolü (alan adı, marka tescili, uygulama mağazası adları); `brand.config.json` → `name`, `domain`.
+- [ ] Her yıl Diyanet bayram tarihlerini ilan edince hesaplananla karşılaştır; fark varsa `src/data/holidays.tr.json` → `overrides`'a ekle (genelde gerekmez).
+- [ ] Alan adını al ve `brand.config.json` → `domain`'e yaz; marka tescili kontrolü.
 - [ ] Ödeme sağlayıcısını seç, `src/app/license.ts` adaptörünü yaz, fiyatları `brand.config.json` → `pricing`'e işle, sağlayıcının API alan adını CSP `connect-src`'ye ekle.
 - [ ] Gizlilik metnini (`/gizlilik`, `src/i18n/tr.ts` → `privacy`) hukukçuya incelet (KVKK); `[YAYINDAN ÖNCE: …]` yer tutucularını doldur (barındırma ve ödeme sağlayıcısı).
 - [ ] Üretim derlemesinde `VITE_DEV_PRO_KEY` tanımlı olmadığını kontrol et.

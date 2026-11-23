@@ -102,7 +102,9 @@ export function CountdownsSetup() {
       return Number.isInteger(d) && d >= 1 && d <= 31 ? { rule: { type: 'payday', day: d }, title: name } : 'payday';
     }
     if (template === 'holiday')
-      return holiday ? { rule: { type: 'at', at: holiday.at }, title: name, unverified: !holiday.verified } : 'holiday';
+      return holiday
+        ? { rule: { type: 'at', at: holiday.at }, title: name, unverified: holiday.source === 'calculated' }
+        : 'holiday';
     const ymd = parseIsoDate(date);
     if (!ymd) return 'date';
     if (template === 'birthday') return { rule: { type: 'yearly', m: ymd.m, d: ymd.d }, title: name };
@@ -212,17 +214,17 @@ export function CountdownsSetup() {
                 id="cd-holiday"
                 className={s.input}
                 value={holiday?.id ?? ''}
-                aria-describedby={holiday && !holiday.verified ? 'cd-holiday-note' : undefined}
+                aria-describedby={holiday?.source === 'calculated' ? 'cd-holiday-note' : undefined}
                 onChange={(e) => setHolidayId(e.target.value)}
               >
                 {holidays.map((h) => (
                   <option key={h.id} value={h.id}>
                     {h.name} · {formatTrDate(h.at)}
-                    {h.verified ? '' : ' *'}
+                    {h.source === 'calculated' ? ' *' : ''}
                   </option>
                 ))}
               </select>
-              {holiday && !holiday.verified && (
+              {holiday?.source === 'calculated' && (
                 <span id="cd-holiday-note" className={`${s.muted} ${s.small}`}>
                   * {t('countdowns.unverified')}
                 </span>

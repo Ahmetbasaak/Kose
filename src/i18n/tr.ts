@@ -153,7 +153,7 @@ export const tr = {
     removeLabel: 'Sil: {title}',
     arrived: 'Geldi!',
     weekendArrived: 'Hafta sonundasın',
-    unverified: 'Tarih henüz resmî kaynaktan doğrulanmadı.',
+    unverified: "Hicri takvimden hesaplandı; Diyanet'in ilanıyla nadiren bir gün fark olabilir.",
     dayClock: '{d} g {clock}',
     errors: {
       title: 'Bir ad yaz.',
