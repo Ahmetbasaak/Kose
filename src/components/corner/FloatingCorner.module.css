@@ -18,11 +18,6 @@
 
 @media (max-width: 639px) {
   .root {
-    left: 16px !important;
-    right: 16px;
-    top: auto !important;
-    bottom: 80px; /* above the tab bar */
-    width: auto;
-    cursor: default;
+    display: none;
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { usePipStore } from '../components/corner/pip';
 import { useNow } from '../components/useNow';
+import { focusEndsBetween } from '../engine/cycles';
 import { trDay } from '../engine/work';
 import { t } from '../i18n';
 import { usePrefsStore } from '../storage/prefs';
@@ -17,6 +18,7 @@ export function SessionRunner() {
   const markAlerted = useSessionStore((s) => s.markAlerted);
   const dismissAlert = useSessionStore((s) => s.dismissAlert);
   const addStudyDay = usePrefsStore((s) => s.addStudyDay);
+  const addPomodoros = usePrefsStore((s) => s.addPomodoros);
   const pipWin = usePipStore((s) => s.win);
   const watching = active !== null && ['countdown', 'cycle', 'target', 'sections'].includes(active.kind);
   const now = useNow(250, pipWin ?? window, watching);
@@ -24,13 +26,17 @@ export function SessionRunner() {
 
   useEffect(() => {
     if (!active || !ev || ev.count <= active.alerts) return;
-    // Pomodoro boundary k (1-based) ends a focus block when k is odd; record the study day.
-    if (active.modeId === 'student' && (ev.count - active.alerts >= 2 || ev.count % 2 === 1)) addStudyDay(trDay(now));
+    // Finished focus blocks feed the study streak and today's Pomodoro count.
+    const finishedFocus = active.modeId === 'student' ? focusEndsBetween(active.alerts, ev.count) : 0;
+    if (finishedFocus > 0) {
+      addStudyDay(trDay(now));
+      addPomodoros(trDay(now), finishedFocus);
+    }
     markAlerted(ev.count);
     if (now - ev.lastAt > MISSED_AFTER_MS) return;
     playChime(ev.gentle ? 1 : 3);
     notify(ev.gentle ? ev.message : t('alert.doneTitle'), ev.gentle ? '' : ev.message);
-  }, [active, ev, now, markAlerted, addStudyDay]);
+  }, [active, ev, now, markAlerted, addStudyDay, addPomodoros]);
 
   if (!active || !ev || active.alerts === 0 || active.alertDismissed) return null;
   return (

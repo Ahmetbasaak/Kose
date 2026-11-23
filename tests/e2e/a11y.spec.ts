@@ -18,6 +18,7 @@ const PAGES = [
   '/gecmis',
   '/ayarlar',
   '/sayim?ad=S%C4%B1nav&t=1812574800',
+  '/mod/yayin',
   '/fiyat',
   '/gizlilik',
   '/bilinmeyen-sayfa',

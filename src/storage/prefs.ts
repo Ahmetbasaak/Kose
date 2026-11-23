@@ -26,6 +26,10 @@ interface PrefsState {
   /** Turkey day numbers with at least one finished Pomodoro focus block. */
   studyDays: number[];
   addStudyDay: (day: number) => void;
+  /** Focus blocks finished on `day` (Turkey day number). */
+  pomodoroDay: { day: number; count: number };
+  addPomodoros: (day: number, n: number) => void;
+  pomodoroGoal: number;
   /** User's own coffee price for "kahve parası" cards; null until they type one. */
   coffeePrice: number | null;
   setCoffeePrice: (p: number | null) => void;
@@ -41,6 +45,8 @@ interface PrefsState {
   cornerScale: number;
   shortcuts: boolean;
   autostart: boolean;
+  /** Last meeting setup, for the home screen's one-tap start. */
+  lastMeeting: { people: number; monthlySalary: number } | null;
   /** Last session started from a setup screen, for autostart. */
   lastStart: StartInput | null;
   appTheme: AppTheme;
@@ -57,7 +63,7 @@ interface PrefsState {
   /** Keep the screen awake while a timer runs (Wake Lock). */
   keepAwake: boolean;
   /** Plain setting fields only (not the action functions). */
-  set: (patch: Partial<Omit<PrefsState, 'set' | `set${string}` | 'addStudyDay'>>) => void;
+  set: (patch: Partial<Omit<PrefsState, 'set' | `set${string}` | `add${string}`>>) => void;
 }
 
 export const usePrefsStore = create<PrefsState>()(
@@ -68,6 +74,10 @@ export const usePrefsStore = create<PrefsState>()(
       lastWork: null,
       setLastWork: (lastWork) => set({ lastWork }),
       studyDays: [],
+      pomodoroDay: { day: 0, count: 0 },
+      addPomodoros: (day, n) =>
+        set((s) => ({ pomodoroDay: { day, count: (s.pomodoroDay.day === day ? s.pomodoroDay.count : 0) + n } })),
+      pomodoroGoal: 4,
       coffeePrice: null,
       setCoffeePrice: (coffeePrice) => set({ coffeePrice }),
       weeklySeenWeek: null,
@@ -78,6 +88,7 @@ export const usePrefsStore = create<PrefsState>()(
       shortcuts: true,
       autostart: false,
       lastStart: null,
+      lastMeeting: null,
       appTheme: 'system',
       reduceMotion: false,
       titleTimer: true,

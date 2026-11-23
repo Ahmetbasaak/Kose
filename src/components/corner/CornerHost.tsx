@@ -4,6 +4,7 @@ import { useLocation } from 'react-router';
 import { useSessionStore } from '../../storage/session';
 import { CornerView } from './CornerView';
 import { FloatingCorner } from './FloatingCorner';
+import { MiniBar } from './MiniBar';
 import { closePip, usePipStore } from './pip';
 import { TargetWindowContext } from './targetWindow';
 
@@ -26,5 +27,11 @@ export function CornerHost() {
       win.document.body,
     );
   if (pathname === '/sayac') return null;
-  return <FloatingCorner />;
+  // CSS shows exactly one of them: the floating window on wide screens, the mini bar on phones.
+  return (
+    <>
+      <FloatingCorner />
+      <MiniBar />
+    </>
+  );
 }

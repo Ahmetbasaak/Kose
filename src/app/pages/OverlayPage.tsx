@@ -2,22 +2,11 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useNow } from '../../components/useNow';
 import { formatClock } from '../../engine/format';
-import { parseOverlay } from '../../share/link';
+import { parseOverlay, type OverlayConfig } from '../../share/link';
 import { daysClock } from '../sessionView';
 
-/** /overlay — bare, transparent counter for an OBS "Browser Source". Configured only by URL. */
-export function OverlayPage() {
-  const [params] = useSearchParams();
-  const [loadedAt] = useState(Date.now);
-  const cfg = parseOverlay(params, loadedAt);
-  const now = useNow(250);
-
-  useEffect(() => {
-    const els = [document.documentElement, document.body];
-    els.forEach((el) => el.style.setProperty('background', 'transparent'));
-    return () => els.forEach((el) => el.style.removeProperty('background'));
-  }, []);
-
+/** The bare counter, shared by /overlay and the link builder's preview. */
+export function OverlayView({ cfg, now }: { cfg: OverlayConfig; now: number }) {
   const m = cfg.mode;
   const value =
     m.type === 'stopwatch'
@@ -25,9 +14,8 @@ export function OverlayPage() {
       : m.type === 'countdown'
         ? formatClock(Math.max(0, m.endAt - now), 'ceil')
         : daysClock(Math.max(0, m.at - now));
-
   return (
-    <main
+    <div
       style={{
         color: cfg.color,
         padding: 16,
@@ -41,6 +29,25 @@ export function OverlayPage() {
       <div className="num" role="timer" style={{ fontSize: cfg.sizePx, letterSpacing: '-0.02em' }}>
         {value}
       </div>
+    </div>
+  );
+}
+
+/** /overlay — bare, transparent counter for an OBS "Browser Source". Configured only by URL. */
+export function OverlayPage() {
+  const [params] = useSearchParams();
+  const [loadedAt] = useState(Date.now);
+  const now = useNow(250);
+
+  useEffect(() => {
+    const els = [document.documentElement, document.body];
+    els.forEach((el) => el.style.setProperty('background', 'transparent'));
+    return () => els.forEach((el) => el.style.removeProperty('background'));
+  }, []);
+
+  return (
+    <main>
+      <OverlayView cfg={parseOverlay(params, loadedAt)} now={now} />
     </main>
   );
 }

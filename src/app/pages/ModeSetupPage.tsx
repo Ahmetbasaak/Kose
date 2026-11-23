@@ -19,7 +19,13 @@ export function ModeSetupPage() {
         <span className={`${s.muted} ${s.small}`}>{t('setup.modeLabel', { mode: title })}</span>
       </div>
       <h1 className={s.h1}>{title}</h1>
-      <Suspense fallback={null}>
+      <Suspense
+        fallback={
+          <div className={s.card} aria-busy="true">
+            {t('app.loading')}
+          </div>
+        }
+      >
         {mode.Setup ? (
           mode.pro ? (
             <ProGate feature={mode.pro}>

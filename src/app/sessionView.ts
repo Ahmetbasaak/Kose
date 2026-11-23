@@ -88,7 +88,7 @@ export function workDisplay(c: WorkConfig, now: number): SessionDisplay {
 }
 
 function cycleCaption(s: ActiveSession, segment: number): string {
-  if (s.modeId === 'student') return segment === 0 ? t('student.focus') : t('student.rest');
+  if (s.modeId === 'student') return segment % 2 === 0 ? t('student.focus') : t('student.rest');
   return t('break.until');
 }
 
@@ -143,7 +143,7 @@ export function sessionDisplay(s: ActiveSession, now: number): SessionDisplay {
       value: formatClock(c.remainingMs, 'ceil'),
       status: running ? 'running' : 'paused',
       caption: running ? cycleCaption(s, c.segment) : t('timer.paused'),
-      sub: s.modeId === 'student' ? t('student.round', { n: c.round }) : undefined,
+      sub: s.modeId === 'student' ? t('student.round', { n: Math.floor(c.boundaries / 2) + 1 }) : undefined,
       canPause: pausable,
     };
   }
@@ -203,7 +203,7 @@ export function sessionEvents(s: ActiveSession, now: number): SessionEvents | nu
     const c = cycleState(elapsedMs(s.timer, now), s.segments);
     const message =
       s.modeId === 'student'
-        ? c.segment === 0
+        ? c.segment % 2 === 0
           ? t('student.focusMessage')
           : t('student.restMessage')
         : t('break.message');

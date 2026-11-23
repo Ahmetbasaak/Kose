@@ -37,3 +37,15 @@ export function timeInSegment(elapsedMs: number, segments: readonly number[], in
   if (s.segment === index) return full + s.segmentElapsedMs;
   return full;
 }
+
+/** Pomodoro plan: `every` focus blocks with short rests, the last rest long. Even indices are focus. */
+export function pomodoroSegments(focusMs: number, restMs: number, longRestMs: number, every: number): number[] {
+  return Array.from({ length: every }, (_, i) => [focusMs, i === every - 1 ? longRestMs : restMs]).flat();
+}
+
+/** Total focus time (all even segments) in a Pomodoro run. */
+export const focusTime = (elapsedMs: number, segments: readonly number[]) =>
+  segments.reduce((sum, _, i) => (i % 2 === 0 ? sum + timeInSegment(elapsedMs, segments, i) : sum), 0);
+
+/** Focus blocks finished among boundaries (from, to]: boundary k (1-based) ends a focus block when k is odd. */
+export const focusEndsBetween = (from: number, to: number) => Math.ceil(to / 2) - Math.ceil(from / 2);

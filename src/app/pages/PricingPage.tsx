@@ -19,7 +19,8 @@ const ROWS = [
   ['history', false],
   ['export', false],
   ['themes', false],
-  ['shortcuts', false],
+  ['shortcuts', true],
+  ['autostart', false],
 ] as const;
 
 function Mark({ on }: { on: boolean }) {

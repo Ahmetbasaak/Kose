@@ -1,5 +1,6 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import { Button, ButtonLink } from '../../components/Button';
+import { InstallHint } from '../../components/InstallHint';
 import { LazyShareCard } from '../../share/lazy';
 import { isPipSupported, openPip, usePipStore } from '../../components/corner/pip';
 import { MoneyValue } from '../../components/MoneyValue';
@@ -17,6 +18,7 @@ export function LivePage() {
   const pipOpen = usePipStore((st) => st.win !== null);
   const finishSession = useFinishSession();
   const [snapshot, setSnapshot] = useState<SessionSummary | null>(null);
+  const card = useRef<HTMLElement>(null);
   const now = useNow(250, window, active !== null);
 
   if (!active)
@@ -35,7 +37,7 @@ export function LivePage() {
   const d = sessionDisplay(active, now);
   return (
     <div className={s.stack}>
-      <section className={s.liveCard} aria-labelledby="live-title" data-level={d.level}>
+      <section ref={card} className={s.liveCard} aria-labelledby="live-title" data-level={d.level}>
         <div className={s.spread}>
           <h1 id="live-title" className={s.liveCaption}>
             {active.label}
@@ -54,6 +56,11 @@ export function LivePage() {
         <Button variant="primary" onClick={finishSession}>
           {finishLabel(active.kind)}
         </Button>
+        {document.fullscreenEnabled && (
+          <Button onClick={() => void card.current?.requestFullscreen().catch(() => undefined)}>
+            {t('timer.fullscreen')}
+          </Button>
+        )}
         <Button
           aria-expanded={snapshot !== null}
           onClick={() => setSnapshot(snapshot ? null : summarize(active, Date.now()))}
@@ -69,6 +76,7 @@ export function LivePage() {
       )}
       {active.kind === 'work' && <p className={`${s.muted} ${s.small}`}>{t('work.disclaimer')}</p>}
       {!isPipSupported() && <p className={`${s.muted} ${s.small}`}>{t('timer.mobileNote')}</p>}
+      {active.kind !== 'stopwatch' && active.kind !== 'work' && <InstallHint />}
     </div>
   );
 }

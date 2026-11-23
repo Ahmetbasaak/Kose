@@ -4,15 +4,7 @@ import { config } from './config';
 
 /** Everything Pro gates. One list so pricing copy and gates stay in sync. */
 export type ProFeature =
-  | 'freelance'
-  | 'presentation'
-  | 'multi'
-  | 'history'
-  | 'export'
-  | 'themes'
-  | 'cornerSettings'
-  | 'shortcuts'
-  | 'autostart';
+  'freelance' | 'presentation' | 'multi' | 'history' | 'export' | 'themes' | 'cornerSettings' | 'autostart';
 
 type Source = 'dev' | 'license';
 

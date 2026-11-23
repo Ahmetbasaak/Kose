@@ -6,6 +6,7 @@ import { Field } from '../../components/Field';
 import { formatMoney } from '../../engine/format';
 import { MONTHLY_HOURS, meetingCost, parseTrNumber } from '../../engine/work';
 import { t } from '../../i18n';
+import { usePrefsStore } from '../../storage/prefs';
 import { StartFooter } from '../StartFooter';
 
 export function MeetingSetup() {
@@ -27,6 +28,7 @@ export function MeetingSetup() {
       document.getElementById(fieldId[error])?.focus();
       return;
     }
+    usePrefsStore.getState().set({ lastMeeting: { people: n, monthlySalary: monthly } });
     await startSession({
       modeId: 'meeting',
       kind: 'stopwatch',

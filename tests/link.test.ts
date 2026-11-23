@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseOverlay, parseSharedCountdown, shareCountdownUrl } from '../src/share/link';
+import { overlayUrl, parseOverlay, parseSharedCountdown, shareCountdownUrl } from '../src/share/link';
 
 const AT = Date.UTC(2027, 5, 10, 6, 30);
 
@@ -46,5 +46,34 @@ describe('overlay params', () => {
     expect(o('boyut=9999').sizePx).toBe(96);
     expect(o('boyut=140&ad=Yayın').sizePx).toBe(140);
     expect(o('ad=Yayın').label).toBe('Yayın');
+  });
+});
+
+describe('overlay link builder', () => {
+  it('round-trips through parseOverlay', () => {
+    const url = new URL(
+      overlayUrl('https://x.dev', {
+        label: 'Mola',
+        mode: { type: 'countdown', minutes: 10 },
+        color: '#ffcc00',
+        sizePx: 140,
+      }),
+    );
+    expect(url.pathname).toBe('/overlay');
+    expect(parseOverlay(url.searchParams, 1000)).toEqual({
+      label: 'Mola',
+      mode: { type: 'countdown', endAt: 1000 + 600_000 },
+      color: '#ffcc00',
+      sizePx: 140,
+    });
+    const target = new URL(
+      overlayUrl('https://x.dev', {
+        label: null,
+        mode: { type: 'target', at: 1_800_000_000_000 },
+        color: '#fff',
+        sizePx: 96,
+      }),
+    );
+    expect(parseOverlay(target.searchParams, 0).mode).toEqual({ type: 'target', at: 1_800_000_000_000 });
   });
 });

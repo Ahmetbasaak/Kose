@@ -64,3 +64,17 @@ export function parseOverlay(params: URLSearchParams, loadedAt: number): Overlay
     sizePx: Number.isFinite(size) && size >= 16 && size <= 400 ? size : 96,
   };
 }
+
+/** Inverse of parseOverlay, for the link builder. */
+export function overlayUrl(origin: string, cfg: Omit<OverlayConfig, 'mode'> & { mode: OverlayLinkMode }): string {
+  const q = new URLSearchParams();
+  if (cfg.mode.type === 'target') q.set('t', String(Math.floor(cfg.mode.at / 1000)));
+  if (cfg.mode.type === 'countdown') q.set('sure', String(cfg.mode.minutes));
+  if (cfg.label) q.set('ad', cfg.label.slice(0, MAX_TITLE));
+  q.set('renk', cfg.color.replace('#', ''));
+  q.set('boyut', String(cfg.sizePx));
+  return `${origin}/overlay?${q}`;
+}
+
+export type OverlayLinkMode =
+  { type: 'stopwatch' } | { type: 'countdown'; minutes: number } | { type: 'target'; at: number };

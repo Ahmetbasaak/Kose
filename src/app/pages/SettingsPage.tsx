@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Button } from '../../components/Button';
 import { CornerFace } from '../../components/corner/CornerView';
+import { InstallHint } from '../../components/InstallHint';
 import { ProGate } from '../../components/ProGate';
 import { t } from '../../i18n';
 import { clearLocalStorage, collectLocalStorage, parseBackup } from '../../storage/backup';
@@ -69,7 +70,7 @@ export function SettingsPage() {
   );
   const [dataMsg, setDataMsg] = useState<string | null>(null);
 
-  const exportData = async () => {
+  const backupFile = async () => {
     const backup = {
       app: 'kose',
       version: 1,
@@ -78,7 +79,18 @@ export function SettingsPage() {
       history: await allRecords().catch(() => []),
     };
     const day = new Date().toISOString().slice(0, 10);
-    download(`${brandSlug}-yedek-${day}.json`, new Blob([JSON.stringify(backup)], { type: 'application/json' }));
+    return new File([JSON.stringify(backup)], `${brandSlug}-yedek-${day}.json`, { type: 'application/json' });
+  };
+  const exportData = async () => {
+    const file = await backupFile();
+    download(file.name, file);
+  };
+  // Phones: hand the file straight to WhatsApp, AirDrop, Drive… via the share sheet.
+  const canShareFile =
+    typeof navigator.canShare === 'function' &&
+    navigator.canShare({ files: [new File(['{}'], 'x.json', { type: 'application/json' })] });
+  const shareData = async () => {
+    await navigator.share({ files: [await backupFile()] }).catch(() => undefined);
   };
 
   const importData = async (file: File | undefined) => {
@@ -185,6 +197,7 @@ export function SettingsPage() {
           <p className={`${s.muted} ${s.small}`} role="status">
             {t(`settings.notif.${notif}`)}
           </p>
+          <InstallHint />
           {notif === 'default' && (
             <div>
               <Button onClick={() => void Notification.requestPermission().then(setNotif)}>
@@ -302,26 +315,24 @@ export function SettingsPage() {
       </Section>
 
       <Section id="set-keys" title={t('settings.shortcuts')}>
-        <ProGate feature="shortcuts">
-          <div className={`${s.card} ${s.stack}`} style={{ gap: 8 }}>
-            <Check
-              checked={prefs.shortcuts}
-              onChange={(v) => prefs.set({ shortcuts: v })}
-              label={t('settings.shortcutsOn')}
-            />
-            <dl style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px 16px', margin: 0 }}>
-              {(['p', 'b', 'k'] as const).map((k) => (
-                <div key={k} style={{ display: 'contents' }}>
-                  <dt>
-                    <kbd className="num">{k.toUpperCase()}</kbd>
-                  </dt>
-                  <dd style={{ margin: 0 }}>{t(`settings.keys.${k}`)}</dd>
-                </div>
-              ))}
-            </dl>
-            <span className={`${s.muted} ${s.small}`}>{t('settings.shortcutsNote')}</span>
-          </div>
-        </ProGate>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 8 }}>
+          <Check
+            checked={prefs.shortcuts}
+            onChange={(v) => prefs.set({ shortcuts: v })}
+            label={t('settings.shortcutsOn')}
+          />
+          <dl style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px 16px', margin: 0 }}>
+            {(['p', 'b', 'k'] as const).map((k) => (
+              <div key={k} style={{ display: 'contents' }}>
+                <dt>
+                  <kbd className="num">{k.toUpperCase()}</kbd>
+                </dt>
+                <dd style={{ margin: 0 }}>{t(`settings.keys.${k}`)}</dd>
+              </div>
+            ))}
+          </dl>
+          <span className={`${s.muted} ${s.small}`}>{t('settings.shortcutsNote')}</span>
+        </div>
       </Section>
 
       <Section id="set-auto" title={t('settings.autostart')}>
@@ -342,6 +353,7 @@ export function SettingsPage() {
           <p className={`${s.muted} ${s.small}`}>{t('settings.dataNote')}</p>
           <div className={s.row}>
             <Button onClick={() => void exportData()}>{t('settings.exportData')}</Button>
+            {canShareFile && <Button onClick={() => void shareData()}>{t('settings.shareData')}</Button>}
             {/* A styled label opens the native file picker; the input stays keyboard-focusable. */}
             <label className={s.fileButton}>
               {t('settings.importData')}

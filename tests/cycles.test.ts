@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cycleState, timeInSegment } from '../src/engine/cycles';
+import { cycleState, focusEndsBetween, focusTime, pomodoroSegments, timeInSegment } from '../src/engine/cycles';
 
 const MIN = 60_000;
 const pomodoro = [25 * MIN, 5 * MIN];
@@ -45,5 +45,23 @@ describe('timeInSegment', () => {
     expect(timeInSegment(28 * MIN, pomodoro, 0)).toBe(25 * MIN);
     expect(timeInSegment(28 * MIN, pomodoro, 1)).toBe(3 * MIN);
     expect(timeInSegment(70 * MIN, pomodoro, 0)).toBe(60 * MIN);
+  });
+});
+
+describe('pomodoro with a long break', () => {
+  const plan = pomodoroSegments(25 * MIN, 5 * MIN, 15 * MIN, 4);
+  it('builds focus/rest pairs with the last rest long', () => {
+    expect(plan.map((m) => m / MIN)).toEqual([25, 5, 25, 5, 25, 5, 25, 15]);
+  });
+  it('counts focus time across all focus blocks only', () => {
+    expect(focusTime(60 * MIN, plan)).toBe(50 * MIN); // 25 + 5 rest + 25 + 5 rest
+    expect(focusTime(120 * MIN, plan)).toBe(100 * MIN); // 4 blocks + long break started
+    expect(focusTime(140 * MIN, plan)).toBe(110 * MIN); // round 2 began at 130: +10 min
+  });
+  it('counts finished focus blocks between alert counts', () => {
+    expect(focusEndsBetween(0, 1)).toBe(1);
+    expect(focusEndsBetween(1, 2)).toBe(0); // rest ended
+    expect(focusEndsBetween(0, 7)).toBe(4);
+    expect(focusEndsBetween(2, 5)).toBe(2);
   });
 });

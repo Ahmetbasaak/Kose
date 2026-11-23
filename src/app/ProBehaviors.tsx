@@ -8,10 +8,10 @@ import { useEntitlements } from './entitlements';
 const typing = (el: EventTarget | null) =>
   el instanceof HTMLElement && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName));
 
-/** Pro keyboard shortcuts (p / b / k) and autostart. Renders nothing. */
+/** Keyboard shortcuts (p / b / k, free) and Pro autostart. Renders nothing. */
 export function ProBehaviors() {
   const { can } = useEntitlements();
-  const shortcutsOn = usePrefsStore((s) => s.shortcuts) && can('shortcuts');
+  const shortcutsOn = usePrefsStore((s) => s.shortcuts);
   const pipWin = usePipStore((s) => s.win);
   const finishSession = useFinishSession();
 

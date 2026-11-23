@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { TargetRule } from '../engine/calendar';
-import { timeInSegment } from '../engine/cycles';
+import { focusTime } from '../engine/cycles';
 import { elapsedMs, pauseTimer, resumeTimer, startTimer, type Timer } from '../engine/timer';
 import { meetingCost, netDailyHours, workState, type WorkConfig } from '../engine/work';
 import type { ModeId } from '../modes/registry';
@@ -88,7 +88,7 @@ export function summarize(a: ActiveSession, now: number): SessionSummary {
     earned: ws?.earned ?? null,
     cost: a.meeting ? meetingCost(elapsed, a.meeting.people, a.meeting.hourlyRate) : null,
     meeting: a.meeting ?? null,
-    focusMs: a.modeId === 'student' && a.segments ? timeInSegment(elapsed, a.segments, 0) : null,
+    focusMs: a.modeId === 'student' && a.segments ? focusTime(elapsed, a.segments) : null,
     totalMs: a.work ? netDailyHours(a.work) * 3_600_000 : a.durationMs,
     projectId: a.projectId ?? null,
     startedAt: a.createdAt,
