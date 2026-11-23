@@ -21,7 +21,7 @@
     left: 16px !important;
     right: 16px;
     top: auto !important;
-    bottom: 16px;
+    bottom: 80px; /* above the tab bar */
     width: auto;
     cursor: default;
   }

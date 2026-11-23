@@ -4,6 +4,7 @@ export const tr = {
     home: 'Ana sayfa',
     skipToContent: 'İçeriğe geç',
     navHistory: 'Geçmiş',
+    navLive: 'Sayaç',
     navSettings: 'Ayarlar',
     nav: 'Ana menü',
     privacyNote: 'Verilerin yalnızca bu cihazda saklanır. Hesap gerekmez.',

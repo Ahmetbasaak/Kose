@@ -11,7 +11,12 @@ npm run dev        # geliştirme sunucusu
 npm run check      # lint + prettier + tsc --noEmit + vitest
 npm run build      # üretim paketi → dist/
 npm run preview    # paketi yerelde sun
+npm run e2e        # Playwright: akışlar, çevrimdışı, axe erişilebilirlik taraması (açık/koyu)
 ```
+
+## PWA
+
+`vite-plugin-pwa` ile kurulabilir ve ilk ziyaretten sonra çevrimdışı çalışır (uygulama kabuğu, Inter latin/latin-ext, ikonlar önbellekte). Yeni sürüm arka planda iner, sonraki açılışta devreye girer; çalışan sayaç durumu localStorage'da olduğu için güncellemeden etkilenmez.
 
 ## Mimari
 

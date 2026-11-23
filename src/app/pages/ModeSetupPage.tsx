@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { Link, useParams } from 'react-router';
 import { t } from '../../i18n';
 import { modeBySlug } from '../../modes/registry';
@@ -18,20 +19,22 @@ export function ModeSetupPage() {
         <span className={`${s.muted} ${s.small}`}>{t('setup.modeLabel', { mode: title })}</span>
       </div>
       <h1 className={s.h1}>{title}</h1>
-      {mode.Setup ? (
-        mode.pro ? (
-          <ProGate feature={mode.pro}>
+      <Suspense fallback={null}>
+        {mode.Setup ? (
+          mode.pro ? (
+            <ProGate feature={mode.pro}>
+              <mode.Setup />
+            </ProGate>
+          ) : (
             <mode.Setup />
-          </ProGate>
+          )
         ) : (
-          <mode.Setup />
-        )
-      ) : (
-        <div className={s.card}>
-          <h2>{t('setup.soonTitle')}</h2>
-          <p className={s.muted}>{t('setup.soonBody')}</p>
-        </div>
-      )}
+          <div className={s.card}>
+            <h2>{t('setup.soonTitle')}</h2>
+            <p className={s.muted}>{t('setup.soonBody')}</p>
+          </div>
+        )}
+      </Suspense>
     </div>
   );
 }

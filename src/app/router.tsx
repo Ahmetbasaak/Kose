@@ -1,29 +1,25 @@
 import { createBrowserRouter } from 'react-router';
 import { Layout } from './Layout';
 import { HomePage } from './pages/HomePage';
-import { ModeSetupPage } from './pages/ModeSetupPage';
-import { LivePage } from './pages/LivePage';
-import { SummaryPage } from './pages/SummaryPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { OverlayPage } from './pages/OverlayPage';
-import { HistoryPage } from './pages/HistoryPage';
-import { SettingsPage } from './pages/SettingsPage';
-import { SharedCountdownPage } from './pages/SharedCountdownPage';
 
+// Home ships in the main bundle (first paint); every other page loads on first visit.
 export const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/mod/:slug', element: <ModeSetupPage /> },
-      { path: '/sayac', element: <LivePage /> },
-      { path: '/ozet', element: <SummaryPage /> },
-      { path: '/sayim', element: <SharedCountdownPage /> },
-      { path: '/gecmis', element: <HistoryPage /> },
-      { path: '/ayarlar', element: <SettingsPage /> },
-      { path: '*', element: <NotFoundPage /> },
+      { path: '/mod/:slug', lazy: () => import('./pages/ModeSetupPage').then((m) => ({ Component: m.ModeSetupPage })) },
+      { path: '/sayac', lazy: () => import('./pages/LivePage').then((m) => ({ Component: m.LivePage })) },
+      { path: '/ozet', lazy: () => import('./pages/SummaryPage').then((m) => ({ Component: m.SummaryPage })) },
+      {
+        path: '/sayim',
+        lazy: () => import('./pages/SharedCountdownPage').then((m) => ({ Component: m.SharedCountdownPage })),
+      },
+      { path: '/gecmis', lazy: () => import('./pages/HistoryPage').then((m) => ({ Component: m.HistoryPage })) },
+      { path: '/ayarlar', lazy: () => import('./pages/SettingsPage').then((m) => ({ Component: m.SettingsPage })) },
+      { path: '*', lazy: () => import('./pages/NotFoundPage').then((m) => ({ Component: m.NotFoundPage })) },
     ],
   },
   // Outside the layout: no header, footer or corner widget on stream.
-  { path: '/overlay', element: <OverlayPage /> },
+  { path: '/overlay', lazy: () => import('./pages/OverlayPage').then((m) => ({ Component: m.OverlayPage })) },
 ]);

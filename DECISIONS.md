@@ -56,3 +56,11 @@
 - Klavye kısayolları: P (duraklat/devam), B (bitir), K (köşe penceresini aç); metin alanında ve Ctrl/Alt/Cmd ile çalışmaz; PiP penceresinde de dinlenir.
 - Açılışta otomatik başlatma: son başlatılan oturum girdisi saklanır; açılışta oturum yoksa yeniden başlatılır, PiP tıklama gerektirdiğinden sayfa köşesinde.
 - Çoklu sayaç: köşe oturumundan bağımsız, sayfa içi ek sayaçlar (ileri ya da geri); her biri mutlak zaman damgalı, geri sayım bitince bir kez ses.
+- PWA: `vite-plugin-pwa` generateSW + `autoUpdate`; Inter'in yalnızca latin/latin-ext alt kümeleri önbelleğe alınır. PNG ikonlar (192, 512, maskable 512, apple-touch 180) SVG'den üretilip repoya eklendi.
+- `npm audit`: 4 orta düzey bulgu `workbox-build` → `glob/minimatch` içinde; yalnızca derleme zamanı, kullanıcıya giden pakette değil. vite-plugin-pwa 1.1'e düşürmek (önerilen "fix") büyük sürüm geri adımı olduğu için yapılmadı.
+- Performans: Ana sayfa dışındaki tüm sayfalar (router `lazy`) ve her mod kurulum ekranı (`React.lazy`) ayrı parça. İlk yük ~114 KB gzip (React + router ~100 KB); Excel (~20 KB) ve kart (~2 KB) yalnızca kullanılınca.
+- Mobil: header menüsü telefonda alt sekme çubuğuna dönüşür (Ana sayfa, Sayaç, Geçmiş, Ayarlar; 44px hedefler); sayfa içi köşe penceresi çubuğun üstünde durur.
+- Erişilebilirlik denetimi: Playwright + axe (WCAG 2.1 AA) tüm sayfalarda açık ve koyu temada, canlı köşe penceresi + uyarı + paylaşım kartıyla, telefon görünümünde ve dört Pro temasında. Bulunan tek eksik (canlı sayfada `h1` yok) düzeltildi.
+- E2E için ayrı test derlemesi `VITE_DEV_PRO_KEY=e2e-only-key` ile yapılır (Pro ekranlarına ulaşmak için); bu derleme yayına alınmamalı. CI ana `npm run build`'i anahtarsız yapar.
+- `@axe-core/playwright` kendi `playwright-core` sürümünü getiriyordu; `overrides` ile @playwright/test (1.63.0) sürümüne sabitlendi.
+- E2E'de PiP kapatılıp sayfa içi pencere test ediliyor; gerçek PiP penceresi elle kontrol gerektiriyor.

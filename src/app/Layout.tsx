@@ -18,6 +18,13 @@ export function Layout() {
           {config.name}
         </Link>
         <nav aria-label={t('app.nav')} className={styles.nav}>
+          {/* Home and the live counter only show in the phone tab bar; the logo covers home on desktop. */}
+          <NavLink to="/" end className={styles.mobileOnly}>
+            {t('app.home')}
+          </NavLink>
+          <NavLink to="/sayac" className={styles.mobileOnly}>
+            {t('app.navLive')}
+          </NavLink>
           <NavLink to="/gecmis">{t('app.navHistory')}</NavLink>
           <NavLink to="/ayarlar">{t('app.navSettings')}</NavLink>
         </nav>

@@ -1,14 +1,20 @@
-import type { ComponentType } from 'react';
+import { lazy, type ComponentType } from 'react';
 import type { ProFeature } from '../app/entitlements';
-import { SimpleSetup } from './simple/SimpleSetup';
-import { WorkSetup } from './work/WorkSetup';
-import { CountdownsSetup } from './countdowns/CountdownsSetup';
-import { MeetingSetup } from './meeting/MeetingSetup';
-import { BreakSetup } from './break/BreakSetup';
-import { StudentSetup } from './student/StudentSetup';
-import { PresentationSetup } from './presentation/PresentationSetup';
-import { FreelanceSetup } from './freelance/FreelanceSetup';
-import { MultiSetup } from './multi/MultiSetup';
+
+// Each setup screen is its own chunk, loaded when that mode is opened.
+const SimpleSetup = lazy(() => import('./simple/SimpleSetup').then((m) => ({ default: m.SimpleSetup })));
+const WorkSetup = lazy(() => import('./work/WorkSetup').then((m) => ({ default: m.WorkSetup })));
+const CountdownsSetup = lazy(() =>
+  import('./countdowns/CountdownsSetup').then((m) => ({ default: m.CountdownsSetup })),
+);
+const MeetingSetup = lazy(() => import('./meeting/MeetingSetup').then((m) => ({ default: m.MeetingSetup })));
+const BreakSetup = lazy(() => import('./break/BreakSetup').then((m) => ({ default: m.BreakSetup })));
+const StudentSetup = lazy(() => import('./student/StudentSetup').then((m) => ({ default: m.StudentSetup })));
+const PresentationSetup = lazy(() =>
+  import('./presentation/PresentationSetup').then((m) => ({ default: m.PresentationSetup })),
+);
+const FreelanceSetup = lazy(() => import('./freelance/FreelanceSetup').then((m) => ({ default: m.FreelanceSetup })));
+const MultiSetup = lazy(() => import('./multi/MultiSetup').then((m) => ({ default: m.MultiSetup })));
 
 export type ModeId =
   'simple' | 'work' | 'countdowns' | 'meeting' | 'break' | 'student' | 'freelance' | 'presentation' | 'multi';

@@ -22,6 +22,7 @@ export function LivePage() {
   if (!active)
     return (
       <div className={s.stack}>
+        <h1 className={s.h1}>{t('app.navLive')}</h1>
         <p className={s.lead}>{t('timer.noActive')}</p>
         <div>
           <ButtonLink to="/" variant="primary">
@@ -34,9 +35,11 @@ export function LivePage() {
   const d = sessionDisplay(active, now);
   return (
     <div className={s.stack}>
-      <section className={s.liveCard} aria-label={active.label} data-level={d.level}>
+      <section className={s.liveCard} aria-labelledby="live-title" data-level={d.level}>
         <div className={s.spread}>
-          <span className={s.liveCaption}>{active.label}</span>
+          <h1 id="live-title" className={s.liveCaption}>
+            {active.label}
+          </h1>
           <span className={s.liveCaption}>{d.caption}</span>
         </div>
         <div className={`${s.liveValue} num`} data-long={d.value.length > 8} role="timer">
