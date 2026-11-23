@@ -310,7 +310,7 @@ export const tr = {
     linkNote: 'Linkte yalnızca ad ve tarih var.',
   },
   weekly: {
-    title: 'Haftalık Köşe özeti',
+    title: 'Haftalık {brand} özeti',
     lead: 'Geçen hafta köşede bu kadar zaman saydın.',
     longest: 'En uzun odak: {d}',
     streak: 'Seri: {n} gün',
@@ -425,6 +425,9 @@ export const tr = {
   },
   settings: {
     title: 'Ayarlar',
+    language: 'Dil / Language',
+    languages: { tr: 'Türkçe', en: 'English' },
+    languageNote: 'Dil değişince sayfa yeniden yüklenir.',
     proStatus: 'Pro durumu',
     proOn: 'Pro açık (kaynak: {source}).',
     proOff: 'Pro kapalı.',
@@ -622,6 +625,7 @@ export const tr = {
     unlocked: 'Kazanıldı',
     homeCard: 'Seri: {n} gün · {earned}/{total} rozet',
     homeLink: 'Başarılarına bak',
+    year: 'Yıl',
     yearTitle: '{year} özeti',
     yearReady: '{year} özetin hazır. Bir bak, paylaş.',
     yearEmpty: 'Bu yıl için henüz kayıt yok.',
@@ -688,6 +692,21 @@ export const tr = {
     range: '{start} – {end}',
     empty: 'Henüz bir özet yok. Bir sayaç başlat, bitince burada görürsün.',
     newTimer: 'Yeni sayaç',
+  },
+  holidays: {
+    yilbasi: 'Yılbaşı',
+    '23-nisan': 'Ulusal Egemenlik ve Çocuk Bayramı',
+    '1-mayis': 'Emek ve Dayanışma Günü',
+    '19-mayis': "Atatürk'ü Anma, Gençlik ve Spor Bayramı",
+    '15-temmuz': 'Demokrasi ve Millî Birlik Günü',
+    '30-agustos': 'Zafer Bayramı',
+    '29-ekim': 'Cumhuriyet Bayramı',
+    ramazan: 'Ramazan Bayramı',
+    kurban: 'Kurban Bayramı',
+  },
+  export: {
+    hours: 'Saat',
+    hoursUnit: '(saat)',
   },
   units: {
     hm: '{h} s {m} dk',

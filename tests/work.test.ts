@@ -6,6 +6,7 @@ import {
   workMilestones,
   netDailyHours,
   parseTime,
+  parseEnNumber,
   parseTrNumber,
   trWeekday,
   trDay,
@@ -188,5 +189,14 @@ describe('equivalents', () => {
       { key: 'coffee', n: 12 },
       { key: 'simit', n: 57 },
     ]);
+  });
+});
+
+describe('parseEnNumber', () => {
+  it('parses English-formatted amounts', () => {
+    expect(parseEnNumber('45,000')).toBe(45_000);
+    expect(parseEnNumber('45000.5')).toBe(45_000.5);
+    expect(parseEnNumber('1,250,000.25 ₺')).toBe(1_250_000.25);
+    expect(parseEnNumber('45.000,50')).toBeNaN();
   });
 });

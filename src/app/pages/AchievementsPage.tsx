@@ -4,7 +4,7 @@ import { useNow } from '../../components/useNow';
 import { streak } from '../../engine/calendar';
 import { trYmd } from '../../engine/calendar';
 import { trDay } from '../../engine/work';
-import { t } from '../../i18n';
+import { LOCALE, t } from '../../i18n';
 import { badges, longestStreak, yearStats } from '../../share/achievements';
 import { LazyCardExport } from '../../share/lazy';
 import { allRecords } from '../../storage/history';
@@ -13,20 +13,8 @@ import type { SessionSummary } from '../../storage/session';
 import { durationWords } from '../sessionView';
 import s from './pages.module.css';
 
-const MONTHS = [
-  'Ocak',
-  'Şubat',
-  'Mart',
-  'Nisan',
-  'Mayıs',
-  'Haziran',
-  'Temmuz',
-  'Ağustos',
-  'Eylül',
-  'Ekim',
-  'Kasım',
-  'Aralık',
-];
+const monthName = (m: number) =>
+  new Intl.DateTimeFormat(LOCALE, { month: 'long', timeZone: 'UTC' }).format(Date.UTC(2026, m - 1, 15));
 
 export function AchievementsPage() {
   const activeDays = usePrefsStore((st) => st.activeDays);
@@ -112,7 +100,7 @@ export function AchievementsPage() {
             {t('achievements.yearTitle', { year })}
           </h2>
           <label className={s.small} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span className="visually-hidden">Yıl</span>
+            <span className="visually-hidden">{t('achievements.year')}</span>
             <select className={s.input} value={year} onChange={(e) => setYear(Number(e.target.value))}>
               {years.map((y) => (
                 <option key={y} value={y}>
@@ -146,7 +134,7 @@ export function AchievementsPage() {
               {ys.topMonth && (
                 <>
                   <dt>{t('achievements.yearRows.month')}</dt>
-                  <dd>{MONTHS[ys.topMonth - 1]}</dd>
+                  <dd>{monthName(ys.topMonth)}</dd>
                 </>
               )}
             </dl>

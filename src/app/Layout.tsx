@@ -1,8 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router';
 import { CornerHost } from '../components/corner/CornerHost';
 import { Logo } from '../components/Logo';
-import { t } from '../i18n';
-import { config } from './config';
+import { brandName, t } from '../i18n';
 import { TEST_MODE } from './entitlements';
 import { ProBehaviors } from './ProBehaviors';
 import { SessionChrome } from './SessionChrome';
@@ -17,9 +16,9 @@ export function Layout() {
         {t('app.skipToContent')}
       </a>
       <header className={styles.header} data-noprint>
-        <Link to="/" className={styles.brand} aria-label={`${config.name} – ${t('app.home')}`}>
+        <Link to="/" className={styles.brand} aria-label={`${brandName} – ${t('app.home')}`}>
           <Logo size={32} />
-          {config.name}
+          {brandName}
         </Link>
         <nav aria-label={t('app.nav')} className={styles.nav}>
           {/* Home and the live counter only show in the phone tab bar; the logo covers home on desktop. */}

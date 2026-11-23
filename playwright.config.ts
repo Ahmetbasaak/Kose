@@ -4,7 +4,8 @@ export const E2E_PRO_KEY = 'e2e-only-key';
 
 export default defineConfig({
   testDir: 'tests/e2e',
-  use: { baseURL: 'http://localhost:4173', trace: 'off' },
+  // Turkish browser locale: the app picks its language from it.
+  use: { baseURL: 'http://localhost:4173', trace: 'off', locale: 'tr-TR' },
   webServer: {
     // Test build only: the dev Pro key lets e2e reach Pro screens. Never deploy this build.
     command: 'npx vite build && npx vite preview --port 4173 --strictPort',

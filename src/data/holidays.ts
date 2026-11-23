@@ -7,6 +7,7 @@
  */
 import { parseIsoDate, trMidnight, trYmd } from '../engine/calendar';
 import { TR_OFFSET_MS, trDay } from '../engine/work';
+import { t, type MessageKey } from '../i18n';
 import data from './holidays.tr.json';
 
 export type HolidaySource = 'law' | 'calculated' | 'official';
@@ -28,21 +29,23 @@ export interface Override {
 
 const DAY = 86_400_000;
 
-const FIXED: [slug: string, name: string, m: number, d: number][] = [
-  ['yilbasi', 'Yılbaşı', 1, 1],
-  ['23-nisan', 'Ulusal Egemenlik ve Çocuk Bayramı', 4, 23],
-  ['1-mayis', 'Emek ve Dayanışma Günü', 5, 1],
-  ['19-mayis', "Atatürk'ü Anma, Gençlik ve Spor Bayramı", 5, 19],
-  ['15-temmuz', 'Demokrasi ve Millî Birlik Günü', 7, 15],
-  ['30-agustos', 'Zafer Bayramı', 8, 30],
-  ['29-ekim', 'Cumhuriyet Bayramı', 10, 29],
+const FIXED: [slug: string, m: number, d: number][] = [
+  ['yilbasi', 1, 1],
+  ['23-nisan', 4, 23],
+  ['1-mayis', 5, 1],
+  ['19-mayis', 5, 19],
+  ['15-temmuz', 7, 15],
+  ['30-agustos', 8, 30],
+  ['29-ekim', 10, 29],
 ];
 
-/** [slug, name, Islamic month, day, length in days] */
-const RELIGIOUS: [string, string, number, number, number][] = [
-  ['ramazan', 'Ramazan Bayramı', 10, 1, 3],
-  ['kurban', 'Kurban Bayramı', 12, 10, 4],
+/** [slug, Islamic month, day, length in days] */
+const RELIGIOUS: [string, number, number, number][] = [
+  ['ramazan', 10, 1, 3],
+  ['kurban', 12, 10, 4],
 ];
+
+const nameOf = (slug: string) => t(`holidays.${slug}` as MessageKey);
 
 const islamic = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
   day: 'numeric',
@@ -63,17 +66,17 @@ export function holidaysBetween(from: number, to: number, overrides: readonly Ov
   const firstYear = trYmd(from).y - 1;
   const lastYear = trYmd(to).y;
   for (let y = firstYear; y <= lastYear; y++)
-    for (const [slug, name, m, d] of FIXED)
-      out.push({ id: `${slug}-${y}`, name, at: trMidnight(y, m, d), days: 1, source: 'law' });
+    for (const [slug, m, d] of FIXED)
+      out.push({ id: `${slug}-${y}`, name: nameOf(slug), at: trMidnight(y, m, d), days: 1, source: 'law' });
 
   if (hasIslamic)
     // Day by day: a Gregorian year can hold the same bayram twice (e.g. Ramazan Bayramı in 2033).
     for (let day = trDay(from) - 5; day <= trDay(to); day++) {
       const [im, id] = islamicMonthDay(day * DAY);
-      for (const [slug, name, hm, hd, days] of RELIGIOUS)
+      for (const [slug, hm, hd, days] of RELIGIOUS)
         if (im === hm && id === hd) {
           const at = day * DAY - TR_OFFSET_MS;
-          out.push({ id: `${slug}-${trYmd(at).y}`, name, at, days, source: 'calculated' });
+          out.push({ id: `${slug}-${trYmd(at).y}`, name: nameOf(slug), at, days, source: 'calculated' });
         }
     }
 

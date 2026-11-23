@@ -1,5 +1,5 @@
+import { brandName } from '../../i18n';
 import { create } from 'zustand';
-import { config } from '../../app/config';
 import { isPro } from '../../app/entitlements';
 import { CORNER_SIZES, usePrefsStore } from '../../storage/prefs';
 
@@ -46,7 +46,7 @@ export async function openPip(): Promise<Window> {
     'data-reduce-motion',
     document.documentElement.hasAttribute('data-reduce-motion'),
   );
-  win.document.title = config.name;
+  win.document.title = brandName;
   win.document.body.classList.add('pip-body');
   win.addEventListener('pagehide', () => usePipStore.setState({ win: null }), { once: true });
   usePipStore.setState({ win });

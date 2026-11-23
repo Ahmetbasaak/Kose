@@ -3,9 +3,8 @@ import { Button } from '../../components/Button';
 import { CornerFace } from '../../components/corner/CornerView';
 import { Field } from '../../components/Field';
 import { InstallHint } from '../../components/InstallHint';
-import { parseTrNumber } from '../../engine/work';
 import { ProGate } from '../../components/ProGate';
-import { t } from '../../i18n';
+import { lang, setLang, type Lang, parseAmount, t } from '../../i18n';
 import { clearLocalStorage, collectLocalStorage, parseBackup } from '../../storage/backup';
 import { allRecords, deleteHistory, replaceRecords } from '../../storage/history';
 import { usePrefsStore, type AppTheme, type CornerSize, type CornerTheme, type Tone } from '../../storage/prefs';
@@ -74,7 +73,7 @@ function PriceField({
       value={text}
       onChange={(e) => {
         setText(e.target.value);
-        const n = parseTrNumber(e.target.value);
+        const n = parseAmount(e.target.value);
         onChange(n > 0 ? n : null);
       }}
     />
@@ -145,6 +144,32 @@ export function SettingsPage() {
   return (
     <div className={s.stack}>
       <h1 className={s.h1}>{t('settings.title')}</h1>
+
+      <Section id="set-lang" title={t('settings.language')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 8 }}>
+          <div className={s.field}>
+            <label htmlFor="set-language" className={s.label}>
+              {t('settings.language')}
+            </label>
+            <select
+              id="set-language"
+              className={s.input}
+              value={lang}
+              aria-describedby="set-language-note"
+              onChange={(e) => setLang(e.target.value as Lang)}
+            >
+              {(['tr', 'en'] as const).map((l) => (
+                <option key={l} value={l} lang={l}>
+                  {t(`settings.languages.${l}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <span id="set-language-note" className={`${s.muted} ${s.small}`}>
+            {t('settings.languageNote')}
+          </span>
+        </div>
+      </Section>
 
       <Section id="set-look" title={t('settings.appearance')}>
         <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>

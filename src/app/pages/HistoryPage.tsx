@@ -5,7 +5,7 @@ import { daysInMonth, trMidnight, trYmd } from '../../engine/calendar';
 import { BarChart, HBarList, type Bar } from '../../components/BarChart';
 import { formatClock, formatMoney } from '../../engine/format';
 import { downloadXlsx, hours } from '../../export/xlsx';
-import { t } from '../../i18n';
+import { LOCALE, t } from '../../i18n';
 import { modes, type ModeId } from '../../modes/registry';
 import { recordsBetween } from '../../storage/history';
 import type { SessionSummary } from '../../storage/session';
@@ -14,7 +14,7 @@ import { durationWords, formatTrDate } from '../sessionView';
 import s from './pages.module.css';
 
 const amountOf = (r: SessionSummary) => r.earned ?? r.cost ?? null;
-const hoursFmt = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 });
+const hoursFmt = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 });
 const fmtHours = (h: number) => hoursFmt.format(h);
 
 function History() {
@@ -80,7 +80,7 @@ function History() {
             t('history.date'),
             t('history.mode'),
             t('history.label'),
-            `${t('summary.duration')} (saat)`,
+            `${t('summary.duration')} ${t('export.hoursUnit')}`,
             `${t('history.amount')} (₺)`,
           ],
           ...shown.map((r) => [

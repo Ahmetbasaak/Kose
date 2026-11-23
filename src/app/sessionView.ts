@@ -5,7 +5,7 @@ import { durationParts, formatClock, formatMoney } from '../engine/format';
 import { elapsedMs, finishAt, isRunning, remainingMs } from '../engine/timer';
 import { equivalents, meetingCost, workState, type WorkConfig } from '../engine/work';
 import { usePrefsStore } from '../storage/prefs';
-import { t } from '../i18n';
+import { LOCALE, t } from '../i18n';
 import { canPause, type ActiveSession, type TimerKind } from '../storage/session';
 
 export type SessionStatus = 'running' | 'paused' | 'done';
@@ -57,14 +57,14 @@ export function daysClock(ms: number): string {
   return days > 0 ? t('countdowns.dayClock', { d: days, clock: formatClock(total % DAY) }) : formatClock(total);
 }
 
-const dateFmt = new Intl.DateTimeFormat('tr-TR', {
+const dateFmt = new Intl.DateTimeFormat(LOCALE, {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
   weekday: 'long',
   timeZone: 'Europe/Istanbul',
 });
-const timeFmt = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' });
+const timeFmt = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' });
 
 /** "9 Mart 2027 Salı", plus the time when it is not midnight. */
 export function formatTrDate(ms: number): string {

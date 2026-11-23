@@ -158,3 +158,10 @@ export function equivalents(amount: number, prices: Partial<Record<PriceKey, num
     .map(([key, p]) => ({ key, n: Math.floor(amount / p!) }))
     .filter((e) => e.n >= 1);
 }
+
+/** English number input: "45,000" and "45,000.50" (comma = thousands, dot = decimal). NaN if malformed. */
+export function parseEnNumber(v: string): number {
+  const s = v.trim().replace(/\s|₺/g, '');
+  if (!/^\d{1,3}(,\d{3})*(\.\d+)?$|^\d+(\.\d+)?$/.test(s)) return NaN;
+  return Number(s.replace(/,/g, ''));
+}

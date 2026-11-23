@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
+import { brandName } from '../i18n';
 import { usePipStore } from '../components/corner/pip';
 import { useNow } from '../components/useNow';
 import { usePrefsStore } from '../storage/prefs';
 import { useSessionStore } from '../storage/session';
-import { config } from './config';
 import { applyAppearance } from './appearance';
 import { sessionDisplay } from './sessionView';
 
@@ -19,7 +19,7 @@ export function SessionChrome() {
     applyAppearance(appTheme, reduceMotion, pipWin ? [document, pipWin.document] : [document]);
   }, [appTheme, reduceMotion, pipWin]);
 
-  const title = showTitle ? `${sessionDisplay(active, now).value} · ${config.name}` : config.name;
+  const title = showTitle ? `${sessionDisplay(active, now).value} · ${brandName}` : brandName;
   useEffect(() => {
     document.title = title;
   }, [title]);

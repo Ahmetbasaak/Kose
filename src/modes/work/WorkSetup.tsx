@@ -10,13 +10,12 @@ import { formatMoney } from '../../engine/format';
 import {
   formatTime,
   parseTime,
-  parseTrNumber,
   validateWork,
   workState,
   type WorkConfig,
   type WorkConfigError,
 } from '../../engine/work';
-import { t } from '../../i18n';
+import { parseAmount, LOCALE, t } from '../../i18n';
 import { usePrefsStore } from '../../storage/prefs';
 
 const DEFAULTS: WorkConfig = {
@@ -28,7 +27,7 @@ const DEFAULTS: WorkConfig = {
   lunchStartMin: 12 * 60 + 30,
 };
 
-const fmtSalary = (n: number) => (Number.isFinite(n) ? new Intl.NumberFormat('tr-TR').format(n) : '');
+const fmtSalary = (n: number) => (Number.isFinite(n) ? new Intl.NumberFormat(LOCALE).format(n) : '');
 
 export function WorkSetup() {
   const saved = usePrefsStore((st) => st.lastWork) ?? DEFAULTS;
@@ -47,7 +46,7 @@ export function WorkSetup() {
   const now = useNow(250);
 
   const config: WorkConfig = {
-    monthlySalary: parseTrNumber(f.salary),
+    monthlySalary: parseAmount(f.salary),
     startMin: parseTime(f.start),
     endMin: parseTime(f.end),
     workDays: Number(f.workDays),

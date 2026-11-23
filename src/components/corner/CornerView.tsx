@@ -1,9 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { useFinishSession } from '../../app/actions';
-import { config } from '../../app/config';
 import type { SessionDisplay } from '../../app/sessionView';
 import { finishLabel, sessionDisplay } from '../../app/sessionView';
-import { t } from '../../i18n';
+import { brandName, t } from '../../i18n';
 import { useEntitlements } from '../../app/entitlements';
 import { usePrefsStore } from '../../storage/prefs';
 import { useSessionStore, type ActiveSession } from '../../storage/session';
@@ -38,7 +37,7 @@ export function CornerFace({ label, display, variant, children }: FaceProps) {
     >
       <div className={styles.top}>
         <span className={styles.label}>
-          {config.name} · {label}
+          {brandName} · {label}
         </span>
         <span className={styles.status}>
           <span className={styles.dot} aria-hidden="true" />

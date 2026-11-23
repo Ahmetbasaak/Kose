@@ -10,24 +10,24 @@ import { trMidnight, trWeekStart, trYmd } from '../../engine/calendar';
 import { formatClock, formatMoney } from '../../engine/format';
 import { amountFor, manualEntry, roundUp, totalsBy, weekRows } from '../../engine/freelance';
 import { elapsedMs, isRunning } from '../../engine/timer';
-import { parseTrNumber, TR_OFFSET_MS } from '../../engine/work';
+import { TR_OFFSET_MS } from '../../engine/work';
 import { downloadXlsx, hours } from '../../export/xlsx';
-import { t } from '../../i18n';
+import { parseAmount, LOCALE, t } from '../../i18n';
 import { useFreelanceStore, type Project } from '../../storage/freelance';
 import { useSessionStore } from '../../storage/session';
 
 const DAY = 86_400_000;
 const LONG_RUN_MS = 8 * 3_600_000;
 const tz = { timeZone: 'Europe/Istanbul' } as const;
-const monthFmt = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric', ...tz });
-const dayFmt = new Intl.DateTimeFormat('tr-TR', { weekday: 'short', day: 'numeric', month: 'short', ...tz });
-const timeFmt = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit', ...tz });
+const monthFmt = new Intl.DateTimeFormat(LOCALE, { month: 'long', year: 'numeric', ...tz });
+const dayFmt = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short', ...tz });
+const timeFmt = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit', ...tz });
 const isoFmt = new Intl.DateTimeFormat('sv-SE', tz); // yyyy-mm-dd
 const dayLabel = (day: number) => dayFmt.format(day * DAY - TR_OFFSET_MS + 12 * 3_600_000);
 const money = (v: number | null) => (v === null ? '—' : formatMoney(v));
 
 /** Optional ₺ amount: '' → null, otherwise a positive number or NaN (invalid). */
-const optionalRate = (v: string) => (v.trim() === '' ? null : parseTrNumber(v) > 0 ? parseTrNumber(v) : NaN);
+const optionalRate = (v: string) => (v.trim() === '' ? null : parseAmount(v) > 0 ? parseAmount(v) : NaN);
 
 export function FreelanceSetup() {
   const store = useFreelanceStore();
@@ -125,7 +125,13 @@ export function FreelanceSetup() {
       {
         name: t('freelance.reportTitle'),
         rows: [
-          [t('freelance.day'), t('freelance.project'), t('freelance.client'), 'Saat', `${t('freelance.amount')} (₺)`],
+          [
+            t('freelance.day'),
+            t('freelance.project'),
+            t('freelance.client'),
+            t('export.hours'),
+            `${t('freelance.amount')} (₺)`,
+          ],
           ...rows.map((r) => [
             isoFmt.format(r.day * DAY - TR_OFFSET_MS + 12 * 3_600_000),
             projectById(r.projectId)?.name ?? '',
@@ -138,7 +144,7 @@ export function FreelanceSetup() {
       {
         name: t('freelance.byClient'),
         rows: [
-          [t('freelance.client'), 'Saat', `${t('freelance.amount')} (₺)`],
+          [t('freelance.client'), t('export.hours'), `${t('freelance.amount')} (₺)`],
           ...[...clientTime].map(([c, ms]) => [c, hours(ms), anyRate ? (clientMoney.get(c) ?? 0) : '']),
         ],
       },
@@ -150,7 +156,7 @@ export function FreelanceSetup() {
             t('freelance.startTime'),
             t('freelance.endTime'),
             t('freelance.project'),
-            'Saat',
+            t('export.hours'),
             t('freelance.noteHeader'),
           ],
           ...weekEntries.map((en) => [

@@ -4,8 +4,8 @@ import s from '../../app/pages/pages.module.css';
 import { CornerFace } from '../../components/corner/CornerView';
 import { Field } from '../../components/Field';
 import { formatMoney } from '../../engine/format';
-import { MONTHLY_HOURS, meetingCost, parseTrNumber } from '../../engine/work';
-import { t } from '../../i18n';
+import { MONTHLY_HOURS, meetingCost } from '../../engine/work';
+import { parseAmount, t } from '../../i18n';
 import { usePrefsStore } from '../../storage/prefs';
 import { StartFooter } from '../StartFooter';
 
@@ -16,7 +16,7 @@ export function MeetingSetup() {
   const startSession = useStartSession();
 
   const n = Number(people);
-  const monthly = parseTrNumber(salary);
+  const monthly = parseAmount(salary);
   const hourly = monthly / MONTHLY_HOURS;
   const error = !Number.isInteger(n) || n < 1 || n > 1000 ? 'people' : !(monthly > 0) ? 'salary' : null;
   const fieldId = { people: 'meeting-people', salary: 'meeting-salary' } as const;

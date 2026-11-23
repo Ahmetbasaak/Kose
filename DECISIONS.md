@@ -80,3 +80,15 @@
 - Ayarlar kapsamı Toggl, Pomofocus ve Flow'un ortak ayarlarından seçildi: tema, hareketleri azalt, sekme başlığında sayaç, ses aç/kapa + seviye + ton (zil/çan/bip) + dene, bildirim izni durumu, başlatınca köşe penceresi, ekranı açık tut (Wake Lock), yedek indir/geri yükle/sil. Dil seçimi, haftanın ilk günü, para birimi eklenmedi: tek dil, Türkiye takvimi ve ₺.
 - Yedek: `kose.*` localStorage anahtarları + IndexedDB geçmişi tek JSON; içeri alma katı doğrulanır, `kose.pro` hiçbir yönde taşınmaz (yedekle Pro kopyalanamaz, silme Pro'yu silmez).
 - Serbest çalışan: Başlat/Duraklat/Devam/Durdur açıkça kartta; 8 saati geçen sayaçta uyarı; proje başına isteğe bağlı saat ücreti → raporda tutar; elle kayıt (tarih + başlangıç–bitiş, gece yarısını geçebilir, not); haftanın kayıt listesi silinebilir; proje kayıtlarıyla silinir (onaylı). Canlı sayaçtan gelen kayda not eklenmez (elle kayıtta var).
+- Geliştirme turu (bulgular 1–21, 7 hariç):
+  - Ana ekran: devam eden sayaç kartı, tek dokunuş "Hızlı başlat" (kronometre, 25 dk odak, kayıtlı mesai/toplantı), modlar 4 grupta. Telefonda yüzen pencere yerine sekmelerin üstünde mini çubuk (CSS ile tek biri görünür).
+  - Mesai: vardiya bitince gün özeti otomatik geçmişe (vardiya günü başına bir kez; elle bitirmeyle çift kayıt olmaz); "arka planda say" ile başka sayaç öndeyken köşede "Bugün ≈"; hafta/ay tahmini her iş günü çalışıldı varsayımıyla.
+  - Kutlamalar ve karşılıklar yalnızca kullanıcının girdiği fiyatlarla (kahve, simit, çay, abonelik); varsayılan fiyat yok, uydurma fiyat yok.
+  - Pomodoro planı odak/mola çiftleri, son mola uzun (varsayılan 4'te bir 15 dk); odak süresi tüm çift indeksli bölümlerin toplamı.
+  - Seri artık tüm modlarda (bitirilen her oturumun günü); rozetler ve yılın özeti geçmişten hesaplanır, ayrıca saklanmaz. Başarılar ücretsiz, geçmiş tablosu/grafikleri Pro.
+  - Grafikler: tek seri, tek renk (vurgu rengi), 4px yuvarlak uç, ipucu fare ve klavyeyle; tablo görünümü zaten var.
+  - Ortam sesleri cihazda üretilen gürültü (beyaz, kahverengi, bant geçiren "yağmur"); kalıcı değil, tarayıcı sesi tıklamayla başlatır.
+  - OBS link oluşturucu `/mod/yayin` (ücretsiz); önizleme iframe değil (CSP frame-ancestors 'none'), aynı `OverlayView` bileşeni.
+  - Geri sayım: kalan iş günü (hafta sonu + resmî tatiller hariç); .ics dışa aktarma (tekrarlayan kurallar RRULE). Maaş günü 31 gibi günlerde takvim uygulaması o ayı atlayabilir (kodda not).
+  - Serbest çalışan: hafta/ay raporu, müşteri filtresi (müşteri başına PDF/Excel), kayıt başına yukarı yuvarlama, faturalanmaz projeler.
+  - İngilizce arayüz ("Corner"): dil tarayıcıdan (Türkçe tarayıcı → TR, diğerleri → EN), Ayarlar'dan değişir (sayfa yenilenir). Tarih/sayı biçimi dile göre; para birimi ₺ ve saatler Türkiye saati kalır. E2E `tr-TR` tarayıcı dilinde çalışır.

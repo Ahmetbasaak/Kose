@@ -18,7 +18,12 @@ export function formatClock(ms: number, round: 'floor' | 'ceil' = 'floor'): stri
   return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${pad(minutes)}:${pad(seconds)}`;
 }
 
-const moneyFormat = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let moneyFormat = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+/** Digit grouping follows the UI language (set once at startup by i18n); the amount stays in ₺. */
+export function setNumberLocale(locale: string): void {
+  moneyFormat = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 /** "1.150,47 ₺" — symbol after the amount, as Turkish users write it. */
 export const formatMoney = (amount: number): string => `${moneyFormat.format(amount)} ₺`;

@@ -1,7 +1,7 @@
 # Köşe
 
 Ekranın köşesinde duran küçük sayaç penceresi. Statik PWA: hesap yok, sunucu yok, veri yalnızca cihazda.
-Marka adı Türkçe **Köşe**, İngilizce **Corner**. Marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
+Marka adı Türkçe **Köşe**, İngilizce **Corner**. Arayüz Türkçe ve İngilizce (`src/i18n/tr.ts`, `src/i18n/en.ts`); dil tarayıcıdan seçilir, Ayarlar'dan değişir. Marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
 
 ## Kurulum
 

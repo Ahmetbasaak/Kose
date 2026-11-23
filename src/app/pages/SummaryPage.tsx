@@ -7,12 +7,12 @@ import { useEntitlements } from '../entitlements';
 import { equivalentsLine, formatTrDate } from '../sessionView';
 import { formatClock, formatMoney } from '../../engine/format';
 import { MONTHLY_HOURS } from '../../engine/work';
-import { t } from '../../i18n';
+import { LOCALE, t } from '../../i18n';
 import { useSessionStore } from '../../storage/session';
 import { durationWords } from '../sessionView';
 import s from './pages.module.css';
 
-const time = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' });
+const time = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' });
 
 export function SummaryPage() {
   const summary = useSessionStore((st) => st.lastSummary);
@@ -104,7 +104,7 @@ export function SummaryPage() {
                     [
                       t('history.label'),
                       t('history.date'),
-                      `${t('summary.duration')} (saat)`,
+                      `${t('summary.duration')} ${t('export.hoursUnit')}`,
                       `${t('history.amount')} (₺)`,
                     ],
                     [

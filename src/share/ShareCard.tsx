@@ -1,10 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { brandSlug, config } from '../app/config';
+import { brandSlug } from '../app/config';
 import s from '../app/pages/pages.module.css';
 import { Button } from '../components/Button';
 import { Field } from '../components/Field';
-import { parseTrNumber } from '../engine/work';
-import { t } from '../i18n';
+import { parseAmount, brandName, t } from '../i18n';
 import { usePrefsStore } from '../storage/prefs';
 import type { SessionSummary } from '../storage/session';
 import { cardBlob, drawCard, type CardSize } from './card';
@@ -20,7 +19,7 @@ export function CardExport({ content }: { content: CardContent }) {
   const text = [content.kicker, content.big, ...content.lines].join(' · ');
 
   useEffect(() => {
-    if (canvas.current) void drawCard(canvas.current, content, size, config.name);
+    if (canvas.current) void drawCard(canvas.current, content, size, brandName);
   }, [content, size]);
 
   const download = async () => {
@@ -116,7 +115,7 @@ export function ShareCard({ summary }: { summary: SessionSummary }) {
               value={priceText}
               onChange={(e) => {
                 setPriceText(e.target.value);
-                const p = parseTrNumber(e.target.value);
+                const p = parseAmount(e.target.value);
                 setCoffeePrice(p > 0 ? p : null);
               }}
             />
