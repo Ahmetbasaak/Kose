@@ -249,3 +249,21 @@ a.modeCard:hover {
   background: color-mix(in srgb, var(--corner-text) 12%, transparent);
   color: var(--corner-text);
 }
+
+/* Label styled as a secondary button around a visually hidden file input. */
+.fileButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 12px;
+  border: 1px solid var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.fileButton:hover {
+  background: var(--accent-soft);
+}
+.fileButton:focus-within {
+  box-shadow: var(--focus);
+}

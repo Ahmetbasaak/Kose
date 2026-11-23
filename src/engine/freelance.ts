@@ -1,4 +1,5 @@
-import { trDay } from './work';
+import { parseIsoDate, trMidnight } from './calendar';
+import { parseTime, trDay } from './work';
 
 export interface TimeEntry {
   id: string;
@@ -7,7 +8,27 @@ export interface TimeEntry {
   endedAt: number;
   /** Paid time; less than endedAt - startedAt when the timer was paused. */
   elapsedMs: number;
+  /** What was done, for the invoice. */
+  note?: string;
 }
+
+/**
+ * A manually added entry ("forgot to start the timer"): date + start/end in Turkey time.
+ * An end before the start means it ran past midnight. Null when the input is invalid.
+ */
+export function manualEntry(date: string, start: string, end: string): Omit<TimeEntry, 'id' | 'projectId'> | null {
+  const ymd = parseIsoDate(date);
+  const s = parseTime(start);
+  const e = parseTime(end);
+  if (!ymd || !Number.isFinite(s) || !Number.isFinite(e) || s === e) return null;
+  const startedAt = trMidnight(ymd.y, ymd.m, ymd.d) + s * 60_000;
+  const elapsedMs = ((((e - s) % 1440) + 1440) % 1440) * 60_000;
+  return { startedAt, endedAt: startedAt + elapsedMs, elapsedMs };
+}
+
+/** Billable amount; null when the project has no hourly rate. */
+export const amountFor = (ms: number, hourlyRate: number | null | undefined) =>
+  hourlyRate ? (ms / 3_600_000) * hourlyRate : null;
 
 export interface WeekRow {
   /** Turkey day number (see trDay). */

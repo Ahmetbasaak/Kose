@@ -16,6 +16,8 @@ const isNarrow = () => window.matchMedia('(max-width: 639px)').matches;
 export function useLaunchCorner() {
   const navigate = useNavigate();
   return async () => {
+    // Setting off: show the big full-page timer instead of the corner window.
+    if (!usePrefsStore.getState().openCornerOnStart) return void navigate('/sayac');
     if (isPipSupported()) {
       try {
         await openPip();

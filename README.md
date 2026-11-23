@@ -16,6 +16,10 @@ npm run preview    # paketi yerelde sun
 npm run e2e        # Playwright: akışlar, çevrimdışı, axe erişilebilirlik taraması (açık/koyu)
 ```
 
+## Ayarlar ve veriler
+
+Ayarlar sayfası: tema (Sistem/Açık/Koyu, Pro'da Retro), hareketleri azalt, sekme başlığında sayaç, ses ve bildirim, başlatınca köşe penceresi, ekranı açık tut, köşe penceresi görünümü (Pro), kısayollar ve otomatik başlatma (Pro), **Verilerim** (JSON yedek indir/geri yükle, tümünü sil). Veriler cihazdan çıkmadığı için cihaz değiştirirken yedek dosyası kullanılır.
+
 ## PWA
 
 `vite-plugin-pwa` ile kurulabilir ve ilk ziyaretten sonra çevrimdışı çalışır (uygulama kabuğu, Inter latin/latin-ext, ikonlar önbellekte). Yeni sürüm arka planda iner, sonraki açılışta devreye girer; çalışan sayaç durumu localStorage'da olduğu için güncellemeden etkilenmez.

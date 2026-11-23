@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { totalsBy, weekRows, type TimeEntry } from '../src/engine/freelance';
+import { amountFor, manualEntry, totalsBy, weekRows, type TimeEntry } from '../src/engine/freelance';
 import { sectionState } from '../src/engine/sections';
 
 const MIN = 60_000;
@@ -52,5 +52,25 @@ describe('freelance week', () => {
   it('totals per client', () => {
     const client = (p: string) => (p === 'web' ? 'A' : 'B');
     expect(Object.fromEntries(totalsBy(weekRows(entries, weekStart), client))).toEqual({ A: 210 * MIN, B: 45 * MIN });
+  });
+});
+
+describe('manual time entry', () => {
+  it('builds an entry from date and Turkey-time start/end', () => {
+    const e = manualEntry('2026-11-24', '09:30', '12:00')!;
+    expect(new Date(e.startedAt).toISOString()).toBe('2026-11-24T06:30:00.000Z');
+    expect(e.elapsedMs).toBe(150 * MIN);
+  });
+  it('an end before the start runs past midnight', () => {
+    expect(manualEntry('2026-11-24', '22:00', '01:30')!.elapsedMs).toBe(210 * MIN);
+  });
+  it('rejects bad input', () => {
+    expect(manualEntry('2026-02-30', '09:00', '10:00')).toBeNull();
+    expect(manualEntry('2026-11-24', '9', '10:00')).toBeNull();
+    expect(manualEntry('2026-11-24', '10:00', '10:00')).toBeNull();
+  });
+  it('bills hours × rate, nothing without a rate', () => {
+    expect(amountFor(90 * MIN, 600)).toBe(900);
+    expect(amountFor(90 * MIN, null)).toBeNull();
   });
 });

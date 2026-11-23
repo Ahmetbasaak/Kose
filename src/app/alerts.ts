@@ -1,21 +1,33 @@
-/** Soft chime via Web Audio (1–3 notes); no audio files to ship. */
-export function playChime(notes = 3): void {
+import { usePrefsStore, type Tone } from '../storage/prefs';
+
+const TONES: Record<Tone, { wave: OscillatorType; notes: number[]; length: number; gap: number }> = {
+  chime: { wave: 'sine', notes: [660, 880, 990], length: 0.4, gap: 0.22 },
+  bell: { wave: 'triangle', notes: [523, 659, 784], length: 0.9, gap: 0.28 },
+  beep: { wave: 'square', notes: [880, 880, 880], length: 0.12, gap: 0.2 },
+};
+
+/** Alert sound via Web Audio (1–3 notes), using the user's tone and volume; no audio files to ship. */
+export function playChime(notes = 3, force = false): void {
+  const { sound, volume, tone } = usePrefsStore.getState();
+  if ((!sound && !force) || volume === 0) return;
+  const spec = TONES[tone];
+  const peak = 0.4 * (volume / 100) * (spec.wave === 'square' ? 0.35 : 1); // square waves are much louder
   try {
     const ctx = new AudioContext();
-    [0, 0.22, 0.44].slice(0, notes).forEach((offset, i) => {
+    spec.notes.slice(0, notes).forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = [660, 880, 990][i]!;
-      const at = ctx.currentTime + offset;
+      osc.type = spec.wave;
+      osc.frequency.value = freq;
+      const at = ctx.currentTime + i * spec.gap;
       gain.gain.setValueAtTime(0.0001, at);
-      gain.gain.exponentialRampToValueAtTime(0.25, at + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.4);
+      gain.gain.exponentialRampToValueAtTime(Math.max(peak, 0.0002), at + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, at + spec.length);
       osc.connect(gain).connect(ctx.destination);
       osc.start(at);
-      osc.stop(at + 0.42);
+      osc.stop(at + spec.length + 0.02);
     });
-    setTimeout(() => void ctx.close(), 1500);
+    setTimeout(() => void ctx.close(), 2000);
   } catch {
     // Audio unavailable: the in-page alert still shows.
   }

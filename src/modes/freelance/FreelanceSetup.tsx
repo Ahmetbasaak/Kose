@@ -7,43 +7,67 @@ import { Button } from '../../components/Button';
 import { Field } from '../../components/Field';
 import { useNow } from '../../components/useNow';
 import { trWeekStart } from '../../engine/calendar';
-import { formatClock } from '../../engine/format';
-import { totalsBy, weekRows } from '../../engine/freelance';
-import { elapsedMs } from '../../engine/timer';
-import { TR_OFFSET_MS } from '../../engine/work';
+import { formatClock, formatMoney } from '../../engine/format';
+import { amountFor, manualEntry, totalsBy, weekRows } from '../../engine/freelance';
+import { elapsedMs, isRunning } from '../../engine/timer';
+import { parseTrNumber, TR_OFFSET_MS } from '../../engine/work';
 import { downloadXlsx, hours } from '../../export/xlsx';
 import { t } from '../../i18n';
 import { useFreelanceStore, type Project } from '../../storage/freelance';
 import { useSessionStore } from '../../storage/session';
 
 const DAY = 86_400_000;
-const dayFmt = new Intl.DateTimeFormat('tr-TR', {
-  weekday: 'short',
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'Europe/Istanbul',
-});
-const isoFmt = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Istanbul' }); // yyyy-mm-dd
+const LONG_RUN_MS = 8 * 3_600_000;
+const tz = { timeZone: 'Europe/Istanbul' } as const;
+const dayFmt = new Intl.DateTimeFormat('tr-TR', { weekday: 'short', day: 'numeric', month: 'short', ...tz });
+const timeFmt = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit', ...tz });
+const isoFmt = new Intl.DateTimeFormat('sv-SE', tz); // yyyy-mm-dd
 const dayLabel = (day: number) => dayFmt.format(day * DAY - TR_OFFSET_MS + 12 * 3_600_000);
+const money = (v: number | null) => (v === null ? '—' : formatMoney(v));
+
+/** Optional ₺ amount: '' → null, otherwise a positive number or NaN (invalid). */
+const optionalRate = (v: string) => (v.trim() === '' ? null : parseTrNumber(v) > 0 ? parseTrNumber(v) : NaN);
 
 export function FreelanceSetup() {
-  const { clients, projects, entries, addProject } = useFreelanceStore();
+  const store = useFreelanceStore();
+  const { clients, projects, entries } = store;
   const active = useSessionStore((st) => st.active);
+  const togglePause = useSessionStore((st) => st.togglePause);
   const startSession = useStartSession();
   const finishSession = useFinishSession();
   const now = useNow(1000);
   const [weekStart, setWeekStart] = useState(() => trWeekStart(Date.now()));
   const [name, setName] = useState('');
   const [clientName, setClientName] = useState('');
-  const [error, setError] = useState(false);
+  const [rate, setRate] = useState('');
+  const [projectError, setProjectError] = useState<'name' | 'rate' | null>(null);
+  const [manual, setManual] = useState(() => ({
+    projectId: '',
+    date: isoFmt.format(Date.now()),
+    start: '09:00',
+    end: '10:00',
+    note: '',
+  }));
+  const [manualMsg, setManualMsg] = useState<'error' | 'added' | null>(null);
 
-  const clientOf = (p: Project | undefined) => clients.find((c) => c.id === p?.clientId)?.name ?? '';
   const projectById = (id: string) => projects.find((p) => p.id === id);
+  const clientOf = (p: Project | undefined) => clients.find((c) => c.id === p?.clientId)?.name ?? '';
+  const rateOf = (pid: string) => projectById(pid)?.hourlyRate ?? null;
   const rows = weekRows(entries, weekStart);
+  const anyRate = projects.some((p) => p.hourlyRate);
   const total = rows.reduce((a, r) => a + r.ms, 0);
-  const byClient = totalsBy(rows, (pid) => clientOf(projectById(pid)));
+  const totalAmount = rows.reduce((a, r) => a + (amountFor(r.ms, rateOf(r.projectId)) ?? 0), 0);
+  const clientTime = totalsBy(rows, (pid) => clientOf(projectById(pid)));
+  const clientMoney = new Map<string, number>();
+  for (const r of rows) {
+    const c = clientOf(projectById(r.projectId));
+    clientMoney.set(c, (clientMoney.get(c) ?? 0) + (amountFor(r.ms, rateOf(r.projectId)) ?? 0));
+  }
+  const weekEntries = entries
+    .filter((e) => e.startedAt >= weekStart && e.startedAt < weekStart + 7 * DAY)
+    .sort((a, b) => a.startedAt - b.startedAt);
   const thisWeekByProject = totalsBy(weekRows(entries, trWeekStart(now)), (pid) => pid);
-  const runningId = active?.modeId === 'freelance' ? active.projectId : null;
+  const running = active?.modeId === 'freelance' ? active : null;
 
   const start = async (p: Project) => {
     const input = {
@@ -58,12 +82,25 @@ export function FreelanceSetup() {
     else await startSession(input);
   };
 
-  const onAdd = (e: FormEvent) => {
+  const onAddProject = (e: FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !clientName.trim()) return setError(true);
-    addProject(name.trim(), clientName.trim());
+    const r = optionalRate(rate);
+    if (!name.trim() || !clientName.trim()) return setProjectError('name');
+    if (Number.isNaN(r)) return setProjectError('rate');
+    store.addProject(name.trim(), clientName.trim(), r);
     setName('');
-    setError(false);
+    setRate('');
+    setProjectError(null);
+  };
+
+  const onAddEntry = (e: FormEvent) => {
+    e.preventDefault();
+    const entry = manualEntry(manual.date, manual.start, manual.end);
+    const projectId = manual.projectId || projects[0]?.id;
+    if (!entry || !projectId) return setManualMsg('error');
+    store.addEntry({ ...entry, projectId, note: manual.note.trim() || undefined });
+    setManual({ ...manual, note: '' });
+    setManualMsg('added');
   };
 
   const exportExcel = () =>
@@ -71,20 +108,42 @@ export function FreelanceSetup() {
       {
         name: t('freelance.reportTitle'),
         rows: [
-          [t('freelance.day'), t('freelance.project'), t('freelance.client'), `${t('freelance.duration')} (saat)`],
+          [t('freelance.day'), t('freelance.project'), t('freelance.client'), 'Saat', `${t('freelance.amount')} (₺)`],
           ...rows.map((r) => [
             isoFmt.format(r.day * DAY - TR_OFFSET_MS + 12 * 3_600_000),
             projectById(r.projectId)?.name ?? '',
             clientOf(projectById(r.projectId)),
             hours(r.ms),
+            amountFor(r.ms, rateOf(r.projectId)) ?? '',
           ]),
         ],
       },
       {
         name: t('freelance.byClient'),
         rows: [
-          [t('freelance.client'), `${t('freelance.duration')} (saat)`],
-          ...[...byClient].map(([c, ms]) => [c, hours(ms)]),
+          [t('freelance.client'), 'Saat', `${t('freelance.amount')} (₺)`],
+          ...[...clientTime].map(([c, ms]) => [c, hours(ms), anyRate ? (clientMoney.get(c) ?? 0) : '']),
+        ],
+      },
+      {
+        name: t('freelance.entries'),
+        rows: [
+          [
+            t('freelance.date'),
+            t('freelance.startTime'),
+            t('freelance.endTime'),
+            t('freelance.project'),
+            'Saat',
+            t('freelance.noteHeader'),
+          ],
+          ...weekEntries.map((en) => [
+            isoFmt.format(en.startedAt),
+            timeFmt.format(en.startedAt),
+            timeFmt.format(en.endedAt),
+            projectById(en.projectId)?.name ?? '',
+            hours(en.elapsedMs),
+            en.note ?? '',
+          ]),
         ],
       },
     ]);
@@ -92,6 +151,17 @@ export function FreelanceSetup() {
   return (
     <div className={s.split}>
       <div className={s.formCol} data-noprint>
+        <section className={`${s.card} ${s.stack}`} style={{ gap: 8 }} aria-labelledby="fl-how">
+          <h2 id="fl-how" className={s.label} style={{ fontSize: 16 }}>
+            {t('freelance.howTitle')}
+          </h2>
+          <ul className={s.small} style={{ margin: 0, paddingLeft: 20, display: 'grid', gap: 4 }}>
+            <li>{t('freelance.how1')}</li>
+            <li>{t('freelance.how2')}</li>
+            <li>{t('freelance.how3')}</li>
+          </ul>
+        </section>
+
         <section className={s.stack} style={{ gap: 12 }} aria-labelledby="fl-projects">
           <h2 id="fl-projects" className={s.modeTitle}>
             {t('freelance.projects')}
@@ -99,22 +169,46 @@ export function FreelanceSetup() {
           {projects.length === 0 && <p className={s.muted}>{t('freelance.noProjects')}</p>}
           <ul role="list" style={{ listStyle: 'none', margin: 0, padding: 0, display: 'grid', gap: 12 }}>
             {projects.map((p) => {
-              const running = runningId === p.id;
-              const live = running && active ? elapsedMs(active.timer, now) : 0;
+              const isOn = running?.projectId === p.id;
+              const live = isOn ? elapsedMs(running.timer, now) : 0;
+              const paused = isOn && !isRunning(running.timer);
               return (
-                <li key={p.id} className={`${s.card} ${s.spread}`} style={{ padding: '16px 20px' }}>
-                  <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                    <strong>{p.name}</strong>
-                    <span className={`${s.muted} ${s.small}`}>{clientOf(p)}</span>
-                  </span>
-                  <span className={s.row}>
-                    <span className="num" style={{ fontSize: 18, fontWeight: 600 }}>
-                      {running ? formatClock(live) : durationWords(thisWeekByProject.get(p.id) ?? 0)}
+                <li key={p.id} className={`${s.card} ${s.stack}`} style={{ padding: '16px 20px', gap: 10 }}>
+                  <div className={s.spread}>
+                    <span style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                      <strong>{p.name}</strong>
+                      <span className={`${s.muted} ${s.small}`}>
+                        {clientOf(p)}
+                        {p.hourlyRate ? ` · ${t('freelance.rateShort', { rate: formatMoney(p.hourlyRate) })}` : ''}
+                      </span>
                     </span>
-                    {running ? (
-                      <Button aria-label={t('freelance.stopLabel', { name: p.name })} onClick={finishSession}>
-                        {t('freelance.stop')}
-                      </Button>
+                    <span className="num" style={{ fontSize: 20, fontWeight: 600 }} role={isOn ? 'timer' : undefined}>
+                      {isOn ? formatClock(live) : durationWords(thisWeekByProject.get(p.id) ?? 0)}
+                    </span>
+                  </div>
+                  {paused && <span className={`${s.muted} ${s.small}`}>{t('freelance.paused')}</span>}
+                  {isOn && live > LONG_RUN_MS && (
+                    <p role="status" className={s.error}>
+                      {t('freelance.longRunning', { h: Math.floor(live / 3_600_000) })}
+                    </p>
+                  )}
+                  <div className={s.row}>
+                    {isOn ? (
+                      <>
+                        <Button
+                          aria-label={t(paused ? 'freelance.resumeLabel' : 'freelance.pauseLabel', { name: p.name })}
+                          onClick={() => togglePause()}
+                        >
+                          {paused ? t('freelance.resume') : t('freelance.pause')}
+                        </Button>
+                        <Button
+                          variant="primary"
+                          aria-label={t('freelance.stopLabel', { name: p.name })}
+                          onClick={finishSession}
+                        >
+                          {t('freelance.stop')}
+                        </Button>
+                      </>
                     ) : (
                       <Button
                         variant="primary"
@@ -124,7 +218,17 @@ export function FreelanceSetup() {
                         {t('freelance.start')}
                       </Button>
                     )}
-                  </span>
+                    <Button
+                      variant="ghost"
+                      aria-label={t('freelance.removeProject', { name: p.name })}
+                      disabled={isOn}
+                      onClick={() =>
+                        window.confirm(t('freelance.removeConfirm', { name: p.name })) && store.removeProject(p.id)
+                      }
+                    >
+                      ×
+                    </Button>
+                  </div>
                 </li>
               );
             })}
@@ -132,7 +236,7 @@ export function FreelanceSetup() {
           <p className={`${s.muted} ${s.small}`}>{t('freelance.switchNote')}</p>
         </section>
 
-        <form className={`${s.card} ${s.formCol}`} onSubmit={onAdd} noValidate aria-labelledby="fl-new">
+        <form className={`${s.card} ${s.formCol}`} onSubmit={onAddProject} noValidate aria-labelledby="fl-new">
           <h2 id="fl-new" className={s.modeTitle}>
             {t('freelance.newProject')}
           </h2>
@@ -142,7 +246,7 @@ export function FreelanceSetup() {
               label={t('freelance.projectName')}
               value={name}
               maxLength={60}
-              errorId={error && !name.trim() ? 'fl-error' : null}
+              errorId={projectError === 'name' && !name.trim() ? 'fl-error' : null}
               onChange={(e) => setName(e.target.value)}
             />
             <Field
@@ -152,7 +256,7 @@ export function FreelanceSetup() {
               value={clientName}
               maxLength={60}
               title={t('freelance.clientHint')}
-              errorId={error && !clientName.trim() ? 'fl-error' : null}
+              errorId={projectError === 'name' && !clientName.trim() ? 'fl-error' : null}
               onChange={(e) => setClientName(e.target.value)}
             />
             <datalist id="fl-clients">
@@ -161,9 +265,19 @@ export function FreelanceSetup() {
               ))}
             </datalist>
           </div>
-          {error && (
+          <div className={s.row}>
+            <Field
+              id="fl-rate"
+              label={t('freelance.rate')}
+              inputMode="decimal"
+              value={rate}
+              errorId={projectError === 'rate' ? 'fl-error' : null}
+              onChange={(e) => setRate(e.target.value)}
+            />
+          </div>
+          {projectError && (
             <p id="fl-error" className={s.error} role="alert">
-              {t('freelance.projectError')}
+              {projectError === 'rate' ? t('freelance.rateError') : t('freelance.projectError')}
             </p>
           )}
           <div>
@@ -172,6 +286,78 @@ export function FreelanceSetup() {
             </Button>
           </div>
         </form>
+
+        {projects.length > 0 && (
+          <form className={`${s.card} ${s.formCol}`} onSubmit={onAddEntry} noValidate aria-labelledby="fl-manual">
+            <h2 id="fl-manual" className={s.modeTitle}>
+              {t('freelance.manualTitle')}
+            </h2>
+            <p className={`${s.muted} ${s.small}`}>{t('freelance.manualNote')}</p>
+            <div className={s.field}>
+              <label htmlFor="fl-m-project" className={s.label}>
+                {t('freelance.project')}
+              </label>
+              <select
+                id="fl-m-project"
+                className={s.input}
+                value={manual.projectId || projects[0]!.id}
+                onChange={(e) => setManual({ ...manual, projectId: e.target.value })}
+              >
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} · {clientOf(p)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={s.row}>
+              <Field
+                id="fl-m-date"
+                label={t('freelance.date')}
+                type="date"
+                value={manual.date}
+                errorId={manualMsg === 'error' ? 'fl-m-msg' : null}
+                onChange={(e) => setManual({ ...manual, date: e.target.value })}
+              />
+              <Field
+                id="fl-m-start"
+                label={t('freelance.startTime')}
+                type="time"
+                value={manual.start}
+                errorId={manualMsg === 'error' ? 'fl-m-msg' : null}
+                onChange={(e) => setManual({ ...manual, start: e.target.value })}
+              />
+              <Field
+                id="fl-m-end"
+                label={t('freelance.endTime')}
+                type="time"
+                value={manual.end}
+                errorId={manualMsg === 'error' ? 'fl-m-msg' : null}
+                onChange={(e) => setManual({ ...manual, end: e.target.value })}
+              />
+            </div>
+            <Field
+              id="fl-m-note"
+              label={t('freelance.note')}
+              placeholder={t('freelance.notePlaceholder')}
+              maxLength={200}
+              value={manual.note}
+              onChange={(e) => setManual({ ...manual, note: e.target.value })}
+            />
+            {manualMsg && (
+              <p
+                id="fl-m-msg"
+                role={manualMsg === 'error' ? 'alert' : 'status'}
+                className={manualMsg === 'error' ? s.error : s.muted}
+              >
+                {manualMsg === 'error' ? t('freelance.manualError') : t('freelance.added')}
+              </p>
+            )}
+            <div>
+              <Button type="submit">{t('freelance.addEntry')}</Button>
+            </div>
+          </form>
+        )}
       </div>
 
       <section className={s.formCol} style={{ flexGrow: 1.4 }} aria-labelledby="fl-week">
@@ -200,6 +386,7 @@ export function FreelanceSetup() {
                     <th scope="col">{t('freelance.project')}</th>
                     <th scope="col">{t('freelance.client')}</th>
                     <th scope="col">{t('freelance.duration')}</th>
+                    {anyRate && <th scope="col">{t('freelance.amount')}</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -209,6 +396,7 @@ export function FreelanceSetup() {
                       <td>{projectById(r.projectId)?.name}</td>
                       <td>{clientOf(projectById(r.projectId))}</td>
                       <td className="num">{durationWords(r.ms)}</td>
+                      {anyRate && <td className="num">{money(amountFor(r.ms, rateOf(r.projectId)))}</td>}
                     </tr>
                   ))}
                 </tbody>
@@ -216,20 +404,66 @@ export function FreelanceSetup() {
             </div>
             <p className="num">
               <strong>{t('freelance.total', { d: durationWords(total) })}</strong>
+              {anyRate && <> · {t('freelance.totalAmount', { v: formatMoney(totalAmount) })}</>}
             </p>
+
             <h3 className={s.label}>{t('freelance.byClient')}</h3>
             <div className={s.card} style={{ padding: 8 }}>
               <table className={s.table}>
                 <tbody>
-                  {[...byClient].map(([c, ms]) => (
+                  {[...clientTime].map(([c, ms]) => (
                     <tr key={c}>
                       <th scope="row">{c}</th>
                       <td className="num">{durationWords(ms)}</td>
+                      {anyRate && <td className="num">{formatMoney(clientMoney.get(c) ?? 0)}</td>}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
+            <h3 className={s.label}>{t('freelance.entries')}</h3>
+            <div className={s.card} style={{ padding: 8, overflowX: 'auto' }}>
+              <table className={s.table}>
+                <thead>
+                  <tr>
+                    <th scope="col">{t('freelance.day')}</th>
+                    <th scope="col">{t('freelance.time')}</th>
+                    <th scope="col">{t('freelance.project')}</th>
+                    <th scope="col">{t('freelance.duration')}</th>
+                    <th scope="col">{t('freelance.noteHeader')}</th>
+                    <th scope="col" data-noprint>
+                      <span className="visually-hidden">{t('countdowns.remove')}</span>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {weekEntries.map((en) => {
+                    const pname = projectById(en.projectId)?.name ?? '';
+                    const range = `${timeFmt.format(en.startedAt)}–${timeFmt.format(en.endedAt)}`;
+                    return (
+                      <tr key={en.id}>
+                        <td>{dayFmt.format(en.startedAt)}</td>
+                        <td className="num">{range}</td>
+                        <td>{pname}</td>
+                        <td className="num">{durationWords(en.elapsedMs)}</td>
+                        <td>{en.note ?? ''}</td>
+                        <td data-noprint>
+                          <Button
+                            variant="ghost"
+                            aria-label={t('freelance.removeEntry', { name: pname, time: range })}
+                            onClick={() => store.removeEntry(en.id)}
+                          >
+                            ×
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
             <div className={s.row} data-noprint>
               <Button onClick={() => void exportExcel()}>{t('freelance.excel')}</Button>
               <Button onClick={() => window.print()}>{t('freelance.pdf')}</Button>

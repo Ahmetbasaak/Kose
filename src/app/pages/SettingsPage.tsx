@@ -1,44 +1,218 @@
+import { useState, type ReactNode } from 'react';
 import { Button } from '../../components/Button';
 import { CornerFace } from '../../components/corner/CornerView';
 import { ProGate } from '../../components/ProGate';
 import { t } from '../../i18n';
-import { usePrefsStore, type CornerSize, type CornerTheme } from '../../storage/prefs';
-import { TEST_MODE, useProStore } from '../entitlements';
+import { clearLocalStorage, collectLocalStorage, parseBackup } from '../../storage/backup';
+import { allRecords, deleteHistory, replaceRecords } from '../../storage/history';
+import { usePrefsStore, type AppTheme, type CornerSize, type CornerTheme, type Tone } from '../../storage/prefs';
+import { playChime } from '../alerts';
+import { brandSlug } from '../config';
+import { TEST_MODE, useEntitlements, useProStore } from '../entitlements';
 import s from './pages.module.css';
 
+const APP_THEMES: AppTheme[] = ['system', 'light', 'dark', 'retro'];
 const THEMES: CornerTheme[] = ['default', 'lcd', 'neon', 'paper', 'minimal'];
 const SIZES: CornerSize[] = ['s', 'm', 'l'];
+const TONES: Tone[] = ['chime', 'bell', 'beep'];
+
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
+  return (
+    <section className={s.stack} style={{ gap: 12 }} aria-labelledby={id}>
+      <h2 id={id} className={s.modeTitle}>
+        {title}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
+function Check({
+  checked,
+  onChange,
+  label,
+  note,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  label: string;
+  note?: string;
+}) {
+  return (
+    <div>
+      <label className={s.radio}>
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        {label}
+      </label>
+      {note && <p className={`${s.muted} ${s.small}`}>{note}</p>}
+    </div>
+  );
+}
+
+function download(name: string, blob: Blob) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 export function SettingsPage() {
   const prefs = usePrefsStore();
   const { pro, source, revoke } = useProStore();
+  const { can } = useEntitlements();
+  const [notif, setNotif] = useState<NotificationPermission | 'unsupported'>(() =>
+    'Notification' in window ? Notification.permission : 'unsupported',
+  );
+  const [dataMsg, setDataMsg] = useState<string | null>(null);
+
+  const exportData = async () => {
+    const backup = {
+      app: 'kose',
+      version: 1,
+      exportedAt: Date.now(),
+      localStorage: collectLocalStorage(localStorage),
+      history: await allRecords().catch(() => []),
+    };
+    const day = new Date().toISOString().slice(0, 10);
+    download(`${brandSlug}-yedek-${day}.json`, new Blob([JSON.stringify(backup)], { type: 'application/json' }));
+  };
+
+  const importData = async (file: File | undefined) => {
+    if (!file) return;
+    const backup = parseBackup(await file.text());
+    if (!backup) return setDataMsg(t('settings.importBad'));
+    if (!window.confirm(t('settings.importConfirm'))) return;
+    clearLocalStorage(localStorage);
+    for (const [k, v] of Object.entries(backup.localStorage)) localStorage.setItem(k, v);
+    await replaceRecords(backup.history);
+    location.reload();
+  };
+
+  const wipe = async () => {
+    if (!window.confirm(t('settings.wipeConfirm'))) return;
+    clearLocalStorage(localStorage);
+    await deleteHistory().catch(() => undefined);
+    location.reload();
+  };
 
   return (
     <div className={s.stack}>
       <h1 className={s.h1}>{t('settings.title')}</h1>
 
-      <section className={`${s.card} ${s.stack}`} style={{ gap: 12 }} aria-labelledby="set-pro">
-        <h2 id="set-pro" className={s.modeTitle}>
-          {t('settings.proStatus')}
-        </h2>
-        <p>
-          {TEST_MODE
-            ? t('settings.proTest')
-            : pro
-              ? t('settings.proOn', { source: source ?? '' })
-              : t('settings.proOff')}
-        </p>
-        {pro && (
-          <div>
-            <Button onClick={revoke}>{t('settings.revoke')}</Button>
-          </div>
-        )}
-      </section>
+      <Section id="set-look" title={t('settings.appearance')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>
+          <fieldset className={s.fieldset}>
+            <legend className={s.label}>{t('settings.appTheme')}</legend>
+            <div className={s.row}>
+              {APP_THEMES.map((k) => {
+                const locked = k === 'retro' && !can('themes');
+                return (
+                  <label key={k} className={s.radio}>
+                    <input
+                      type="radio"
+                      name="app-theme"
+                      checked={prefs.appTheme === k}
+                      disabled={locked}
+                      onChange={() => prefs.set({ appTheme: k })}
+                    />
+                    {t(`settings.appThemes.${k}`)}
+                    {k === 'retro' && <span className={s.badge}>{t('home.pro')}</span>}
+                  </label>
+                );
+              })}
+            </div>
+            <span className={`${s.muted} ${s.small}`}>{t('settings.appThemeNote')}</span>
+          </fieldset>
+          <Check
+            checked={prefs.reduceMotion}
+            onChange={(v) => prefs.set({ reduceMotion: v })}
+            label={t('settings.reduceMotion')}
+          />
+          <Check
+            checked={prefs.titleTimer}
+            onChange={(v) => prefs.set({ titleTimer: v })}
+            label={t('settings.titleTimer')}
+          />
+        </div>
+      </Section>
 
-      <section className={s.stack} style={{ gap: 12 }} aria-labelledby="set-corner">
-        <h2 id="set-corner" className={s.modeTitle}>
-          {t('settings.corner')}
-        </h2>
+      <Section id="set-sound" title={t('settings.soundTitle')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>
+          <Check checked={prefs.sound} onChange={(v) => prefs.set({ sound: v })} label={t('settings.sound')} />
+          <div className={s.row}>
+            <div className={s.field}>
+              <label htmlFor="set-volume" className={s.label}>
+                {t('settings.volume', { n: prefs.volume })}
+              </label>
+              <input
+                id="set-volume"
+                type="range"
+                min={0}
+                max={100}
+                step={10}
+                value={prefs.volume}
+                disabled={!prefs.sound}
+                onChange={(e) => prefs.set({ volume: Number(e.target.value) })}
+              />
+            </div>
+            <div className={s.field}>
+              <label htmlFor="set-tone" className={s.label}>
+                {t('settings.tone')}
+              </label>
+              <select
+                id="set-tone"
+                className={s.input}
+                value={prefs.tone}
+                disabled={!prefs.sound}
+                onChange={(e) => prefs.set({ tone: e.target.value as Tone })}
+              >
+                {TONES.map((k) => (
+                  <option key={k} value={k}>
+                    {t(`settings.tones.${k}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div>
+            <Button onClick={() => playChime(3, true)}>{t('settings.testSound')}</Button>
+          </div>
+          <h3 className={s.label}>{t('settings.notifications')}</h3>
+          <p className={`${s.muted} ${s.small}`} role="status">
+            {t(`settings.notif.${notif}`)}
+          </p>
+          {notif === 'default' && (
+            <div>
+              <Button onClick={() => void Notification.requestPermission().then(setNotif)}>
+                {t('settings.askNotif')}
+              </Button>
+            </div>
+          )}
+        </div>
+      </Section>
+
+      <Section id="set-timer" title={t('settings.timerTitle')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>
+          <Check
+            checked={prefs.openCornerOnStart}
+            onChange={(v) => prefs.set({ openCornerOnStart: v })}
+            label={t('settings.openCorner')}
+            note={t('settings.openCornerNote')}
+          />
+          <Check
+            checked={prefs.keepAwake}
+            onChange={(v) => prefs.set({ keepAwake: v })}
+            label={t('settings.keepAwake')}
+            note={'wakeLock' in navigator ? t('settings.keepAwakeNote') : t('settings.keepAwakeUnsupported')}
+          />
+        </div>
+      </Section>
+
+      <Section id="set-corner" title={t('settings.corner')}>
         <ProGate feature="cornerSettings">
           <div className={`${s.card} ${s.split}`}>
             <div className={s.formCol}>
@@ -125,22 +299,16 @@ export function SettingsPage() {
             </div>
           </div>
         </ProGate>
-      </section>
+      </Section>
 
-      <section className={s.stack} style={{ gap: 12 }} aria-labelledby="set-keys">
-        <h2 id="set-keys" className={s.modeTitle}>
-          {t('settings.shortcuts')}
-        </h2>
+      <Section id="set-keys" title={t('settings.shortcuts')}>
         <ProGate feature="shortcuts">
           <div className={`${s.card} ${s.stack}`} style={{ gap: 8 }}>
-            <label className={s.radio}>
-              <input
-                type="checkbox"
-                checked={prefs.shortcuts}
-                onChange={(e) => prefs.set({ shortcuts: e.target.checked })}
-              />
-              {t('settings.shortcutsOn')}
-            </label>
+            <Check
+              checked={prefs.shortcuts}
+              onChange={(v) => prefs.set({ shortcuts: v })}
+              label={t('settings.shortcutsOn')}
+            />
             <dl style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px 16px', margin: 0 }}>
               {(['p', 'b', 'k'] as const).map((k) => (
                 <div key={k} style={{ display: 'contents' }}>
@@ -154,26 +322,64 @@ export function SettingsPage() {
             <span className={`${s.muted} ${s.small}`}>{t('settings.shortcutsNote')}</span>
           </div>
         </ProGate>
-      </section>
+      </Section>
 
-      <section className={s.stack} style={{ gap: 12 }} aria-labelledby="set-auto">
-        <h2 id="set-auto" className={s.modeTitle}>
-          {t('settings.autostart')}
-        </h2>
+      <Section id="set-auto" title={t('settings.autostart')}>
         <ProGate feature="autostart">
-          <div className={`${s.card} ${s.stack}`} style={{ gap: 8 }}>
-            <label className={s.radio}>
-              <input
-                type="checkbox"
-                checked={prefs.autostart}
-                onChange={(e) => prefs.set({ autostart: e.target.checked })}
-              />
-              {t('settings.autostartOn')}
-            </label>
-            <span className={`${s.muted} ${s.small}`}>{t('settings.autostartNote')}</span>
+          <div className={s.card}>
+            <Check
+              checked={prefs.autostart}
+              onChange={(v) => prefs.set({ autostart: v })}
+              label={t('settings.autostartOn')}
+              note={t('settings.autostartNote')}
+            />
           </div>
         </ProGate>
-      </section>
+      </Section>
+
+      <Section id="set-data" title={t('settings.data')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>
+          <p className={`${s.muted} ${s.small}`}>{t('settings.dataNote')}</p>
+          <div className={s.row}>
+            <Button onClick={() => void exportData()}>{t('settings.exportData')}</Button>
+            {/* A styled label opens the native file picker; the input stays keyboard-focusable. */}
+            <label className={s.fileButton}>
+              {t('settings.importData')}
+              <input
+                type="file"
+                accept="application/json,.json"
+                className="visually-hidden"
+                onChange={(e) => void importData(e.target.files?.[0])}
+              />
+            </label>
+            <Button onClick={() => void wipe()} style={{ color: 'var(--danger)', borderColor: 'var(--danger)' }}>
+              {t('settings.wipe')}
+            </Button>
+          </div>
+          {dataMsg && (
+            <p role="alert" className={s.error}>
+              {dataMsg}
+            </p>
+          )}
+        </div>
+      </Section>
+
+      <Section id="set-pro" title={t('settings.proStatus')}>
+        <div className={`${s.card} ${s.stack}`} style={{ gap: 12 }}>
+          <p>
+            {TEST_MODE
+              ? t('settings.proTest')
+              : pro
+                ? t('settings.proOn', { source: source ?? '' })
+                : t('settings.proOff')}
+          </p>
+          {pro && !TEST_MODE && (
+            <div>
+              <Button onClick={revoke}>{t('settings.revoke')}</Button>
+            </div>
+          )}
+        </div>
+      </Section>
     </div>
   );
 }

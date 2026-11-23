@@ -6,6 +6,9 @@ import type { StartInput } from './session';
 export type Corner = 'tl' | 'tr' | 'br' | 'bl';
 export type CornerTheme = 'default' | 'lcd' | 'neon' | 'paper' | 'minimal';
 export type CornerSize = 's' | 'm' | 'l';
+/** 'system' follows the device light/dark setting; 'retro' is Pro. */
+export type AppTheme = 'system' | 'light' | 'dark' | 'retro';
+export type Tone = 'chime' | 'bell' | 'beep';
 
 /** PiP window sizes (px). */
 export const CORNER_SIZES: Record<CornerSize, { width: number; height: number }> = {
@@ -40,14 +43,21 @@ interface PrefsState {
   autostart: boolean;
   /** Last session started from a setup screen, for autostart. */
   lastStart: StartInput | null;
-  set: (
-    patch: Partial<
-      Pick<
-        PrefsState,
-        'cornerTheme' | 'cornerSize' | 'cornerOpacity' | 'cornerScale' | 'shortcuts' | 'autostart' | 'lastStart'
-      >
-    >,
-  ) => void;
+  appTheme: AppTheme;
+  /** Force reduced motion even when the OS doesn't ask for it. */
+  reduceMotion: boolean;
+  /** Show the running timer in the browser tab title. */
+  titleTimer: boolean;
+  sound: boolean;
+  /** 0–100 */
+  volume: number;
+  tone: Tone;
+  /** Off: starting a timer opens the full-page view instead of the corner window. */
+  openCornerOnStart: boolean;
+  /** Keep the screen awake while a timer runs (Wake Lock). */
+  keepAwake: boolean;
+  /** Plain setting fields only (not the action functions). */
+  set: (patch: Partial<Omit<PrefsState, 'set' | `set${string}` | 'addStudyDay'>>) => void;
 }
 
 export const usePrefsStore = create<PrefsState>()(
@@ -58,7 +68,6 @@ export const usePrefsStore = create<PrefsState>()(
       lastWork: null,
       setLastWork: (lastWork) => set({ lastWork }),
       studyDays: [],
-      // A year is plenty for a consecutive-day streak; keeps the list from growing forever.
       coffeePrice: null,
       setCoffeePrice: (coffeePrice) => set({ coffeePrice }),
       weeklySeenWeek: null,
@@ -69,8 +78,17 @@ export const usePrefsStore = create<PrefsState>()(
       shortcuts: true,
       autostart: false,
       lastStart: null,
+      appTheme: 'system',
+      reduceMotion: false,
+      titleTimer: true,
+      sound: true,
+      volume: 60,
+      tone: 'chime',
+      openCornerOnStart: true,
+      keepAwake: false,
       set: (patch) => set(patch),
       setWeeklySeenWeek: (weeklySeenWeek) => set({ weeklySeenWeek }),
+      // A year is plenty for a consecutive-day streak; keeps the list from growing forever.
       addStudyDay: (day) =>
         set((s) => (s.studyDays.includes(day) ? s : { studyDays: [...s.studyDays, day].slice(-366) })),
     }),

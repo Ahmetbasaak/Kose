@@ -1,49 +1,61 @@
 @import '@fontsource-variable/inter';
 
 :root {
+  /* Sistem by default; [data-theme] pins light, dark or retro. light-dark() picks per color-scheme. */
   color-scheme: light dark;
-  --bg: #f6f5f1;
-  --surface: #ffffff;
-  --text: #1b1b1a;
-  --muted: #5b5b57;
-  --border: #dad8d0;
-  --input-border: #8c8a82;
-  --accent: #0f766e;
-  --accent-hover: #0b5a54;
-  --on-accent: #ffffff;
-  --accent-soft: #e6f3f1;
-  --pro-bg: #fdf0dc;
-  --pro-text: #8a4a06;
-  --danger: #b42318;
-  --corner-bg: #1b1b1a;
+  --bg: light-dark(#f6f5f1, #161615);
+  --surface: light-dark(#ffffff, #222220);
+  --text: light-dark(#1b1b1a, #f2f1ec);
+  --muted: light-dark(#5b5b57, #b4b2aa);
+  --border: light-dark(#dad8d0, #3a3936);
+  --input-border: light-dark(#8c8a82, #77756d);
+  --accent: light-dark(#0f766e, #5cc8b8);
+  --accent-hover: light-dark(#0b5a54, #7fd6c9);
+  --on-accent: light-dark(#ffffff, #0d1f1c);
+  --accent-soft: light-dark(#e6f3f1, #17312d);
+  --pro-bg: light-dark(#fdf0dc, #3a2a12);
+  --pro-text: light-dark(#8a4a06, #f6c98a);
+  --danger: light-dark(#b42318, #ff8a7a);
+  --corner-bg: light-dark(#1b1b1a, #0e0e0d);
   --corner-text: #ffffff;
   --corner-muted: #c9c7bf;
   --corner-live: #34d399;
   --radius: 16px;
+  --font: 'Inter Variable', system-ui, sans-serif;
   --focus: 0 0 0 3px var(--bg), 0 0 0 5px var(--accent);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
-  font-family: 'Inter Variable', system-ui, sans-serif;
+  font-family: var(--font);
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #161615;
-    --surface: #222220;
-    --text: #f2f1ec;
-    --muted: #b4b2aa;
-    --border: #3a3936;
-    --input-border: #77756d;
-    --accent: #5cc8b8;
-    --accent-hover: #7fd6c9;
-    --on-accent: #0d1f1c;
-    --accent-soft: #17312d;
-    --pro-bg: #3a2a12;
-    --pro-text: #f6c98a;
-    --danger: #ff8a7a;
-    --corner-bg: #0e0e0d;
-  }
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+/* Retro (Pro): warm paper, terracotta, typewriter type. All text pairs ≥ 4.5:1. */
+:root[data-theme='retro'] {
+  color-scheme: light;
+  --bg: #f3ead3;
+  --surface: #fbf5e6;
+  --text: #2a1f14;
+  --muted: #5c4a36;
+  --border: #d8c8a4;
+  --input-border: #8e7a5c;
+  --accent: #a63f17;
+  --accent-hover: #83300f;
+  --on-accent: #fff8ec;
+  --accent-soft: #f1dcc8;
+  --pro-bg: #e8d5a8;
+  --pro-text: #5a3a06;
+  --danger: #9b1c1c;
+  --corner-bg: #2a1f14;
+  --corner-text: #fbf5e6;
+  --corner-muted: #d9cbb0;
+  --corner-live: #f2b33d;
+  --radius: 6px;
+  --font: ui-monospace, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 *,
@@ -135,4 +147,12 @@ a:hover {
   body {
     background: #fff;
   }
+}
+
+/* Settings → "Hareketleri azalt: her zaman". */
+:root[data-reduce-motion] *,
+:root[data-reduce-motion] *::before,
+:root[data-reduce-motion] *::after {
+  transition-duration: 0.01ms !important;
+  animation-duration: 0.01ms !important;
 }

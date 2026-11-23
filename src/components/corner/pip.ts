@@ -41,6 +41,11 @@ export async function openPip(): Promise<Window> {
   const win = await api()!.requestWindow(size);
   copyStyles(win.document);
   win.document.documentElement.lang = document.documentElement.lang;
+  Object.assign(win.document.documentElement.dataset, document.documentElement.dataset);
+  win.document.documentElement.toggleAttribute(
+    'data-reduce-motion',
+    document.documentElement.hasAttribute('data-reduce-motion'),
+  );
   win.document.title = config.name;
   win.document.body.classList.add('pip-body');
   win.addEventListener('pagehide', () => usePipStore.setState({ win: null }), { once: true });

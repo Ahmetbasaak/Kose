@@ -87,6 +87,32 @@ Köşe penceresi: `documentPictureInPicture` varsa React portal ile PiP penceres
 
 Faz 0–7 tamamlandı. Ayrıntılar commit geçmişinde ve `DECISIONS.md`'de; yayın öncesi kalanlar README'deki listede.
 
+## Faz 8 — Kapsam netleştirme (kullanıcı geri bildirimi)
+
+### Genel temalar
+
+- Ayarlar → Görünüm → Tema: **Sistem** (varsayılan, cihaz açık/koyu ayarını izler), **Açık**, **Koyu**, **Retro** (Pro; sıcak bej zemin, kiremit vurgu, eşit aralıklı yazı).
+- Tema tüm uygulamaya uygulanır; köşe penceresi temaları (LCD, neon, kâğıt, minimal) ayrı kalır.
+
+### Ayarlar (Toggl, Pomofocus, Flow gibi zaman takip uygulamalarındaki ortak ayarlar esas alındı)
+
+- **Görünüm:** tema; hareketleri azalt (sistem / her zaman); sekme başlığında çalışan sayacı göster.
+- **Ses ve bildirim:** ses açık/kapalı, ses seviyesi, ses tonu (zil, çan, bip) ve "Sesi dene"; bildirim izni durumu ve "İzin iste".
+- **Sayaç davranışı:** "Başlatınca köşe penceresini aç" (kapalıysa tam sayfa sayaç açılır); "Sayaç çalışırken ekranı açık tut" (telefonda kilitlenmesin, Wake Lock).
+- **Köşe penceresi (Pro):** tema, boyut, saydamlık, rakam boyutu (mevcut).
+- **Kısayollar ve otomatik başlatma (Pro):** mevcut.
+- **Verilerim:** yedeği indir (JSON), yedekten geri yükle, tüm verileri sil. Pro/lisans bilgisi yedeğe girmez.
+
+### Serbest çalışan sayacı — nasıl çalışır
+
+- Proje (ve müşterisi) bir kez tanımlanır; isteğe bağlı **saat ücreti** girilir.
+- **Başlat** anından itibaren geçen her saniye sayılır; sayaç köşede de görünür. **Duraklat** ara verir (ara süre sayılmaz), **Devam et** sürdürür, **Durdur** işi bitirir ve süreyi o projeye **kayıt** olarak yazar.
+- Aynı anda tek proje sayılır: başka projeyi başlatmak çalışanı durdurup kaydeder.
+- Sayaç 8 saatten uzun süredir çalışıyorsa "durdurmayı unuttun mu?" uyarısı çıkar.
+- Unutulan işler için **elle kayıt**: proje, tarih, başlangıç–bitiş saati, not.
+- Haftalık rapor: kayıt listesi (silinebilir, notlu), gün/proje tablosu, müşteri başına süre ve (ücret girildiyse) **tutar**; Excel ve PDF.
+- Proje silinebilir (kayıtlarıyla birlikte, onay sorulur).
+
 ## Açık sorular (kullanıcıya)
 
 - Marka adı / alan adı (şimdilik "Köşe", `brand.config.json`)
