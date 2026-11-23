@@ -92,3 +92,5 @@
   - Geri sayım: kalan iş günü (hafta sonu + resmî tatiller hariç); .ics dışa aktarma (tekrarlayan kurallar RRULE). Maaş günü 31 gibi günlerde takvim uygulaması o ayı atlayabilir (kodda not).
   - Serbest çalışan: hafta/ay raporu, müşteri filtresi (müşteri başına PDF/Excel), kayıt başına yukarı yuvarlama, faturalanmaz projeler.
   - İngilizce arayüz ("Corner"): dil tarayıcıdan (Türkçe tarayıcı → TR, diğerleri → EN), Ayarlar'dan değişir (sayfa yenilenir). Tarih/sayı biçimi dile göre; para birimi ₺ ve saatler Türkiye saati kalır. E2E `tr-TR` tarayıcı dilinde çalışır.
+- Marka adı **TimerZ** (TR ve EN aynı). Logo: turkuaz kare içinde dört belirgin köşe çerçevesi, beyaz yelkovan (12'yi gösterir), sarı akrep ve merkez nokta; header, favicon, PWA ikonları ve paylaşım kartı aynı çizimi kullanır. "Köşe penceresi" gibi metinler ürün özelliğinin adı olarak kaldı.
+- Ad değişse de iç anahtarlar (`kose.*` localStorage, `kose` IndexedDB) ve Cloudflare worker adı (`wrangler.jsonc` → `kose`) değişmedi: mevcut cihazlardaki veriler ve yayın adresi korunur.

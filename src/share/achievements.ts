@@ -76,7 +76,7 @@ export interface YearStats {
   topMonth: number | null;
 }
 
-/** "Köşe yılın özeti": everything for one calendar year (Turkey time). */
+/** "Yılın özeti": everything for one calendar year (Turkey time). */
 export function yearStats(records: readonly SessionSummary[], year: number): YearStats {
   const inYear = records.filter((r) => r.kind !== 'target' && new Date(r.endedAt + 3 * H).getUTCFullYear() === year);
   const byMode = new Map<SessionSummary['modeId'], number>();

@@ -1,7 +1,7 @@
-# Köşe
+# TimerZ
 
 Ekranın köşesinde duran küçük sayaç penceresi. Statik PWA: hesap yok, sunucu yok, veri yalnızca cihazda.
-Marka adı Türkçe **Köşe**, İngilizce **Corner**. Arayüz Türkçe ve İngilizce (`src/i18n/tr.ts`, `src/i18n/en.ts`); dil tarayıcıdan seçilir, Ayarlar'dan değişir. Marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
+Marka adı **TimerZ** (Türkçe ve İngilizcede aynı). Logo: köşeleri belirgin çerçeve içinde saat ibreleri (`public/icon.svg`, `src/components/Logo.tsx`). Arayüz Türkçe ve İngilizce (`src/i18n/tr.ts`, `src/i18n/en.ts`); dil tarayıcıdan seçilir, Ayarlar'dan değişir. Marka adı, alan adı ve fiyat yer tutucuları `brand.config.json` içindedir.
 
 ## Kurulum
 

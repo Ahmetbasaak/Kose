@@ -37,19 +37,27 @@ export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: 
 
   ctx.fillStyle = BG[c.tone ?? 'work'];
   ctx.fillRect(0, 0, w, h);
-  // Brand mark (public/icon.svg) top-right: the corner stroke and the live dot.
+  // Brand mark (public/icon.svg) top-right: corner frame and clock hands.
   const m = 120 / 64;
-  const ox = w - pad - 120;
   ctx.save();
-  ctx.translate(ox, pad - 20);
+  ctx.translate(w - pad - 120, pad - 20);
   ctx.scale(m, m);
-  ctx.strokeStyle = SOFT;
-  ctx.lineWidth = 6;
+  ctx.lineWidth = 4.5;
   ctx.lineCap = 'round';
-  ctx.stroke(new Path2D('M19 45V27a8 8 0 0 1 8-8h18'));
-  ctx.fillStyle = DOT;
+  ctx.strokeStyle = SOFT;
+  for (const d of [
+    'M12 22V15a3 3 0 0 1 3-3h7',
+    'M42 12h7a3 3 0 0 1 3 3v7',
+    'M52 42v7a3 3 0 0 1-3 3h-7',
+    'M22 52h-7a3 3 0 0 1-3-3v-7',
+    'M32 32V21',
+  ])
+    ctx.stroke(new Path2D(d));
+  ctx.strokeStyle = DOT;
+  ctx.stroke(new Path2D('M32 32l9 6'));
+  ctx.fillStyle = SOFT;
   ctx.beginPath();
-  ctx.arc(44, 44, 7.5, 0, Math.PI * 2);
+  ctx.arc(32, 32, 3.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 

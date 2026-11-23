@@ -1,6 +1,6 @@
 import type { Dictionary } from './tr';
 
-// English UI ("Corner"). Same keys as tr.ts; the Dictionary type makes a missing key a compile error.
+// English UI. Same keys as tr.ts; the Dictionary type makes a missing key a compile error.
 export const en: Dictionary = {
   app: {
     home: 'Home',
