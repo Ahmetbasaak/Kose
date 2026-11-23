@@ -71,7 +71,8 @@ Anahtar istemci paketine gömülür; yalnızca geliştirme içindir. **Üretim d
 
 Statik site: `npm run build` çıktısı `dist/`.
 
-- **Cloudflare Pages:** derleme komutu `npm run build`, çıktı dizini `dist`. `public/_redirects` (SPA yönlendirmesi) ve `public/_headers` (CSP, güvenlik ve önbellek başlıkları) pakete kopyalanır.
+- **Cloudflare Workers (statik):** derleme komutu `npm run build`, deploy komutu `npx wrangler deploy`. `wrangler.jsonc` `dist`'i sunar ve bilinmeyen yolları `index.html`'e düşürür (SPA); `public/_headers` CSP, güvenlik ve önbellek başlıklarını verir. `_redirects` kullanma: Workers `/* /index.html 200` kuralını sonsuz döngü sayıp reddeder.
+- **Cloudflare Pages:** derleme `npm run build`, çıktı `dist`; `404.html` olmadığı için SPA yönlendirmesi kendiliğinden çalışır, `_headers` aynen geçerli.
 - **Vercel:** `vercel.json` aynı yönlendirme ve başlıkları içerir; çerçeve "Vite", çıktı `dist`.
 
 İki dosyadaki CSP aynı olmalı; `npm run e2e` bunu ve uygulamanın bu CSP altında (PiP dahil) çalıştığını kontrol eder.
