@@ -94,3 +94,4 @@
   - İngilizce arayüz ("Corner"): dil tarayıcıdan (Türkçe tarayıcı → TR, diğerleri → EN), Ayarlar'dan değişir (sayfa yenilenir). Tarih/sayı biçimi dile göre; para birimi ₺ ve saatler Türkiye saati kalır. E2E `tr-TR` tarayıcı dilinde çalışır.
 - Marka adı **TimerZ** (TR ve EN aynı). Logo (d taslağı): turkuaz kare içinde yumuşak iç çerçeve, sol üst ve sağ alt köşesi belirgin, beyaz yelkovan (12'yi gösterir), sarı akrep ve merkez; header, favicon, PWA ikonları ve paylaşım kartı aynı çizimi kullanır. "Köşe penceresi" gibi metinler ürün özelliğinin adı olarak kaldı.
 - Ad değişse de iç anahtarlar (`kose.*` localStorage, `kose` IndexedDB) ve Cloudflare worker adı (`wrangler.jsonc` → `kose`) değişmedi: mevcut cihazlardaki veriler ve yayın adresi korunur.
+- Marka adı **TimerZ** yerine **Timekeepera**: App Store'da aynı kategoride "TimerZ" adlı bir sayaç uygulaması var. "Timekeepera" için web'de birebir eşleşme bulunmadı (resmî marka veritabanları ayrıca kontrol edilmeli).

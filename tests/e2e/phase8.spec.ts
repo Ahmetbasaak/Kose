@@ -84,5 +84,5 @@ test('backup: download, then restore it; a foreign file is rejected', async ({ p
     mimeType: 'application/json',
     buffer: Buffer.from('{"app":"other"}'),
   });
-  await expect(page.getByRole('alert')).toContainText('geçerli bir TimerZ yedeği değil');
+  await expect(page.getByRole('alert')).toContainText('geçerli bir Timekeepera yedeği değil');
 });

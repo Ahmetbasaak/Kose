@@ -129,7 +129,7 @@ const icsUtc = (ms: number) =>
  */
 export function toIcs(title: string, rule: TargetRule, now: number, uid: string): string {
   const at = targetState(rule, now).at;
-  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//TimerZ//TR', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT'];
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Timekeepera//TR', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT'];
   lines.push(`UID:${uid}`, `DTSTAMP:${icsUtc(now)}`, `SUMMARY:${icsText(title)}`);
   const midnight = (at + TR_OFFSET_MS) % DAY === 0;
   if (rule.type === 'at' && !midnight) lines.push(`DTSTART:${icsUtc(at)}`, `DTEND:${icsUtc(at + 3_600_000)}`);
