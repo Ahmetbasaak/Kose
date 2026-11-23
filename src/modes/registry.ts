@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { SimpleSetup } from './simple/SimpleSetup';
+import { WorkSetup } from './work/WorkSetup';
 
 export type ModeId = 'simple' | 'work' | 'countdowns' | 'meeting' | 'break' | 'student' | 'freelance' | 'presentation';
 
@@ -14,7 +15,7 @@ export interface ModeDef {
 
 export const modes: ModeDef[] = [
   { id: 'simple', slug: 'sayac', pro: false, Setup: SimpleSetup },
-  { id: 'work', slug: 'mesai', pro: false },
+  { id: 'work', slug: 'mesai', pro: false, Setup: WorkSetup },
   { id: 'countdowns', slug: 'geri-sayim', pro: false },
   { id: 'meeting', slug: 'toplanti', pro: false },
   { id: 'break', slug: 'mola', pro: false },

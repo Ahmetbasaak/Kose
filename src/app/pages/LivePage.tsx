@@ -1,5 +1,6 @@
 import { Button, ButtonLink } from '../../components/Button';
 import { isPipSupported, openPip, usePipStore } from '../../components/corner/pip';
+import { MoneyValue } from '../../components/MoneyValue';
 import { useNow } from '../../components/useNow';
 import { t } from '../../i18n';
 import { useSessionStore } from '../../storage/session';
@@ -35,12 +36,13 @@ export function LivePage() {
           <span className={s.liveCaption}>{active.label}</span>
           <span className={s.liveCaption}>{d.caption}</span>
         </div>
-        <div className={`${s.liveValue} num`} role="timer">
-          {d.value}
+        <div className={`${s.liveValue} num`} data-long={d.value.length > 8} role="timer">
+          {d.money === undefined ? d.value : <MoneyValue amount={d.money} />}
         </div>
+        {d.sub && <span className={s.liveCaption}>{d.sub}</span>}
       </section>
       <div className={s.row}>
-        {d.status !== 'done' && (
+        {d.canPause && (
           <Button onClick={() => togglePause()}>{d.status === 'paused' ? t('timer.resume') : t('timer.pause')}</Button>
         )}
         <Button variant="primary" onClick={finishSession}>
@@ -48,6 +50,7 @@ export function LivePage() {
         </Button>
         {isPipSupported() && !pipOpen && <Button onClick={() => void openPip()}>{t('timer.openCorner')}</Button>}
       </div>
+      {active.kind === 'work' && <p className={`${s.muted} ${s.small}`}>{t('work.disclaimer')}</p>}
       {!isPipSupported() && <p className={`${s.muted} ${s.small}`}>{t('timer.mobileNote')}</p>}
     </div>
   );

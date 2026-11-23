@@ -121,6 +121,7 @@ export function SimpleSetup() {
             value: formatClock(kind === 'countdown' ? durationMs : 0),
             status: 'running',
             caption: kind === 'countdown' ? t('timer.remaining') : t('timer.elapsed'),
+            canPause: true,
           }}
         />
       </div>

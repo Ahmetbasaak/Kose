@@ -59,6 +59,16 @@
   align-items: center;
   font-size: clamp(28px, min(22vw, 42vh), 200px);
 }
+.root[data-variant='window'] .value[data-long='true'] {
+  font-size: clamp(22px, min(11vw, 34vh), 120px);
+}
+.value[data-long='true'] {
+  font-size: 34px;
+}
+.sub {
+  font-size: 13px;
+  color: var(--corner-muted);
+}
 .root[data-status='done'] .value {
   animation: pulse 1.2s var(--ease) 3;
 }

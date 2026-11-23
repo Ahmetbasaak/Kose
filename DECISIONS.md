@@ -17,3 +17,10 @@
 - PiP penceresindeki eylem düğmeleri 28px — pencere fareyle kullanılan masaüstü penceresi ve 140px yüksek; sayfa içi widget ve tüm sayfalarda 44px korunur.
 - Faz 0 ve Faz 1 birbirine bağlı (router canlı/özet sayfalarını içeriyor) olduğundan tek commit'te teslim edildi; sonraki fazlar ayrı commit.
 - Lint uyarıları da hata sayılır (`--max-warnings 0`).
+- Mesai modu: "Öğle arası başlangıcı" alanı eklendi (varsayılan 12:30) — spesifikasyon yalnızca süre veriyor, "Mola" durumunu göstermek için başlangıç gerekli.
+- Gece vardiyası (bitiş < başlangıç): vardiya başladığı güne aittir; ertesi sabah bitişten sonra o günün kazancı 0'dan başlar.
+- Hafta sonu = vardiyanın başladığı gün Cumartesi/Pazar; resmî tatiller Faz 3'teki tatil verisi doğrulanınca eklenebilir.
+- Saatler her zaman Türkiye saatiyle (UTC+3) hesaplanır ve gösterilir; cihazın saat dilimi kullanılmaz.
+- Mesai modunda duraklatma yok: kazanç saate bağlı, sayaç değil.
+- Son mesai ayarları (maaş dahil) yalnızca bu cihazda localStorage'da tutulur ki form tekrar doldurulmasın.
+- Özet ekranındaki paylaşım kartı ve Excel/PDF düğmeleri şimdilik pasif; kart önizlemesi Faz 4'te kartla birlikte gelir.

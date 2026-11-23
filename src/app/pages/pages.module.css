@@ -194,6 +194,9 @@ a.modeCard:hover {
   line-height: 1;
   letter-spacing: -0.03em;
 }
+.liveValue[data-long='true'] {
+  font-size: clamp(40px, 10vw, 140px);
+}
 .liveCaption {
   font-size: 15px;
   font-weight: 600;

@@ -5,6 +5,7 @@ import type { SessionDisplay } from '../../app/sessionView';
 import { sessionDisplay } from '../../app/sessionView';
 import { t } from '../../i18n';
 import { useSessionStore, type ActiveSession } from '../../storage/session';
+import { MoneyValue } from '../MoneyValue';
 import { useNow } from '../useNow';
 import { useTargetWindow } from './targetWindow';
 import styles from './CornerView.module.css';
@@ -31,9 +32,14 @@ export function CornerFace({ label, display, variant, children }: FaceProps) {
           {display.caption}
         </span>
       </div>
-      <div className={`${styles.value} num`} role={variant === 'preview' ? undefined : 'timer'}>
-        {display.value}
+      <div
+        className={`${styles.value} num`}
+        data-long={display.value.length > 8}
+        role={variant === 'preview' ? undefined : 'timer'}
+      >
+        {display.money === undefined ? display.value : <MoneyValue amount={display.money} />}
       </div>
+      {display.sub && <div className={styles.sub}>{display.sub}</div>}
       {children}
     </div>
   );
@@ -48,7 +54,7 @@ function LiveCorner({ session, variant, extra }: { session: ActiveSession; varia
   return (
     <CornerFace label={session.label} display={display} variant={variant}>
       <div className={styles.actions}>
-        {display.status !== 'done' && (
+        {display.canPause && (
           <button type="button" className={styles.action} onClick={() => togglePause()}>
             {display.status === 'paused' ? t('timer.resume') : t('timer.pause')}
           </button>

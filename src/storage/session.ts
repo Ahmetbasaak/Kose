@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { elapsedMs, pauseTimer, resumeTimer, startTimer, type Timer } from '../engine/timer';
+import { workState, type WorkConfig } from '../engine/work';
 import type { ModeId } from '../modes/registry';
 
-export type TimerKind = 'stopwatch' | 'countdown';
+export type TimerKind = 'stopwatch' | 'countdown' | 'work';
 
 export interface ActiveSession {
   id: string;
@@ -13,6 +14,8 @@ export interface ActiveSession {
   timer: Timer;
   /** Countdown length; null for stopwatches. */
   durationMs: number | null;
+  /** Shift settings for kind 'work'; earnings come from the clock, not from the timer. */
+  work?: WorkConfig | null;
   createdAt: number;
   /** Set once the end alert has fired, so a reload never alerts twice. */
   alertedAt: number | null;
@@ -24,6 +27,8 @@ export interface SessionSummary {
   kind: TimerKind;
   label: string;
   elapsedMs: number;
+  /** Estimated earnings (work mode only). */
+  earned?: number | null;
   startedAt: number;
   endedAt: number;
 }
@@ -33,6 +38,7 @@ export interface StartInput {
   kind: TimerKind;
   label: string;
   durationMs: number | null;
+  work?: WorkConfig | null;
 }
 
 interface SessionState {
@@ -63,7 +69,7 @@ export const useSessionStore = create<SessionState>()(
         }),
       togglePause: (now = Date.now()) => {
         const a = get().active;
-        if (!a) return;
+        if (!a || a.kind === 'work') return;
         const timer = a.timer.startedAt === null ? resumeTimer(a.timer, now) : pauseTimer(a.timer, now);
         set({ active: { ...a, timer } });
       },
@@ -79,11 +85,13 @@ export const useSessionStore = create<SessionState>()(
         const a = get().active;
         if (!a) return null;
         const elapsed = elapsedMs(a.timer, now);
+        const ws = a.work ? workState(a.work, now) : null;
         const summary: SessionSummary = {
           modeId: a.modeId,
           kind: a.kind,
           label: a.label,
-          elapsedMs: a.durationMs === null ? elapsed : Math.min(elapsed, a.durationMs),
+          elapsedMs: ws ? ws.workedMs : a.durationMs === null ? elapsed : Math.min(elapsed, a.durationMs),
+          earned: ws?.earned ?? null,
           startedAt: a.createdAt,
           endedAt: now,
         };
