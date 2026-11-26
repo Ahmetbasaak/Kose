@@ -15,6 +15,8 @@ import { AchievementsTeaser } from '../AchievementsTeaser';
 import { WeeklyCard } from '../WeeklyCard';
 import { Hero } from '../Hero';
 import { ModeIcon } from '../../components/ModeIcon';
+import { SplitWords } from '../../components/SplitWords';
+import { Intro } from '../Intro';
 import { RollingValue } from '../../components/RollingValue';
 import s from './pages.module.css';
 
@@ -141,16 +143,65 @@ function QuickStart() {
   );
 }
 
+/** Decorative band of mode names; the list is doubled so the loop is seamless. */
+function Marquee() {
+  const names = modes.map((m) => t(`modes.${m.id}.title`));
+  return (
+    <div className="marquee" aria-hidden="true">
+      <div className="marquee-track">
+        {[...names, ...names].map((n, i) => (
+          <span key={i}>{n}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const STEPS = [
+  ['home.how.s1t', 'home.how.s1d'],
+  ['home.how.s2t', 'home.how.s2d'],
+  ['home.how.s3t', 'home.how.s3d'],
+] as const;
+
+/** Three steps; on wide screens the section pins and the panels slide sideways as you scroll. */
+function HowItWorks() {
+  return (
+    <section className="steps" aria-labelledby="how-title">
+      <div className="steps-sticky">
+        <h2 id="how-title" className={`${s.sectionTitle} word-fill`}>
+          <SplitWords text={t('home.how.title')} />
+        </h2>
+        <ol className="steps-track">
+          {STEPS.map(([title, desc], i) => (
+            <li key={title} className="step">
+              <span className="step-num" aria-hidden="true">
+                0{i + 1}
+              </span>
+              <h3>{t(title)}</h3>
+              <p>{t(desc)}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
 export function HomePage() {
   return (
     <div className={s.stack}>
       <ActiveCard />
+      <Intro />
       <Hero />
+      <Marquee />
       <QuickStart />
+      <HowItWorks />
       <WeeklyCard />
       <AchievementsTeaser />
       <div className={s.intro} data-reveal="scroll">
-        <h2 className={s.sectionTitle}>{t('home.title')}</h2>
+        <h2 className={`${s.sectionTitle} word-fill`}>
+          <SplitWords text={t('home.title')} />
+        </h2>
         <p className={s.lead}>{t('home.lead')}</p>
       </div>
       {GROUPS.map((g) => (
@@ -167,7 +218,14 @@ export function HomePage() {
                   data-reveal="scroll"
                   style={{ display: 'flex', flexDirection: 'column', '--i': i } as CSSProperties}
                 >
-                  <Link to={`/mod/${m.slug}`} viewTransition className={s.modeCard} style={{ flex: 1 }}>
+                  <Link
+                    to={`/mod/${m.slug}`}
+                    viewTransition
+                    className={s.modeCard}
+                    style={{ flex: 1 }}
+                    data-tilt
+                    data-cursor-label={t('home.cursorOpen')}
+                  >
                     <span className={s.spread}>
                       <span className={s.modeIcon}>
                         <ModeIcon id={m.id} />

@@ -4,6 +4,7 @@ import { CornerHost } from '../components/corner/CornerHost';
 import { Logo } from '../components/Logo';
 import { brandName, t } from '../i18n';
 import { TEST_MODE } from './entitlements';
+import { Motion } from './Motion';
 import { ProBehaviors } from './ProBehaviors';
 import { SessionChrome } from './SessionChrome';
 import { track } from './telemetry';
@@ -67,6 +68,7 @@ export function Layout() {
       <CornerHost />
       <ProBehaviors />
       <SessionChrome />
+      <Motion />
     </div>
   );
 }

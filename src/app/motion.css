@@ -1,0 +1,466 @@
+/*
+ * Motion layer: everything that moves for show (not the timers themselves).
+ * Every effect here is switched off at the bottom for reduced motion (system setting or Settings → "her zaman").
+ */
+
+body {
+  overflow-x: clip; /* full-bleed bands and the hero glow may poke past the viewport; clip (not hidden) keeps sticky working */
+}
+
+/* ---------- Entrances ---------- */
+
+/* data-reveal: rises in on load, staggered by --i. data-reveal='scroll': does the same as it scrolls into view
+   where scroll-driven animations exist, else on load like the rest. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(48px) scale(0.96);
+    clip-path: inset(20% 0 0 0 round 16px);
+  }
+}
+[data-reveal] {
+  animation: rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(min(var(--i, 0), 8) * 70ms);
+}
+@supports (animation-timeline: view()) {
+  [data-reveal='scroll'] {
+    animation-delay: 0s;
+    animation-timeline: view();
+    animation-range: entry 0% entry 80%;
+  }
+}
+
+/* Headline words slide up out of a mask, one after another. */
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.word {
+  display: inline-block;
+  animation: word-up 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--intro-delay, 0s) + 0.15s + var(--w, 0) * 90ms);
+}
+@keyframes word-up {
+  from {
+    transform: translateY(110%) rotate(4deg);
+  }
+}
+/* The highlighted word: a slow gradient sweep. */
+.word-accent {
+  background: linear-gradient(100deg, var(--accent) 0%, #d97706 45%, var(--accent) 90%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation:
+    word-up 1s cubic-bezier(0.16, 1, 0.3, 1) both,
+    sheen 6s ease-in-out infinite alternate;
+  animation-delay: calc(var(--intro-delay, 0s) + 0.15s + var(--w, 0) * 90ms), 0s;
+}
+@keyframes sheen {
+  to {
+    background-position: 100% 0;
+  }
+}
+.fade-late {
+  animation: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--intro-delay, 0s) + 0.55s + var(--i, 0) * 90ms);
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* Section titles fill in word by word as they scroll through. */
+@supports (animation-timeline: view()) {
+  .word-fill .word {
+    animation: fill linear both;
+    animation-timeline: view();
+    animation-range: entry calc(30% + var(--w, 0) * 10%) cover calc(30% + var(--w, 0) * 6%);
+  }
+}
+@keyframes fill {
+  from {
+    opacity: 0.12;
+  }
+}
+
+/* ---------- Hero glow ---------- */
+
+.aurora {
+  position: absolute;
+  inset: -120px -12vw -60px;
+  z-index: -1;
+  pointer-events: none;
+  mask-image: radial-gradient(closest-side, #000 55%, transparent);
+}
+.aurora i {
+  position: absolute;
+  width: 46%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.22;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+.aurora i:nth-child(1) {
+  left: 4%;
+  top: 0;
+  background: var(--accent);
+}
+.aurora i:nth-child(2) {
+  right: 2%;
+  top: 10%;
+  background: #f59e0b;
+  animation-duration: 22s;
+  animation-direction: alternate-reverse;
+}
+.aurora i:nth-child(3) {
+  left: 35%;
+  bottom: -10%;
+  background: #6366f1;
+  opacity: 0.14;
+  animation-duration: 26s;
+}
+@keyframes drift {
+  50% {
+    transform: translate(12%, 10%) scale(1.15);
+  }
+  to {
+    transform: translate(-8%, 16%) scale(0.9);
+  }
+}
+
+/* ---------- Pointer effects (driven by Motion.tsx) ---------- */
+
+[data-tilt] {
+  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-magnetic] {
+  transition:
+    translate 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.15s var(--ease),
+    transform 0.1s var(--ease);
+}
+
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  background: var(--accent);
+}
+.cursor-ring {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--on-accent);
+  transition:
+    opacity 0.3s,
+    width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.25s;
+}
+.cursor-ring > span {
+  translate: -50% -50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+:root[data-cursor] .cursor-dot,
+:root[data-cursor] .cursor-ring {
+  opacity: 1;
+}
+.cursor-ring[data-hot] {
+  width: 60px;
+  height: 60px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.cursor-ring[data-label] {
+  width: 76px;
+  height: 76px;
+  background: var(--accent);
+}
+.cursor-ring[data-label]::after {
+  content: attr(data-label);
+}
+
+/* ---------- Bands ---------- */
+
+/* Endless outline/filled type band; skews with scroll speed (--skew from Motion.tsx). */
+.marquee {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  padding: 8px 0;
+  border-block: 1px solid var(--border);
+  user-select: none;
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee-track > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding-right: 0.5em;
+  font-size: clamp(40px, 8vw, 104px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  white-space: nowrap;
+  transform: skewX(var(--skew, 0deg));
+  transition: transform 0.2s linear;
+}
+.marquee-track > span:nth-child(odd) {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--text);
+}
+.marquee-track > span::after {
+  content: '✦';
+  font-size: 0.4em;
+  color: var(--accent);
+  -webkit-text-stroke: 0;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* "How it works": pinned while its three panels slide sideways (wide screens with scroll-driven animations). */
+.steps-track {
+  display: grid;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  min-height: 260px;
+  padding: 32px;
+  border-radius: 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.step:nth-child(2) {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: transparent;
+}
+.step:nth-child(2) p {
+  color: inherit;
+}
+.step-num {
+  position: absolute;
+  top: 8px;
+  right: 24px;
+  font-size: clamp(96px, 14vw, 200px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--text);
+  opacity: 0.35;
+}
+.step:nth-child(2) .step-num {
+  -webkit-text-stroke-color: var(--on-accent);
+}
+.step h3 {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.step p {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 34ch;
+}
+@supports (animation-timeline: view()) {
+  @media (min-width: 800px) {
+    :root:not([data-reduce-motion]) .steps {
+      height: 280vh;
+      view-timeline: --steps block;
+    }
+    :root:not([data-reduce-motion]) .steps-sticky {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      padding: 0 max(clamp(16px, 4vw, 56px), calc(50vw - 600px + clamp(16px, 4vw, 56px)));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 32px;
+      overflow: hidden;
+    }
+    :root:not([data-reduce-motion]) .steps-track {
+      display: flex;
+      width: max-content;
+      animation: steps-slide linear both;
+      animation-timeline: --steps;
+      animation-range: contain 0% contain 100%;
+    }
+    :root:not([data-reduce-motion]) .step {
+      width: min(62vw, 720px);
+      min-height: 52vh;
+    }
+  }
+}
+@keyframes steps-slide {
+  to {
+    transform: translateX(calc(-100% + 100vw - 2 * clamp(16px, 4vw, 56px)));
+  }
+}
+
+/* Thin progress line along the top while scrolling. */
+.scroll-progress {
+  display: none;
+}
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto;
+    height: 3px;
+    z-index: 50;
+    background: linear-gradient(90deg, var(--accent), #f59e0b);
+    transform-origin: 0 50%;
+    animation: progress linear both;
+    animation-timeline: scroll(root);
+    pointer-events: none;
+  }
+}
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- First visit intro ---------- */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: #0b2f2c;
+  color: #f6f5f1;
+  pointer-events: none;
+  animation: intro-out 0.8s cubic-bezier(0.76, 0, 0.24, 1) 1.05s both;
+}
+.intro-mark {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.intro-mark svg {
+  animation: intro-spin 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.intro-mark .word {
+  animation-delay: calc(0.2s + var(--w, 0) * 40ms);
+}
+@keyframes intro-spin {
+  from {
+    transform: rotate(-180deg) scale(0.4);
+    opacity: 0;
+  }
+}
+@keyframes intro-out {
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+/* ---------- Page transitions: the old page sinks back, the new one is uncovered from below ---------- */
+
+::view-transition-old(page) {
+  animation: page-out 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+::view-transition-new(page) {
+  animation: page-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(6px);
+  }
+}
+@keyframes page-in {
+  from {
+    clip-path: inset(100% 0 0 0);
+    transform: translateY(60px);
+  }
+}
+
+/* ---------- Reduced motion: all of the above off ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  .word,
+  .word-accent,
+  .fade-late,
+  .aurora i,
+  .marquee-track,
+  .scroll-progress,
+  .intro,
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .cursor-dot,
+  .cursor-ring,
+  .scroll-progress,
+  .intro {
+    display: none !important;
+  }
+}
+:root[data-reduce-motion]
+  :is([data-reveal], .word, .word-accent, .fade-late, .aurora i, .marquee-track, .scroll-progress),
+:root[data-reduce-motion]::view-transition-group(*),
+:root[data-reduce-motion]::view-transition-old(*),
+:root[data-reduce-motion]::view-transition-new(*) {
+  animation: none !important;
+}
+:root[data-reduce-motion] :is(.cursor-dot, .cursor-ring, .scroll-progress, .intro) {
+  display: none !important;
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import { Button } from '../components/Button';
 import { CornerFace } from '../components/corner/CornerView';
 import { Field } from '../components/Field';
+import { SplitWords } from '../components/SplitWords';
 import { useNow } from '../components/useNow';
 import { trMidnight } from '../engine/calendar';
 import { formatTime, type WorkConfig } from '../engine/work';
@@ -45,13 +46,25 @@ export function Hero() {
 
   return (
     <section className={s.hero} aria-labelledby="hero-title">
-      <div className={s.heroText} data-reveal>
-        <p className={s.eyebrow}>{t('home.hero.eyebrow')}</p>
+      <div className="aurora" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
+      <div className={s.heroText}>
+        <p className={`${s.eyebrow} fade-late`}>{t('home.hero.eyebrow')}</p>
         <h1 id="hero-title" className={s.heroTitle}>
-          {t('home.hero.title')}
+          <SplitWords text={t('home.hero.title')} />
         </h1>
-        <p className={s.lead}>{t('home.hero.lead')}</p>
-        <form className={s.heroForm} onSubmit={(e) => void start(e)} noValidate>
+        <p className={`${s.lead} fade-late`} style={{ '--i': 1 } as CSSProperties}>
+          {t('home.hero.lead')}
+        </p>
+        <form
+          className={`${s.heroForm} fade-late`}
+          style={{ '--i': 2 } as CSSProperties}
+          onSubmit={(e) => void start(e)}
+          noValidate
+        >
           {lastWork ? (
             <p className={`${s.muted} ${s.small}`}>
               {t('home.hero.saved', { start: formatTime(lastWork.startMin), end: formatTime(lastWork.endMin) })}
@@ -80,7 +93,7 @@ export function Hero() {
           )}
           {!lastWork && <p className={`${s.muted} ${s.small}`}>{t('home.hero.defaults')}</p>}
         </form>
-        <p className={s.row}>
+        <p className={`${s.row} fade-late`} style={{ '--i': 3 } as CSSProperties}>
           <Link to="/hesapla/toplanti-maliyeti" className={s.backLink}>
             {t('home.hero.meetingLink')} →
           </Link>
@@ -89,19 +102,21 @@ export function Hero() {
           </Link>
         </p>
       </div>
-      <figure className={s.heroDemo} data-playing={playing} data-reveal style={{ '--i': 2 } as CSSProperties}>
-        <CornerFace
-          variant="preview"
-          label={t('modes.work.title')}
-          display={workDisplay(DEMO, DEMO_BASE + (now - loadedAt))}
-        />
-        <figcaption className={`${s.spread} ${s.small} ${s.muted}`}>
-          <span>{t('home.hero.demoLabel')}</span>
-          <button type="button" className={s.textButton} onClick={() => setPlaying(!playing)}>
-            {playing ? t('home.hero.pause') : t('home.hero.play')}
-          </button>
-        </figcaption>
-      </figure>
+      <div className="fade-late" style={{ '--i': 2 } as CSSProperties}>
+        <figure className={s.heroDemo} data-playing={playing} data-tilt>
+          <CornerFace
+            variant="preview"
+            label={t('modes.work.title')}
+            display={workDisplay(DEMO, DEMO_BASE + (now - loadedAt))}
+          />
+          <figcaption className={`${s.spread} ${s.small} ${s.muted}`}>
+            <span>{t('home.hero.demoLabel')}</span>
+            <button type="button" className={s.textButton} onClick={() => setPlaying(!playing)}>
+              {playing ? t('home.hero.pause') : t('home.hero.play')}
+            </button>
+          </figcaption>
+        </figure>
+      </div>
     </section>
   );
 }

@@ -12,9 +12,23 @@ export function Button({
   type = 'button',
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
-  return <button type={type} className={cls(variant, className)} {...rest} />;
+  return (
+    <button
+      type={type}
+      className={cls(variant, className)}
+      data-magnetic={variant === 'primary' || undefined}
+      {...rest}
+    />
+  );
 }
 
 export function ButtonLink({ variant = 'secondary', className, ...rest }: LinkProps & { variant?: Variant }) {
-  return <Link viewTransition className={cls(variant, className)} {...rest} />;
+  return (
+    <Link
+      viewTransition
+      className={cls(variant, className)}
+      data-magnetic={variant === 'primary' || undefined}
+      {...rest}
+    />
+  );
 }

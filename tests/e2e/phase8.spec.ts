@@ -76,8 +76,8 @@ test('backup: download, then restore it; a foreign file is rejected', async ({ p
   await page.evaluate(() => localStorage.removeItem('kose.countdowns'));
   page.once('dialog', (d) => void d.accept());
   await page.getByLabel('Yedekten geri yükle').setInputFiles(path);
-  await page.waitForLoadState('load');
-  expect(await page.evaluate(() => localStorage.getItem('kose.countdowns'))).toContain('Hafta sonu');
+  // Restore reloads the page; poll so the read never races the reload.
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('kose.countdowns'))).toContain('Hafta sonu');
 
   await page.getByLabel('Yedekten geri yükle').setInputFiles({
     name: 'x.json',

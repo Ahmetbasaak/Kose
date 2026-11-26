@@ -77,7 +77,6 @@
 a.modeCard:hover {
   color: var(--text);
   border-color: var(--accent);
-  transform: translateY(-2px);
 }
 .modeTitle {
   font-size: 20px;
@@ -375,6 +374,8 @@ a.modeCard:hover {
 
 /* Hero: one promise, one field, a live example. */
 .hero {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: clamp(24px, 5vw, 64px);
@@ -398,8 +399,8 @@ a.modeCard:hover {
   color: var(--accent);
 }
 .heroTitle {
-  font-size: clamp(38px, 6.5vw, 64px);
-  line-height: 1.02;
+  font-size: clamp(44px, 8.5vw, 104px);
+  line-height: 0.98;
   font-weight: 800;
   letter-spacing: -0.03em;
 }
@@ -464,9 +465,6 @@ a.modeCard:hover {
     0 1px 2px rgb(0 0 0 / 0.05),
     0 14px 28px -14px rgb(0 0 0 / 0.28);
 }
-a.modeCard:active {
-  transform: translateY(0);
-}
 
 /* Card micro-interactions: a soft accent wash, the icon tile tilts, an arrow slides in. */
 .modeCard {
@@ -479,7 +477,7 @@ a.modeCard:active {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(120% 80% at 0% 0%, var(--accent-soft), transparent 60%);
+  background: radial-gradient(340px circle at var(--mx, 0%) var(--my, 0%), var(--accent-soft), transparent 70%);
   opacity: 0;
   transition: opacity 0.3s var(--ease);
 }
