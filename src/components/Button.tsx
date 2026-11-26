@@ -16,5 +16,5 @@ export function Button({
 }
 
 export function ButtonLink({ variant = 'secondary', className, ...rest }: LinkProps & { variant?: Variant }) {
-  return <Link className={cls(variant, className)} {...rest} />;
+  return <Link viewTransition className={cls(variant, className)} {...rest} />;
 }

@@ -16,7 +16,7 @@ export interface SessionDisplay {
   caption: string;
   /** Secondary line under the number. */
   sub?: string;
-  /** Set when the value is money, so the kuruş digits can animate. */
+  /** Set when the value is money (for the "that's N coffees" line). */
   money?: number;
   canPause: boolean;
   /** Presentation traffic light. */

@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-test.use({ locale: 'en-US' });
+test.use({ locale: 'en-US', reducedMotion: 'reduce' }); // axe checks the settled page, not mid-entrance cards
 
 test('English browser gets the English UI; language can be switched', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-11-23T14:30:00+03:00')); // Monday

@@ -37,6 +37,7 @@ export const router = createBrowserRouter([
         path: '/hesapla/saatlik-ucret',
         lazy: () => import('./pages/SeoPages').then((m) => ({ Component: m.HourlyCalculatorPage })),
       },
+      { path: '/istatistik', lazy: () => import('./pages/StatsPage').then((m) => ({ Component: m.StatsPage })) },
       { path: '/fiyat', lazy: () => import('./pages/PricingPage').then((m) => ({ Component: m.PricingPage })) },
       { path: '/gizlilik', lazy: () => import('./pages/PrivacyPage').then((m) => ({ Component: m.PrivacyPage })) },
       { path: '*', lazy: () => import('./pages/NotFoundPage').then((m) => ({ Component: m.NotFoundPage })) },

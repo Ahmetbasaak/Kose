@@ -4,7 +4,7 @@ import { AmbientControl } from '../../components/AmbientControl';
 import { InstallHint } from '../../components/InstallHint';
 import { LazyShareCard } from '../../share/lazy';
 import { isPipSupported, openPip, usePipStore } from '../../components/corner/pip';
-import { MoneyValue } from '../../components/MoneyValue';
+import { RollingValue } from '../../components/RollingValue';
 import { useNow } from '../../components/useNow';
 import { t } from '../../i18n';
 import { summarize, useSessionStore, type SessionSummary } from '../../storage/session';
@@ -66,7 +66,7 @@ export function LivePage() {
           <span className={s.liveCaption}>{d.caption}</span>
         </div>
         <div className={`${s.liveValue} num`} data-long={d.value.length > 8} role="timer">
-          {d.money === undefined ? d.value : <MoneyValue amount={d.money} />}
+          <RollingValue text={d.value} />
         </div>
         {d.sub && <span className={s.liveCaption}>{d.sub}</span>}
       </section>

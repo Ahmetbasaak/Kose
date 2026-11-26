@@ -5,6 +5,7 @@ const SECTIONS = [
   'device',
   'account',
   'tracking',
+  'stats',
   'notifications',
   'sharing',
   'hosting',

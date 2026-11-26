@@ -8,6 +8,7 @@ import { formatClock } from '../../engine/format';
 import { elapsedMs, isRunning, remainingMs } from '../../engine/timer';
 import { t } from '../../i18n';
 import { useMultiStore } from '../../storage/multi';
+import { RollingValue } from '../../components/RollingValue';
 
 export function MultiSetup() {
   const { items, add, toggle, reset, remove, markAlerted } = useMultiStore();
@@ -53,7 +54,9 @@ export function MultiSetup() {
               >
                 <span className={s.liveCaption}>{m.label}</span>
                 <span className={`${s.statValue} num`} role="timer" style={{ fontSize: 44 }}>
-                  {left === null ? formatClock(elapsedMs(m.timer, now)) : formatClock(left, 'ceil')}
+                  <RollingValue
+                    text={left === null ? formatClock(elapsedMs(m.timer, now)) : formatClock(left, 'ceil')}
+                  />
                 </span>
                 <span className={s.row}>
                   {!done && (

@@ -20,7 +20,7 @@ const TONES: Tone[] = ['chime', 'bell', 'beep'];
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
-    <section className={s.stack} style={{ gap: 12 }} aria-labelledby={id}>
+    <section className={s.stack} style={{ gap: 12 }} aria-labelledby={id} data-reveal="scroll">
       <h2 id={id} className={s.modeTitle}>
         {title}
       </h2>
@@ -424,6 +424,17 @@ export function SettingsPage() {
               />
             ))}
           </div>
+        </div>
+      </Section>
+
+      <Section id="set-stats" title={t('settings.statsTitle')}>
+        <div className={s.card}>
+          <Check
+            checked={prefs.stats}
+            onChange={(v) => prefs.set({ stats: v })}
+            label={t('settings.statsOn')}
+            note={t('settings.statsNote')}
+          />
         </div>
       </Section>
 

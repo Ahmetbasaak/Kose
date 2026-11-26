@@ -2,6 +2,9 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { E2E_PRO_KEY } from '../../playwright.config';
 
+// Contrast is checked on the settled page: mid-entrance cards are half transparent on purpose.
+test.use({ reducedMotion: 'reduce' });
+
 const PAGES = [
   '/',
   '/mod/sayac',

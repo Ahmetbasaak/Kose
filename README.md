@@ -20,6 +20,20 @@ npm run e2e        # Playwright: akışlar, çevrimdışı, axe erişilebilirlik
 
 Ayarlar sayfası: tema (Sistem/Açık/Koyu, Pro'da Retro), hareketleri azalt, sekme başlığında sayaç, ses ve bildirim, başlatınca köşe penceresi, ekranı açık tut, köşe penceresi görünümü (Pro), kısayollar ve otomatik başlatma (Pro), **Verilerim** (JSON yedek indir/geri yükle, tümünü sil). Veriler cihazdan çıkmadığı için cihaz değiştirirken yedek dosyası kullanılır.
 
+## Ziyaret istatistiği (anonim)
+
+Site yalnızca şunları sayar: sayfa ziyareti, hangi modun başlatıldığı/bitirildiği ve ne kadar sürdüğü, paylaşım kartı indirildi mi. Her olayda sadece `event, mode, path, lang, device (mobile/desktop), display (browser/app), seconds` gider. Çerez, kimlik, IP kaydı, maaş/tutar, sayaç adı, sorgu dizesi yok. Ayarlar → "Anonim kullanım istatistiği gönder" ile kapanır; tarayıcıda "Do Not Track" / GPC açıksa hiç gönderilmez. Yalnızca yayın derlemesinde çalışır.
+
+Veri Cloudflare **Workers Analytics Engine**'e yazılır (`wrangler.jsonc` → `analytics_engine_datasets`, veri kümesi `timekeepera`; ilk yazımda kendiliğinden oluşur, 90 gün tutulur). Sunucu kodu: `worker/index.ts` (`POST /api/e` yazar, `GET /api/stats` okur; `worker/events.ts` gelen her alanı katı doğrular).
+
+Raporu görmek için (bir kez): Cloudflare → Workers & Pages → `kose` → Settings → Variables and Secrets'a üç **Secret** ekle:
+
+- `STATS_KEY`: kendi seçtiğin uzun bir parola (rapor sayfası bunu sorar).
+- `CF_ACCOUNT_ID`: Cloudflare hesap kimliği (panelde sağ altta, "Account ID").
+- `CF_API_TOKEN`: My Profile → API Tokens → Create Token → Custom; izin **Account → Account Analytics → Read**.
+
+Sonra `https://<site>/istatistik` adresine gir, parolayı yaz: ziyaretler, başlatılan/biten oturumlar, mod başına ortalama süre, günlük ziyaret grafiği, en çok açılan sayfalar ve cihaz dağılımı (son 7/30/90 gün). Sayfa menüde görünmez; parola yalnızca o sekmede (sessionStorage) tutulur.
+
 ## PWA
 
 `vite-plugin-pwa` ile kurulabilir ve ilk ziyaretten sonra çevrimdışı çalışır (uygulama kabuğu, Inter latin/latin-ext, ikonlar önbellekte). Yeni sürüm arka planda iner, sonraki açılışta devreye girer; çalışan sayaç durumu localStorage'da olduğu için güncellemeden etkilenmez.

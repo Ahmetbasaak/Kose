@@ -467,3 +467,70 @@ a.modeCard:hover {
 a.modeCard:active {
   transform: translateY(0);
 }
+
+/* Card micro-interactions: a soft accent wash, the icon tile tilts, an arrow slides in. */
+.modeCard {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.modeCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(120% 80% at 0% 0%, var(--accent-soft), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+a.modeCard:hover::before,
+a.modeCard:focus-visible::before {
+  opacity: 1;
+}
+.modeIcon {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+a.modeCard:hover .modeIcon,
+a.modeCard:focus-visible .modeIcon {
+  transform: rotate(-8deg) scale(1.1);
+}
+.modeArrow {
+  color: var(--accent);
+  font-weight: 700;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+a.modeCard:hover .modeArrow,
+a.modeCard:focus-visible .modeArrow {
+  opacity: 1;
+  transform: none;
+}
+.quickItem {
+  transition:
+    border-color 0.2s var(--ease),
+    transform 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
+}
+.quickItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px -14px rgb(0 0 0 / 0.3);
+}
+.quickItem:active {
+  transform: none;
+}
+
+/* Hero example floats gently while it plays. */
+.heroDemo > div {
+  animation: float 6s ease-in-out infinite;
+}
+.heroDemo[data-playing='false'] > div {
+  animation-play-state: paused;
+}
+@keyframes float {
+  50% {
+    transform: translateY(-6px);
+  }
+}

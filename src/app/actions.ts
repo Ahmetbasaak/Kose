@@ -7,6 +7,7 @@ import { usePrefsStore } from '../storage/prefs';
 import { addRecord } from '../storage/history';
 import { summarize, useSessionStore, type SessionSummary, type StartInput } from '../storage/session';
 import { requestNotificationPermission } from './alerts';
+import { track } from './telemetry';
 
 const isNarrow = () => window.matchMedia('(max-width: 639px)').matches;
 
@@ -39,6 +40,7 @@ export function useStartSession() {
     if (useSessionStore.getState().active && !window.confirm(t('setup.replaceConfirm'))) return;
     start(input);
     usePrefsStore.getState().set({ lastStart: input });
+    track('start', { mode: input.modeId });
     await launch();
     // After the PiP request: both need the click's user activation and PiP must go first.
     if (opts.askNotify) requestNotificationPermission();
@@ -53,6 +55,7 @@ export function recordSummary(s: SessionSummary): void {
     usePrefsStore.getState().set({ workRecordedDay: s.shiftDay });
   }
   usePrefsStore.getState().addActiveDay(trDay(s.endedAt));
+  track('finish', { mode: s.modeId, seconds: s.elapsedMs / 1000 });
   // History is a bonus: private mode or a full disk must not block finishing.
   addRecord(s).catch(() => undefined);
   if (s.modeId === 'freelance' && s.projectId)
@@ -67,6 +70,7 @@ export function switchSession(input: StartInput): void {
   if (current) recordSummary(summarize(current, Date.now()));
   useSessionStore.getState().start(input);
   usePrefsStore.getState().set({ lastStart: input });
+  track('start', { mode: input.modeId });
 }
 
 const afterFinish = (s: SessionSummary | null) =>

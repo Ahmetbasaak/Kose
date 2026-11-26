@@ -7,7 +7,7 @@ import { upcomingHolidays } from '../../data/holidays';
 import { businessDaysUntil } from '../../engine/calendar';
 import { formatMoney } from '../../engine/format';
 import { MONTHLY_HOURS, meetingCost } from '../../engine/work';
-import { parseAmount } from '../../i18n';
+import { brandName, parseAmount } from '../../i18n';
 import {
   CALCULATOR_PAGES,
   COUNTDOWN_INDEX,
@@ -22,11 +22,16 @@ import { useStartSession } from '../actions';
 import { daysClock, formatTrDate } from '../sessionView';
 import { NotFoundPage } from './NotFoundPage';
 import s from './pages.module.css';
+import { RollingValue } from '../../components/RollingValue';
 
 /** Keeps the tab title in step with the prerendered <title> Google indexed. */
 function useDocumentTitle(title: string) {
   useEffect(() => {
+    if (!title) return;
     document.title = title;
+    return () => {
+      document.title = brandName; // leaving the page must not leave its title on the tab
+    };
   }, [title]);
 }
 
@@ -70,7 +75,7 @@ export function HolidayCountdownPage() {
         <section className={s.liveCard} aria-label={page.name}>
           <span className={s.liveCaption}>{page.name}</span>
           <div className={`${s.liveValue} num`} data-long role="timer">
-            {o.at > now ? daysClock(o.at - now) : 'Bugün!'}
+            <RollingValue text={o.at > now ? daysClock(o.at - now) : 'Bugün!'} />
           </div>
           <span className={s.liveCaption}>
             {formatTrDate(o.at)}
@@ -188,7 +193,7 @@ export function MeetingCalculatorPage() {
         <section className={s.liveCard} aria-live="polite" aria-label="Sonuç">
           <span className={s.liveCaption}>Bu toplantının maliyeti</span>
           <div className={`${s.liveValue} num`} data-long>
-            {ok ? formatMoney(meetingCost(mins * 60_000, n, hourly)) : '—'}
+            <RollingValue text={ok ? formatMoney(meetingCost(mins * 60_000, n, hourly)) : '—'} />
           </div>
           {ok && <span className={s.liveCaption}>Dakikası ≈ {formatMoney(meetingCost(60_000, n, hourly))}</span>}
           <div>
@@ -267,7 +272,7 @@ export function HourlyCalculatorPage() {
         <section className={s.liveCard} aria-live="polite" aria-label="Sonuç">
           <span className={s.liveCaption}>Saatlik kazancın</span>
           <div className={`${s.liveValue} num`} data-long>
-            {ok ? formatMoney(hourly) : '—'}
+            <RollingValue text={ok ? formatMoney(hourly) : '—'} />
           </div>
           {ok && (
             <span className={s.liveCaption}>

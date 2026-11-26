@@ -475,6 +475,10 @@ export const tr = {
     keepAwake: 'Sayaç çalışırken ekranı açık tut',
     keepAwakeNote: 'Telefonda ekran kilitlenmesin diye. Pil tüketimini artırır.',
     keepAwakeUnsupported: 'Bu tarayıcı ekranı açık tutmayı desteklemiyor.',
+    statsTitle: 'Anonim kullanım istatistiği',
+    statsOn: 'Anonim kullanım istatistiği gönder',
+    statsNote:
+      'Yalnızca şunlar gider: açılan sayfa, başlatılan mod ve ne kadar sürdüğü, dil, telefon mu bilgisayar mı. Maaş, ad, not, IP, çerez ya da kimlik gönderilmez. Tarayıcında "Takip etme" açıksa hiç gönderilmez.',
     data: 'Verilerim',
     dataNote:
       'Her şey yalnızca bu cihazda. Başka cihaza taşımak ya da saklamak için yedek al. Pro bilgisi yedeğe girmez.',
@@ -573,7 +577,11 @@ export const tr = {
       },
       tracking: {
         h: 'Takip yok',
-        p: 'Analitik, reklam ya da üçüncü taraf takip betiği kullanmıyoruz. Yazı tipi dahil tüm dosyalar uygulamanın kendi adresinden gelir.',
+        p: 'Reklam ya da üçüncü taraf takip betiği kullanmıyoruz; çerez yok. Yazı tipi dahil tüm dosyalar uygulamanın kendi adresinden gelir.',
+      },
+      stats: {
+        h: 'Anonim kullanım sayıları',
+        p: 'Uygulamayı geliştirmek için yalnızca sayım tutarız: hangi sayfanın açıldığı, hangi modun başlatıldığı ve ne kadar sürdüğü, dil, telefon mu bilgisayar mı ve uygulama yüklü mü. Maaş, tutar, ad, not, IP adresi, tarayıcı kimliği ya da seni tanımlayan hiçbir şey gönderilmez veya saklanmaz. Tarayıcında "Takip etme" açıksa hiçbir şey gönderilmez; Ayarlar’dan da kapatabilirsin.',
       },
       notifications: {
         h: 'Bildirimler',
@@ -708,6 +716,29 @@ export const tr = {
     range: '{start} – {end}',
     empty: 'Henüz bir özet yok. Bir sayaç başlat, bitince burada görürsün.',
     newTimer: 'Yeni sayaç',
+  },
+  stats: {
+    title: 'Kullanım istatistikleri',
+    lead: 'Anonim sayımlar. Kişisel veri yok.',
+    key: 'Erişim anahtarı',
+    load: 'Göster',
+    days: 'Son {n} gün',
+    unauthorized: 'Anahtar yanlış.',
+    notConfigured: "Okuma ayarlanmamış: Worker'a CF_ACCOUNT_ID ve CF_API_TOKEN gizli değişkenlerini ekle (README).",
+    failed: 'Veriler alınamadı.',
+    visits: 'Ziyaret',
+    starts: 'Başlatma',
+    finishes: 'Bitirme',
+    shares: 'Kart paylaşımı',
+    totalTime: 'Toplam kullanım',
+    dailyVisits: 'Günlük ziyaret',
+    byMode: 'Modlara göre',
+    mode: 'Mod',
+    avg: 'Ortalama süre',
+    topPages: 'En çok açılan sayfalar',
+    page: 'Sayfa',
+    devices: 'Cihaz ve kurulum',
+    noMode: '(sayfa)',
   },
   holidays: {
     yilbasi: 'Yılbaşı',

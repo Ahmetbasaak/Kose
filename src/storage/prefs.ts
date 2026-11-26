@@ -73,6 +73,8 @@ interface PrefsState {
   openCornerOnStart: boolean;
   /** Keep the screen awake while a timer runs (Wake Lock). */
   keepAwake: boolean;
+  /** Anonymous usage counts (see worker/events.ts). Off also when the browser sends GPC/DNT. */
+  stats: boolean;
   /** Plain setting fields only (not the action functions). */
   set: (patch: Partial<Omit<PrefsState, 'set' | `set${string}` | `add${string}`>>) => void;
 }
@@ -115,6 +117,7 @@ export const usePrefsStore = create<PrefsState>()(
       tone: 'chime',
       openCornerOnStart: true,
       keepAwake: false,
+      stats: true,
       set: (patch) => set(patch),
       setWeeklySeenWeek: (weeklySeenWeek) => set({ weeklySeenWeek }),
       // A year is plenty for a consecutive-day streak; keeps the list from growing forever.

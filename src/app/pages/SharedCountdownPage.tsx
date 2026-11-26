@@ -7,6 +7,7 @@ import { parseSharedCountdown } from '../../share/link';
 import { useCountdownsStore } from '../../storage/countdowns';
 import { daysClock, formatTrDate } from '../sessionView';
 import s from './pages.module.css';
+import { RollingValue } from '../../components/RollingValue';
 
 /** /sayim?ad=…&t=… — a countdown someone shared; no backend, everything is in the URL. */
 export function SharedCountdownPage() {
@@ -39,7 +40,7 @@ export function SharedCountdownPage() {
           {shared.title}
         </h1>
         <div className={`${s.liveValue} num`} data-long={left > 86_400_000} role="timer">
-          {left > 0 ? daysClock(left) : t('countdowns.arrived')}
+          <RollingValue text={left > 0 ? daysClock(left) : t('countdowns.arrived')} />
         </div>
         <span className={s.liveCaption}>{formatTrDate(shared.at)}</span>
       </section>

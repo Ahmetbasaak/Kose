@@ -1,4 +1,4 @@
-import { Suspense, useState } from 'react';
+import { Suspense, useState, type CSSProperties } from 'react';
 import { Button, ButtonLink } from '../../components/Button';
 import { LazyShareCard } from '../../share/lazy';
 import { downloadXlsx, hours } from '../../export/xlsx';
@@ -40,7 +40,7 @@ export function SummaryPage() {
         <p className={s.lead}>{summary.label}</p>
       </div>
       <div className={s.stats}>
-        <div className={`${s.card} ${s.stat}`}>
+        <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 0 } as CSSProperties}>
           <span className={`${s.muted} ${s.small}`}>{isWork ? t('summary.worked') : t('summary.duration')}</span>
           <span className={`${s.statValue} num`}>{durationWords(summary.elapsedMs)}</span>
           {/* Work time comes from the shift, so the open/close range would contradict it. */}
@@ -52,7 +52,7 @@ export function SummaryPage() {
           )}
         </div>
         {summary.cost != null && summary.meeting && (
-          <div className={`${s.card} ${s.stat}`}>
+          <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 1 } as CSSProperties}>
             <span className={`${s.muted} ${s.small}`}>{t('meeting.cost')}</span>
             <span className={`${s.statValue} num`}>{formatMoney(summary.cost)}</span>
             <span className={`${s.muted} ${s.small} num`}>
@@ -65,13 +65,13 @@ export function SummaryPage() {
           </div>
         )}
         {summary.focusMs != null && (
-          <div className={`${s.card} ${s.stat}`}>
+          <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 2 } as CSSProperties}>
             <span className={`${s.muted} ${s.small}`}>{t('student.focusTotal')}</span>
             <span className={`${s.statValue} num`}>{durationWords(summary.focusMs)}</span>
           </div>
         )}
         {(summary.earned ?? summary.cost) != null && equivalentsLine((summary.earned ?? summary.cost)!) && (
-          <div className={`${s.card} ${s.stat}`}>
+          <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 3 } as CSSProperties}>
             <span className={`${s.muted} ${s.small}`}>{t('equiv.title')}</span>
             <span className={`${s.statValue} num`} style={{ fontSize: 22 }}>
               {equivalentsLine((summary.earned ?? summary.cost)!)}
@@ -79,7 +79,7 @@ export function SummaryPage() {
           </div>
         )}
         {isWork && (
-          <div className={`${s.card} ${s.stat}`}>
+          <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 4 } as CSSProperties}>
             <span className={`${s.muted} ${s.small}`}>{t('summary.earned')}</span>
             <span className={`${s.statValue} num`}>{formatMoney(summary.earned ?? 0)}</span>
             <span className={`${s.muted} ${s.small}`}>{t('work.disclaimer')}</span>

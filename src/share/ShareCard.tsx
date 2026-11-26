@@ -6,6 +6,7 @@ import { Field } from '../components/Field';
 import { parseAmount, brandName, t } from '../i18n';
 import { usePrefsStore } from '../storage/prefs';
 import type { SessionSummary } from '../storage/session';
+import { track } from '../app/telemetry';
 import { cardBlob, drawCard, type CardSize } from './card';
 import { cardContent, unitAvailable, type CardContent, type CardUnit } from './content';
 
@@ -23,6 +24,7 @@ export function CardExport({ content }: { content: CardContent }) {
   }, [content, size]);
 
   const download = async () => {
+    track('share');
     const url = URL.createObjectURL(await cardBlob(canvas.current!));
     const a = document.createElement('a');
     a.href = url;
@@ -38,6 +40,7 @@ export function CardExport({ content }: { content: CardContent }) {
     typeof navigator.canShare === 'function' &&
     navigator.canShare({ files: [new File([], fileName(), { type: 'image/png' })] });
   const share = async () => {
+    track('share');
     try {
       await navigator.share({ files: [await file()] });
     } catch {

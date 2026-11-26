@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type CSSProperties, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { Button } from '../components/Button';
 import { CornerFace } from '../components/corner/CornerView';
@@ -45,7 +45,7 @@ export function Hero() {
 
   return (
     <section className={s.hero} aria-labelledby="hero-title">
-      <div className={s.heroText}>
+      <div className={s.heroText} data-reveal>
         <p className={s.eyebrow}>{t('home.hero.eyebrow')}</p>
         <h1 id="hero-title" className={s.heroTitle}>
           {t('home.hero.title')}
@@ -89,7 +89,7 @@ export function Hero() {
           </Link>
         </p>
       </div>
-      <figure className={s.heroDemo}>
+      <figure className={s.heroDemo} data-playing={playing} data-reveal style={{ '--i': 2 } as CSSProperties}>
         <CornerFace
           variant="preview"
           label={t('modes.work.title')}

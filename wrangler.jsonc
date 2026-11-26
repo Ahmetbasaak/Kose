@@ -1,12 +1,16 @@
-// Cloudflare Workers (static assets only, no server code).
-// Every unknown path serves index.html so app routes like /mod/mesai work on reload.
-// Security and cache headers come from public/_headers.
+// Cloudflare Worker: serves dist/ as static assets (unknown paths → index.html for app routes)
+// and runs worker/index.ts only for /api/* (anonymous usage stats). Headers: public/_headers.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "kose",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-11-19",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
   },
+  // Created automatically on first write; free tier. Nothing personal is ever written.
+  "analytics_engine_datasets": [{ "binding": "STATS", "dataset": "timekeepera" }],
 }

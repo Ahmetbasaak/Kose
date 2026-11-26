@@ -41,6 +41,17 @@
 }
 .root[data-status='running'] .dot {
   background: var(--corner-live);
+  animation: ping 2s ease-out infinite;
+}
+/* A ring that keeps widening from the live dot: "this is running". */
+@keyframes ping {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--corner-live) 70%, transparent);
+  }
+  70%,
+  to {
+    box-shadow: 0 0 0 7px transparent;
+  }
 }
 .root[data-status='done'] .dot {
   background: #fbbf24;

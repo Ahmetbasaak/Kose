@@ -124,12 +124,16 @@ Konumlandırma: **"Zamanın kaç para ediyor?"** Giriş kapısı maaş sayacı v
 - Arama sayfaları derlemede gerçek HTML olarak üretilir: `/kac-gun-kaldi` + 11 geri sayım (bayramlar, resmî tatiller, hafta sonu, maaş günü), `/hesapla/toplanti-maliyeti`, `/hesapla/saatlik-ucret`; `robots.txt`; alan adı girilince `sitemap.xml` + canonical.
 - Görsel: mod ikonları (tek stil SVG), kart derinliği ve hover, başlık hiyerarşisi (hero 64px / bölüm 34px / grup etiketi).
 
+### Ölçüm (yapıldı)
+
+- Anonim ziyaret ve mod kullanım istatistiği (Workers Analytics Engine), sahip için `/istatistik` raporu. Ayrıntı README'de.
+
 ### Görsel kalite analizi — sıradaki adımlar
 
 1. **Link önizleme görselleri (Open Graph):** WhatsApp/X/LinkedIn'de paylaşılan her sayfa için otomatik görsel. Büyüme için en etkili sıradaki iş.
 2. **Kart şablonları:** toplantı ve mesai için 4–5 esprili, poster tipografili şablon; kart seçici.
 3. **Ana sayfa bölümleri:** "Nasıl çalışır" (3 adım), gizlilik sözü, ileride kullanıcı alıntıları.
-4. **Hareket:** sayfa geçişlerinde View Transitions, rakam yuvarlanma animasyonu (hareket azaltmaya duyarlı).
+4. ~~**Hareket:** sayfa geçişlerinde View Transitions, rakam yuvarlanma animasyonu (hareket azaltmaya duyarlı).~~ Yapıldı: ayrıca kart girişleri, kaydırınca belirme, kart hover etkileşimleri.
 5. **Boş durumlar:** geçmiş, geri sayım, proje listesi için küçük çizimler ve tek eylemli davet.
 6. **Tema cilası:** koyu ve retro temada kart gölgeleri, giriş bölümü zemini.
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { Button } from '../../components/Button';
 import { ProGate } from '../../components/ProGate';
 import { daysInMonth, trMidnight, trYmd } from '../../engine/calendar';
@@ -135,19 +135,19 @@ function History() {
           {t('history.monthly')} · {month}
         </h2>
         <div className={s.stats}>
-          <div className={`${s.card} ${s.stat}`}>
+          <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 0 } as CSSProperties}>
             <span className={`${s.muted} ${s.small}`}>{t('history.totalTime')}</span>
             <span className={`${s.statValue} num`}>{durationWords(totalMs)}</span>
             <span className={`${s.muted} ${s.small}`}>{t('history.sessions', { n: shown.length })}</span>
           </div>
           {earned > 0 && (
-            <div className={`${s.card} ${s.stat}`}>
+            <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 1 } as CSSProperties}>
               <span className={`${s.muted} ${s.small}`}>{t('history.earned')}</span>
               <span className={`${s.statValue} num`}>{formatMoney(earned)}</span>
             </div>
           )}
           {cost > 0 && (
-            <div className={`${s.card} ${s.stat}`}>
+            <div className={`${s.card} ${s.stat}`} data-reveal style={{ '--i': 2 } as CSSProperties}>
               <span className={`${s.muted} ${s.small}`}>{t('history.cost')}</span>
               <span className={`${s.statValue} num`}>{formatMoney(cost)}</span>
             </div>

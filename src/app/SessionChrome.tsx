@@ -19,9 +19,14 @@ export function SessionChrome() {
     applyAppearance(appTheme, reduceMotion, pipWin ? [document, pipWin.document] : [document]);
   }, [appTheme, reduceMotion, pipWin]);
 
-  const title = showTitle ? `${sessionDisplay(active, now).value} · ${brandName}` : brandName;
+  // Only a running timer owns the tab title; otherwise pages (the SEO ones) keep their own.
+  const title = showTitle ? `${sessionDisplay(active, now).value} · ${brandName}` : null;
   useEffect(() => {
+    if (title === null) return;
     document.title = title;
+    return () => {
+      document.title = brandName;
+    };
   }, [title]);
 
   const awake = keepAwake && active !== null;

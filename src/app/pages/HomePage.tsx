@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { Link } from 'react-router';
 import { Button, ButtonLink } from '../../components/Button';
 import { useNow } from '../../components/useNow';
@@ -14,6 +15,7 @@ import { AchievementsTeaser } from '../AchievementsTeaser';
 import { WeeklyCard } from '../WeeklyCard';
 import { Hero } from '../Hero';
 import { ModeIcon } from '../../components/ModeIcon';
+import { RollingValue } from '../../components/RollingValue';
 import s from './pages.module.css';
 
 const GROUPS: ModeGroup[] = ['work', 'focus', 'life', 'stream'];
@@ -35,7 +37,7 @@ function ActiveCard() {
         <span className={s.liveCaption}>{d.caption}</span>
       </div>
       <span className={`${s.statValue} num`} style={{ fontSize: 44 }} role="timer">
-        {d.value}
+        <RollingValue text={d.value} />
       </span>
       <div className={s.row}>
         <ButtonLink to="/sayac" variant="primary">
@@ -111,14 +113,19 @@ function QuickStart() {
     },
   ];
   return (
-    <section aria-labelledby="quick-title" className={s.stack} style={{ gap: 12 }}>
+    <section
+      aria-labelledby="quick-title"
+      className={s.stack}
+      style={{ gap: 12, '--i': 3 } as CSSProperties}
+      data-reveal
+    >
       <h2 id="quick-title" className={s.label} style={{ fontSize: 16 }}>
         {t('home.quickTitle')}
       </h2>
       <div className={s.quickGrid}>
         {items.map((it) =>
           it.to ? (
-            <Link key={it.key} to={it.to} className={s.quickItem}>
+            <Link key={it.key} to={it.to} viewTransition className={s.quickItem}>
               <strong>{it.title}</strong>
               <span className={`${s.muted} ${s.small}`}>{it.hint}</span>
             </Link>
@@ -142,21 +149,25 @@ export function HomePage() {
       <QuickStart />
       <WeeklyCard />
       <AchievementsTeaser />
-      <div className={s.intro}>
+      <div className={s.intro} data-reveal="scroll">
         <h2 className={s.sectionTitle}>{t('home.title')}</h2>
         <p className={s.lead}>{t('home.lead')}</p>
       </div>
       {GROUPS.map((g) => (
         <section key={g} aria-labelledby={`grp-${g}`} className={s.stack} style={{ gap: 12 }}>
-          <h3 id={`grp-${g}`} className={s.groupTitle}>
+          <h3 id={`grp-${g}`} className={s.groupTitle} data-reveal="scroll">
             {t(`home.groups.${g}`)}
           </h3>
           <ul className={s.grid} role="list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {modes
               .filter((m) => m.group === g)
-              .map((m) => (
-                <li key={m.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <Link to={`/mod/${m.slug}`} className={s.modeCard} style={{ flex: 1 }}>
+              .map((m, i) => (
+                <li
+                  key={m.id}
+                  data-reveal="scroll"
+                  style={{ display: 'flex', flexDirection: 'column', '--i': i } as CSSProperties}
+                >
+                  <Link to={`/mod/${m.slug}`} viewTransition className={s.modeCard} style={{ flex: 1 }}>
                     <span className={s.spread}>
                       <span className={s.modeIcon}>
                         <ModeIcon id={m.id} />
@@ -165,6 +176,9 @@ export function HomePage() {
                     </span>
                     <span className={s.spread}>
                       <span className={s.modeTitle}>{t(`modes.${m.id}.title`)}</span>
+                      <span className={s.modeArrow} aria-hidden="true">
+                        →
+                      </span>
                     </span>
                     <span className={s.modeDesc}>{t(`modes.${m.id}.desc`)}</span>
                     <span className={s.modeHint}>{t(`modes.${m.id}.hint`)}</span>

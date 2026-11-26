@@ -32,8 +32,10 @@ test('countdown landing page counts live and adds to the list', async ({ page })
   await page.goto('/kac-gun-kaldi/kurban-bayrami');
   await expect(page.getByRole('timer')).toHaveText(/\d+ g \d\d:\d\d:\d\d/);
   await page.getByRole('button', { name: 'Listeme ekle' }).click();
+  await expect(page).toHaveTitle(/Kurban Bayramı/);
   await page.getByRole('link', { name: 'Geri sayımlarım' }).click();
   await expect(page.locator('#cd-list-title + ul')).toContainText('Kurban Bayramı');
+  await expect(page).not.toHaveTitle(/Kurban Bayramı/); // leaving restores the tab title
 });
 
 test('calculators answer instantly', async ({ page }) => {

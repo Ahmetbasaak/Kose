@@ -6,7 +6,7 @@ import { brandName, t } from '../../i18n';
 import { useEntitlements } from '../../app/entitlements';
 import { usePrefsStore } from '../../storage/prefs';
 import { useSessionStore, type ActiveSession } from '../../storage/session';
-import { MoneyValue } from '../MoneyValue';
+import { RollingValue } from '../RollingValue';
 import { useNow } from '../useNow';
 import { useTargetWindow } from './targetWindow';
 import styles from './CornerView.module.css';
@@ -49,7 +49,7 @@ export function CornerFace({ label, display, variant, children }: FaceProps) {
         data-long={display.value.length > 8}
         role={variant === 'preview' ? undefined : 'timer'}
       >
-        {display.money === undefined ? display.value : <MoneyValue amount={display.money} />}
+        <RollingValue text={display.value} />
       </div>
       {display.sub && <div className={styles.sub}>{display.sub}</div>}
       {display.extra && <div className={styles.sub}>{display.extra}</div>}

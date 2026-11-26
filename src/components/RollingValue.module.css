@@ -1,0 +1,11 @@
+.digit {
+  display: inline-block;
+  animation: roll 0.34s var(--ease);
+}
+@keyframes roll {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35em);
+    filter: blur(1.5px);
+  }
+}
