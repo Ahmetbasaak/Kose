@@ -6,7 +6,7 @@ test.use({ locale: 'en-US' });
 test('English browser gets the English UI; language can be switched', async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-11-23T14:30:00+03:00')); // Monday
   await page.goto('/');
-  await expect(page.locator('h1')).toHaveText('What are we counting?');
+  await expect(page.locator('h1')).toHaveText('What is your time worth?');
   await expect(page.getByRole('link', { name: /Timekeepera – Home/ })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.lang)).toBe('en');
   const { violations } = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
@@ -20,5 +20,5 @@ test('English browser gets the English UI; language can be switched', async ({ p
   await page.getByRole('combobox', { name: 'Language / Dil' }).selectOption('tr');
   await expect(page.locator('h1')).toHaveText('Ayarlar');
   await page.goto('/');
-  await expect(page.locator('h1')).toHaveText('Ne sayacağız?');
+  await expect(page.locator('h1')).toHaveText('Zamanın kaç para ediyor?');
 });

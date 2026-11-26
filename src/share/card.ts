@@ -25,7 +25,8 @@ function fitFont(ctx: CanvasRenderingContext2D, text: string, weight: number, st
 }
 
 /** Draws a card: kicker top-left, the corner motif top-right, the big number, lines, brand at the bottom. */
-export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: CardSize, brand: string) {
+/** `site` (e.g. "timekeepera.app") is printed bottom-right: every shared card links back. */
+export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: CardSize, brand: string, site = '') {
   await document.fonts.load(`700 100px ${FONT}`).catch(() => undefined);
   const [w, h] = CARD_SIZES[size];
   canvas.width = w;
@@ -79,6 +80,12 @@ export async function drawCard(canvas: HTMLCanvasElement, c: CardContent, size: 
   ctx.fillStyle = SOFT;
   ctx.font = `700 44px ${FONT}`;
   ctx.fillText(brand, pad, h - pad);
+  if (site) {
+    ctx.font = `500 34px ${FONT}`;
+    ctx.textAlign = 'right';
+    ctx.fillText(site, w - pad, h - pad);
+    ctx.textAlign = 'left';
+  }
 }
 
 export const cardBlob = (canvas: HTMLCanvasElement) =>

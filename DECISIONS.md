@@ -95,3 +95,7 @@
 - Marka adı **TimerZ** (TR ve EN aynı). Logo (d taslağı): turkuaz kare içinde yumuşak iç çerçeve, sol üst ve sağ alt köşesi belirgin, beyaz yelkovan (12'yi gösterir), sarı akrep ve merkez; header, favicon, PWA ikonları ve paylaşım kartı aynı çizimi kullanır. "Köşe penceresi" gibi metinler ürün özelliğinin adı olarak kaldı.
 - Ad değişse de iç anahtarlar (`kose.*` localStorage, `kose` IndexedDB) ve Cloudflare worker adı (`wrangler.jsonc` → `kose`) değişmedi: mevcut cihazlardaki veriler ve yayın adresi korunur.
 - Marka adı **TimerZ** yerine **Timekeepera**: App Store'da aynı kategoride "TimerZ" adlı bir sayaç uygulaması var. "Timekeepera" için web'de birebir eşleşme bulunmadı (resmî marka veritabanları ayrıca kontrol edilmeli).
+- Büyüme odağı: ana sayfa tek vaatle açılır ("Zamanın kaç para ediyor?"), maaş girilince varsayılan mesaiyle (09:00–18:00, 60 dk öğle 12:30'da, 22 gün) hemen başlar; sonra mesai ekranından değiştirilir.
+- Arama sayfaları `src/seo/pages.ts`'te tek tanım; hem canlı React sayfası hem derleme zamanı HTML'i bundan üretilir. Statik metinde kalan gün yazılmaz (yayınlar arasında eskir), yalnızca tarih; canlı sayı sayfada. Sayfalar `yol.html` olarak yazılır (eğik çizgisiz adres yönlendirmesiz açılır). İçerik Türkçe (Türkiye aramaları).
+- `sitemap.xml` ve canonical yalnızca `brand.config.json` → `domain` gerçek bir alan adı olunca üretilir.
+- Paylaşım kartının sağ altında sitenin adresi (`location.host`) yazar.

@@ -113,6 +113,26 @@ Faz 0–7 tamamlandı. Ayrıntılar commit geçmişinde ve `DECISIONS.md`'de; ya
 - Haftalık rapor: kayıt listesi (silinebilir, notlu), gün/proje tablosu, müşteri başına süre ve (ücret girildiyse) **tutar**; Excel ve PDF.
 - Proje silinebilir (kayıtlarıyla birlikte, onay sorulur).
 
+## Faz 9 — Büyüme odağı ve görsel kalite
+
+Konumlandırma: **"Zamanın kaç para ediyor?"** Giriş kapısı maaş sayacı ve toplantı maliyeti; diğer modlar ikinci planda.
+
+### Yapıldı (ilk adım)
+
+- Ana sayfa girişi: tek vaat, tek alan (maaş), tek düğme; yanında canlı örnek (durdur/oynat, hareket azaltmada sabit).
+- Paylaşım kartlarında site adresi (her paylaşım geri bağlantı).
+- Arama sayfaları derlemede gerçek HTML olarak üretilir: `/kac-gun-kaldi` + 11 geri sayım (bayramlar, resmî tatiller, hafta sonu, maaş günü), `/hesapla/toplanti-maliyeti`, `/hesapla/saatlik-ucret`; `robots.txt`; alan adı girilince `sitemap.xml` + canonical.
+- Görsel: mod ikonları (tek stil SVG), kart derinliği ve hover, başlık hiyerarşisi (hero 64px / bölüm 34px / grup etiketi).
+
+### Görsel kalite analizi — sıradaki adımlar
+
+1. **Link önizleme görselleri (Open Graph):** WhatsApp/X/LinkedIn'de paylaşılan her sayfa için otomatik görsel. Büyüme için en etkili sıradaki iş.
+2. **Kart şablonları:** toplantı ve mesai için 4–5 esprili, poster tipografili şablon; kart seçici.
+3. **Ana sayfa bölümleri:** "Nasıl çalışır" (3 adım), gizlilik sözü, ileride kullanıcı alıntıları.
+4. **Hareket:** sayfa geçişlerinde View Transitions, rakam yuvarlanma animasyonu (hareket azaltmaya duyarlı).
+5. **Boş durumlar:** geçmiş, geri sayım, proje listesi için küçük çizimler ve tek eylemli davet.
+6. **Tema cilası:** koyu ve retro temada kart gölgeleri, giriş bölümü zemini.
+
 ## Açık sorular (kullanıcıya)
 
 - Marka adı / alan adı (şimdilik "Köşe", `brand.config.json`)

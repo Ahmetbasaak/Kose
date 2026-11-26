@@ -70,8 +70,9 @@
   color: var(--text);
   text-decoration: none;
   transition:
-    border-color 0.15s var(--ease),
-    transform 0.15s var(--ease);
+    border-color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 a.modeCard:hover {
   color: var(--text);
@@ -346,4 +347,123 @@ a.modeCard:hover {
 .yearGrid dd {
   margin: 0;
   font-weight: 600;
+}
+
+.chipList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chipList a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+}
+.chipList a:hover {
+  border-color: var(--accent);
+}
+
+/* Hero: one promise, one field, a live example. */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+  padding: clamp(8px, 3vw, 32px) 0 8px;
+}
+@media (max-width: 800px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+}
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+}
+.heroTitle {
+  font-size: clamp(38px, 6.5vw, 64px);
+  line-height: 1.02;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.heroForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 440px;
+}
+.heroDemo {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: clamp(16px, 3vw, 28px);
+  border-radius: 24px;
+  background: var(--accent-soft);
+}
+.heroDemo > div {
+  box-shadow: 0 20px 40px -18px rgb(0 0 0 / 0.45);
+}
+.textButton {
+  min-height: 44px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sectionTitle {
+  font-size: clamp(26px, 3.5vw, 34px);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+.groupTitle {
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* Mode cards: icon tile, soft elevation, gentle lift on hover. */
+.modeIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.modeCard {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 6px 20px -12px rgb(0 0 0 / 0.18);
+}
+a.modeCard:hover {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.05),
+    0 14px 28px -14px rgb(0 0 0 / 0.28);
+}
+a.modeCard:active {
+  transform: translateY(0);
 }

@@ -12,6 +12,8 @@ import { MONTHLY_HOURS } from '../../engine/work';
 import { sessionDisplay } from '../sessionView';
 import { AchievementsTeaser } from '../AchievementsTeaser';
 import { WeeklyCard } from '../WeeklyCard';
+import { Hero } from '../Hero';
+import { ModeIcon } from '../../components/ModeIcon';
 import s from './pages.module.css';
 
 const GROUPS: ModeGroup[] = ['work', 'focus', 'life', 'stream'];
@@ -135,19 +137,20 @@ function QuickStart() {
 export function HomePage() {
   return (
     <div className={s.stack}>
-      <div className={s.intro}>
-        <h1 className={s.h1}>{t('home.title')}</h1>
-        <p className={s.lead}>{t('home.lead')}</p>
-      </div>
       <ActiveCard />
+      <Hero />
       <QuickStart />
       <WeeklyCard />
       <AchievementsTeaser />
+      <div className={s.intro}>
+        <h2 className={s.sectionTitle}>{t('home.title')}</h2>
+        <p className={s.lead}>{t('home.lead')}</p>
+      </div>
       {GROUPS.map((g) => (
         <section key={g} aria-labelledby={`grp-${g}`} className={s.stack} style={{ gap: 12 }}>
-          <h2 id={`grp-${g}`} className={s.modeTitle}>
+          <h3 id={`grp-${g}`} className={s.groupTitle}>
             {t(`home.groups.${g}`)}
-          </h2>
+          </h3>
           <ul className={s.grid} role="list" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
             {modes
               .filter((m) => m.group === g)
@@ -155,8 +158,13 @@ export function HomePage() {
                 <li key={m.id} style={{ display: 'flex', flexDirection: 'column' }}>
                   <Link to={`/mod/${m.slug}`} className={s.modeCard} style={{ flex: 1 }}>
                     <span className={s.spread}>
-                      <span className={s.modeTitle}>{t(`modes.${m.id}.title`)}</span>
+                      <span className={s.modeIcon}>
+                        <ModeIcon id={m.id} />
+                      </span>
                       {m.pro && <span className={s.badge}>{t('home.pro')}</span>}
+                    </span>
+                    <span className={s.spread}>
+                      <span className={s.modeTitle}>{t(`modes.${m.id}.title`)}</span>
                     </span>
                     <span className={s.modeDesc}>{t(`modes.${m.id}.desc`)}</span>
                     <span className={s.modeHint}>{t(`modes.${m.id}.hint`)}</span>

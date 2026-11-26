@@ -21,6 +21,22 @@ export const router = createBrowserRouter([
         path: '/basarilar',
         lazy: () => import('./pages/AchievementsPage').then((m) => ({ Component: m.AchievementsPage })),
       },
+      {
+        path: '/kac-gun-kaldi',
+        lazy: () => import('./pages/SeoPages').then((m) => ({ Component: m.CountdownIndexPage })),
+      },
+      {
+        path: '/kac-gun-kaldi/:slug',
+        lazy: () => import('./pages/SeoPages').then((m) => ({ Component: m.HolidayCountdownPage })),
+      },
+      {
+        path: '/hesapla/toplanti-maliyeti',
+        lazy: () => import('./pages/SeoPages').then((m) => ({ Component: m.MeetingCalculatorPage })),
+      },
+      {
+        path: '/hesapla/saatlik-ucret',
+        lazy: () => import('./pages/SeoPages').then((m) => ({ Component: m.HourlyCalculatorPage })),
+      },
       { path: '/fiyat', lazy: () => import('./pages/PricingPage').then((m) => ({ Component: m.PricingPage })) },
       { path: '/gizlilik', lazy: () => import('./pages/PrivacyPage').then((m) => ({ Component: m.PrivacyPage })) },
       { path: '*', lazy: () => import('./pages/NotFoundPage').then((m) => ({ Component: m.NotFoundPage })) },

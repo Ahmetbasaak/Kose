@@ -88,7 +88,8 @@ Statik site: `npm run build` çıktısı `dist/`.
 ## Yayından önce yapılacaklar
 
 - [ ] Her yıl Diyanet bayram tarihlerini ilan edince hesaplananla karşılaştır; fark varsa `src/data/holidays.tr.json` → `overrides`'a ekle (genelde gerekmez).
-- [ ] Alan adını al ve `brand.config.json` → `domain`'e yaz; marka tescili kontrolü.
+- [ ] Alan adını al ve `brand.config.json` → `domain`'e yaz (sitemap ve canonical bununla üretilir); marka tescili kontrolü.
+- [ ] Google Search Console'a siteyi ve `sitemap.xml`'i ekle.
 - [ ] Ödeme sağlayıcısını seç, `src/app/license.ts` adaptörünü yaz, fiyatları `brand.config.json` → `pricing`'e işle, sağlayıcının API alan adını CSP `connect-src`'ye ekle.
 - [ ] Gizlilik metnini (`/gizlilik`, `src/i18n/tr.ts` → `privacy`) hukukçuya incelet (KVKK); `[YAYINDAN ÖNCE: …]` yer tutucularını doldur (barındırma ve ödeme sağlayıcısı).
 - [ ] `brand.config.json` → `testMode`'u `false` yap (yoksa herkes Pro'yu bedava kullanır).

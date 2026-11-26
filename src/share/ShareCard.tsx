@@ -19,7 +19,7 @@ export function CardExport({ content }: { content: CardContent }) {
   const text = [content.kicker, content.big, ...content.lines].join(' · ');
 
   useEffect(() => {
-    if (canvas.current) void drawCard(canvas.current, content, size, brandName);
+    if (canvas.current) void drawCard(canvas.current, content, size, brandName, location.host);
   }, [content, size]);
 
   const download = async () => {
